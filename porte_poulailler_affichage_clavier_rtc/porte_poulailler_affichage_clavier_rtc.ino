@@ -1,4 +1,5 @@
 /* porte-poulailler : affichage + clavier + rtc */
+//first commit sur gihub le 01 12 2016
 // 20 septembre 2016
 /* 20 septembre 2016 :
     crétion d'une classe Clavier
