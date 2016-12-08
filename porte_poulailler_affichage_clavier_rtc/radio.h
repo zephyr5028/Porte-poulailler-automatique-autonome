@@ -5,8 +5,8 @@
 
 //----routine envoi message radio----
 void envoiMessage(char chaine1[]) {
-  byte res = strcmp(chaine1, "xx");
-  if (res != 0) { // test de la dernière chaine
+  byte resultat = strcmp(chaine1, "xx");
+  if (resultat != 0) { // test de la dernière chaine
     strcat(chaine, chaine1);
     strcat(chaine, ";");
     if (DEBUG) {

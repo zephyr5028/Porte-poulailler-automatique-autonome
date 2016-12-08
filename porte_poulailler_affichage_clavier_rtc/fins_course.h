@@ -17,15 +17,8 @@ void affiFinDeCourseHaut() {
     }
     if (RADIO) {
       //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "F. course H = ";
-      /*    char chaine1[22] = "Fin course H = ";
-          char finDeCourseH_temp[5];
-          sprintf(finDeCourseH_temp, "%i", finDeCourseH);
-          strcat(chaine1, finDeCourseH_temp);
-          envoiMessage(chaine1);// on envoie le message
-      */
-      // char chaine1[9] = "E=";
       char chaine1[9] = "";
-      strcat(chaine1, "E=");
+      //strcat(chaine1, "E=");
       char finDeCourseH_temp[5];
       sprintf(finDeCourseH_temp, "%i", finDeCourseH);
       strcat(chaine1, finDeCourseH_temp);
@@ -51,15 +44,8 @@ void affiFinDeCourseBas() {
     }
     if (RADIO) {
       //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "F. course B = ";
-      /*    char chaine1[22] = "Fin course B = ";
-          char finDeCourseB_temp[5];
-          sprintf(finDeCourseB_temp, "%i", finDeCourseB);
-          strcat(chaine1, finDeCourseB_temp);
-          envoiMessage(chaine1);// on envoie le message
-      */
-      //char chaine1[9] = "F=";
       char chaine1[9] = "";
-      strcat(chaine1, "F=");
+      //strcat(chaine1, "F=");
       char finDeCourseB_temp[5];
       sprintf(finDeCourseB_temp, "%i", finDeCourseB);
       strcat(chaine1, finDeCourseB_temp);
