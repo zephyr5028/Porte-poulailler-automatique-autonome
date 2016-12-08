@@ -44,7 +44,7 @@ void routineGestionWatchdog() {
           // N.B. La constante VW_MAX_MESSAGE_LEN est fournie par la lib VirtualWire
           //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Batterie faible !!!!";
           char chaine1[21] = "Batterie faible !!!!";
-          envoiMessage(chaine1);// on envoie le message
+          messageRadio(chaine1);// on envoie le message
         }
         // informations à afficher
         displayTime();

@@ -5,12 +5,13 @@
 
 //----routine envoi message radio----
 void envoiMessage(char chaine1[]) {
-  if (chaine1[0] == "x") {
-    messageRadio(chaine);
-  } else {
+  //if (chaine1[0] == "x") {
+    
+ // } else {
     strcat(chaine, chaine1);
     strcat(chaine, ";");
-  }
+    messageRadio(chaine);
+//  }
 }
 
 // message Radio
