@@ -21,13 +21,15 @@ void lumiere() {
     }
     if (RADIO) {
       //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Lum : ";
-  /*    char chaine1[12] = "Lum : ";
-      char lumValue_temp[5];
-      sprintf(lumValue_temp, "%i",  lumValue);
-      strcat(chaine1, lumValue_temp);
-      envoiMessage(chaine1);// on envoie le message
+      /*    char chaine1[12] = "Lum : ";
+          char lumValue_temp[5];
+          sprintf(lumValue_temp, "%i",  lumValue);
+          strcat(chaine1, lumValue_temp);
+          envoiMessage(chaine1);// on envoie le message
       */
-       char chaine1[9] = "I=";
+      //char chaine1[9] = "I=";
+      char chaine1[9] = "";
+      strcat(chaine1, "I=");
       char lumValue_temp[5];
       sprintf(lumValue_temp, "%i",  lumValue);
       strcat(chaine1, lumValue_temp);

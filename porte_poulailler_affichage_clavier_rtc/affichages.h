@@ -61,17 +61,19 @@ void displayTime () {
       }
       if (RADIO) {
         //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Time : ";
-       /* char chaine1[17] = "Time : "; 
-        char hour_temp[3];
-        char minute_temp[3];
-        sprintf(hour_temp, "%i",  timeHour);
-        strcat(chaine1, hour_temp);
-        strcat(chaine1, "h ");
-        sprintf(minute_temp, "%i",  timeMinute);
-        strcat(chaine1, minute_temp);
-        strcat(chaine1, "m");
-        envoiMessage(chaine1);// on envoie le message*/
-        char chaine1[11] = "A="; // time
+        /* char chaine1[17] = "Time : ";
+          char hour_temp[3];
+          char minute_temp[3];
+          sprintf(hour_temp, "%i",  timeHour);
+          strcat(chaine1, hour_temp);
+          strcat(chaine1, "h ");
+          sprintf(minute_temp, "%i",  timeMinute);
+          strcat(chaine1, minute_temp);
+          strcat(chaine1, "m");
+          envoiMessage(chaine1);// on envoie le message*/
+        //char chaine1[11] = "A="; // time
+        char chaine1[11] = "";
+        strcat(chaine1, "A=");
         char hour_temp[3];
         char minute_temp[3];
         sprintf(hour_temp, "%i",  timeHour);
@@ -164,8 +166,8 @@ void affiPulsePlusCptRoue() {
     if (RADIO) {
       if ( compteRoueCodeuse > (finDeCourseH - 5) and compteRoueCodeuse < (finDeCourseH + 5)) {
         if (sens) {
-         // char chaine1[15] = "Porte ouverte";
-         char chaine1[5] = "G=o";
+          // char chaine1[15] = "Porte ouverte";
+          char chaine1[5] = "G=o";
           envoiMessage(chaine1);// on envoie le message
         } else {
           //char chaine1[14] = "Porte fermee";
@@ -185,7 +187,9 @@ void affiPulsePlusCptRoue() {
         }
       }
       //char chaine1[22] = "Cpt Roue Cod = ";
-      char chaine1[9] = "H=";
+      // char chaine1[9] = "H=";
+      char chaine1[9] = "";
+      strcat(chaine1, "H=");
       char compteRoueCodeuse_temp[5];
       sprintf(compteRoueCodeuse_temp, "%i", compteRoueCodeuse);
       strcat(chaine1, compteRoueCodeuse_temp);

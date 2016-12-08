@@ -23,14 +23,16 @@ void affiTensionBatCdes() {
     }
     if (RADIO) {
       //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Ten. Cdes = ";
- /*     char chaine1[18] = "Ten Cdes = ";
-      char voltage_temp[6];
-      dtostrf(voltage, 1, 2, voltage_temp);
-      strcat(chaine1, voltage_temp);
-      strcat(chaine1, " V");
-      envoiMessage(chaine1);// on envoie le message
-*/
-       char chaine1[11] = "C=";
+      /*     char chaine1[18] = "Ten Cdes = ";
+           char voltage_temp[6];
+           dtostrf(voltage, 1, 2, voltage_temp);
+           strcat(chaine1, voltage_temp);
+           strcat(chaine1, " V");
+           envoiMessage(chaine1);// on envoie le message
+      */
+      // char chaine1[11] = "C=";
+      char chaine1[11] = "";
+      strcat(chaine1, "C=");
       char voltage_temp[6];
       dtostrf(voltage, 1, 2, voltage_temp);
       strcat(chaine1, voltage_temp);
@@ -63,14 +65,16 @@ void affiTensionBatServo() {
     }
     if (RADIO) {
       //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Ten. Servo = ";
- /*     char chaine1[19] = "Ten Servo = ";
-      char voltage_temp[6];
-      dtostrf(voltage, 1, 2, voltage_temp);
-      strcat(chaine1, voltage_temp);
-      strcat(chaine1, " V");
-      envoiMessage(chaine1);// on envoie le message
+      /*     char chaine1[19] = "Ten Servo = ";
+           char voltage_temp[6];
+           dtostrf(voltage, 1, 2, voltage_temp);
+           strcat(chaine1, voltage_temp);
+           strcat(chaine1, " V");
+           envoiMessage(chaine1);// on envoie le message
       */
-      char chaine1[11] = "D=";
+      // char chaine1[11] = "D=";
+      char chaine1[11] = "";
+      strcat(chaine1, "D=");
       char voltage_temp[6];
       dtostrf(voltage, 1, 2, voltage_temp);
       strcat(chaine1, voltage_temp);
