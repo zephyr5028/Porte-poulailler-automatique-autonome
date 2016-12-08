@@ -25,7 +25,14 @@ void read_temp(boolean type) {
     if (RADIO) {
       // N.B. La constante VW_MAX_MESSAGE_LEN est fournie par la lib VirtualWire
       //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Temp = ";
-      char chaine1[16] = "Temp = ";
+      /* char chaine1[16] = "Temp = ";
+        char celsius_temp[6];
+        dtostrf(celsius, 2, 2, celsius_temp);
+        strcat(chaine1, celsius_temp);
+        strcat(chaine1, "°C");
+        envoiMessage(chaine1);// on envoie le message
+      */
+      char chaine1[11] = "B=";
       char celsius_temp[6];
       dtostrf(celsius, 2, 2, celsius_temp);
       strcat(chaine1, celsius_temp);
