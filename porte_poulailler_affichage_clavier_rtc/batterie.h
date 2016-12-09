@@ -29,7 +29,7 @@ void affiTensionBatCdes() {
       dtostrf(voltage, 1, 2, voltage_temp);
       strcat(chaine1, voltage_temp);
       strcat(chaine1, "V");
-      envoiMessage(chaine1);// on envoie le message
+      rad.envoiMessage(chaine1);// on envoie le message
     }
   }
 }
@@ -63,7 +63,7 @@ void affiTensionBatServo() {
       dtostrf(voltage, 1, 2, voltage_temp);
       strcat(chaine1, voltage_temp);
       strcat(chaine1, "V");
-      envoiMessage(chaine1);// on envoie le message
+      rad.envoiMessage(chaine1);// on envoie le message
     }
   }
 }

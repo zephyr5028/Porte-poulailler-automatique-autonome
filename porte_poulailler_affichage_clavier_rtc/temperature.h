@@ -31,7 +31,7 @@ void read_temp(boolean type) {
       dtostrf(celsius, 2, 2, celsius_temp);
       strcat(chaine1, celsius_temp);
       strcat(chaine1, "°C");
-      envoiMessage(chaine1);// on envoie le message
+      rad.envoiMessage(chaine1);// on envoie le message
     }
   }
 }

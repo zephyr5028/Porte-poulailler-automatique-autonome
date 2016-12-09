@@ -22,7 +22,7 @@ void affiFinDeCourseHaut() {
       char finDeCourseH_temp[5];
       sprintf(finDeCourseH_temp, "%i", finDeCourseH);
       strcat(chaine1, finDeCourseH_temp);
-      envoiMessage(chaine1);// on envoie le message
+      rad.envoiMessage(chaine1);// on envoie le message
     }
   }
 }
@@ -49,7 +49,7 @@ void affiFinDeCourseBas() {
       char finDeCourseB_temp[5];
       sprintf(finDeCourseB_temp, "%i", finDeCourseB);
       strcat(chaine1, finDeCourseB_temp);
-      envoiMessage(chaine1);// on envoie le message
+      rad.envoiMessage(chaine1);// on envoie le message
     }
   }
 }

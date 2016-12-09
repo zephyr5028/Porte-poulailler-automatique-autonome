@@ -44,7 +44,7 @@ void routineGestionWatchdog() {
           // N.B. La constante VW_MAX_MESSAGE_LEN est fournie par la lib VirtualWire
           //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Batterie faible !!!!";
           char chaine1[21] = "Batterie faible !!!!";
-          messageRadio(chaine1);// on envoie le message
+          rad.messageRadio(chaine1);// on envoie le message
         }
         // informations à afficher
         displayTime();
@@ -56,7 +56,7 @@ void routineGestionWatchdog() {
         affiPulsePlusCptRoue();
         affiChoixOuvFerm();
         lumiere();
-        chaineVide();
+        rad.chaineVide();
         if (DEBUG) {
           Serial.print(F("compt watchdog lum : x * 8s  = ")); Serial.println(compteurWatchdogLumiere);
           Serial.print(F("Bat faible : "));

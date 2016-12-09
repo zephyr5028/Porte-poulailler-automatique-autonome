@@ -71,7 +71,7 @@ void displayTime () {
         sprintf(minute_temp, "%i",  timeMinute);
         strcat(chaine1, minute_temp);
         strcat(chaine1, "m");
-        envoiMessage(chaine1);// on envoie le message
+        rad.envoiMessage(chaine1);// on envoie le message
       }
     }
   }
@@ -158,12 +158,12 @@ void affiPulsePlusCptRoue() {
           char chaine1[5] = "";
           strcat(chaine1, "ouv");
           //char chaine1[5] = "G=o";
-          envoiMessage(chaine1);// on envoie le message
+          rad.envoiMessage(chaine1);// on envoie le message
         } else {
           //char chaine1[5] = "G=f";
           char chaine1[5] = "";
           strcat(chaine1, "fer");
-          envoiMessage(chaine1);// on envoie le message
+          rad.envoiMessage(chaine1);// on envoie le message
         }
       }
       if ( compteRoueCodeuse > (finDeCourseB - 5) and compteRoueCodeuse < (finDeCourseB + 5)) {
@@ -171,12 +171,12 @@ void affiPulsePlusCptRoue() {
           //char chaine1[5] = "G=f";
           char chaine1[5] = "";
           strcat(chaine1, "fer");
-          envoiMessage(chaine1);// on envoie le message
+          rad.envoiMessage(chaine1);// on envoie le message
         } else {
           //char chaine1[5] = "G=o";
           char chaine1[5] = "";
           strcat(chaine1, "ouv");
-          envoiMessage(chaine1);// on envoie le message
+          rad.envoiMessage(chaine1);// on envoie le message
         }
       }
       char chaine1[9] = "";
@@ -184,7 +184,7 @@ void affiPulsePlusCptRoue() {
       char compteRoueCodeuse_temp[5];
       sprintf(compteRoueCodeuse_temp, "%i", compteRoueCodeuse);
       strcat(chaine1, compteRoueCodeuse_temp);
-      envoiMessage(chaine1);// on envoie le message
+      rad.envoiMessage(chaine1);// on envoie le message
     }
   }
 }

@@ -64,8 +64,8 @@ byte touche; // valeur de la touche appuyee
 const byte sensorClavier = 1; //pin A1 pour le clavier
 
 /* radio */
-int const taille=80;
-char chaine[taille] = ""; // initialisation de la ligne envoyee par radio
+//int const taille=80;
+//char chaine[taille] = ""; // initialisation de la ligne envoyee par radio
 
 /* lumiere */
 byte ouve = 1; // ouverture 1 donc heure

@@ -30,7 +30,7 @@ void lumiere() {
       char lumValue_temp[5];
       sprintf(lumValue_temp, "%i",  lumValue);
       strcat(chaine1, lumValue_temp);
-      envoiMessage(chaine1);// on envoie le message
+     rad.envoiMessage(chaine1);// on envoie le message
     }
   }
 }

@@ -3,6 +3,12 @@
 /*-----virtualWire pour la liaison RF 433Mhz-----*/
 #include <VirtualWire.h>
 
+
+#include "Radio.h"
+
+Radio rad(RADIO,DEBUG); // class Radio avec true pour envoi par radio
+
+/*
 //----routine envoi message radio----
 void envoiMessage(char chaine1[]) {
   byte resultat = strcmp(chaine1, "xx");
@@ -34,4 +40,4 @@ void chaineVide() {
     strcat(chaine1, "xx");
     envoiMessage(chaine1);// on envoie le message
   }
-}
+}*/
