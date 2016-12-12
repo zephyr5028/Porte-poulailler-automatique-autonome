@@ -27,7 +27,7 @@ void loop() {
   if (!boitierOuvert and  !servoAction) {
     ouvFermLum() ;  // ouverture/fermeture par test de la lumière
   }
-  compteurRoueCodeuse(); //compteur roue codeuse
+  //compteurRoueCodeuse(); //compteur roue codeuse
   batterieCdesFaible(); // batterie cdes < 4 volt
   monteePorte(); // sequence de montee de la porte
   descentePorte();// sequence de descente de la porte

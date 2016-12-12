@@ -8,7 +8,11 @@ byte alarm_2 = 2; //alarme 2
 /* roue codeuse */
 // digital pin D7 has a détecteur roue codeuse
 const byte roueCodeuse = 7;//digital pin D7 pour entrée roue codeuse
-int compteRoueCodeuse = 200; // compteur roue codeuse, valeur au reset du montage
+volatile unsigned int compteRoueCodeuse;  // un compteur de position
+boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
+boolean positionRoueCodeuse;
+
+//int compteRoueCodeuse = 200; // compteur roue codeuse, valeur au reset du montage
 const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
 
 /* servo */
@@ -83,7 +87,7 @@ const byte pinEmRadio = 10; // pin D10 emetteur radio
 volatile boolean interruptBp = false; // etat interruption entree 9
 volatile boolean interruptRTC = false; // etat interruption entree 10
 volatile boolean interruptOuvBoi = false; // etat interruption entree 6
-volatile boolean interruptRoueCodeuse = false; // etat interruption roue codeuse   entree D2 et D7
+//volatile boolean interruptRoueCodeuse = false; // etat interruption roue codeuse   entree D2 et D7
 
 /* menus */
 const byte menuDate = 1;

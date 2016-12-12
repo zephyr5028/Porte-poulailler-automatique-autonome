@@ -10,10 +10,7 @@
 
 //-----routine interruption D2 INT0------
 void myInterruptINT0() {
-  if (!interruptRoueCodeuse and servoAction) {
-    interruptRoueCodeuse = true; // compteur roue codeuse
-    //compteurRoueCodeuse();
-  }
+    compteurRoueCodeuse();
 }
 
 //-----routine interruption D3 INT1-----
