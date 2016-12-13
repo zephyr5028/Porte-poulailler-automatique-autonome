@@ -46,7 +46,7 @@ void monteePorte() {
     if (!digitalRead(securiteHaute)) {
       delay(300); // attente fin l'arrêt complet du servo
       compteRoueCodeuse = finDeCourseH;
-      sens = true; // sens de fonctionnement du servo pour éviter de bloquer le servo en cas de probleme
+   //   sens = true; // sens de fonctionnement du servo pour éviter de bloquer le servo en cas de probleme
     }
     servoAction = false; // servo arret
   }
@@ -70,7 +70,7 @@ void  descentePorte() {
     if (!digitalRead(securiteHaute)) {
       delay(300); // attente fin l'arrêt complet du servo
       compteRoueCodeuse = finDeCourseB;
-      sens = false ; // sens de fonctionnement pour éviter de bloquer le servo en cas de probleme
+   //   sens = false ; // sens de fonctionnement pour éviter de bloquer le servo en cas de probleme
     }
     servoAction = false; // servo arret
   }

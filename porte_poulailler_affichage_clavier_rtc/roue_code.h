@@ -14,19 +14,19 @@ void monteeDescenteManuelle() {
 //-----compteur roue codeuse-----
 void compteurRoueCodeuse() {
   // debounce
-  if (interruptRoueCodeuse) delay (2);  // attendre un petit peut
+ // if (interruptRoueCodeuse) delay (2);  // attendre
   interruptRoueCodeuse = true; //activation de l'anti-rebond
   bool cpt = digitalRead(roueCodeuse);
   // Confirmation du changement
   if (cpt != positionRoueCodeuse) {
     positionRoueCodeuse = !positionRoueCodeuse;
+    if (pulse >= pulseStop) {
+      compteRoueCodeuse++;
+    } else {
+      compteRoueCodeuse--;
+    }
+    interruptRoueCodeuse = false; //libération de l'anti-rebond
   }
-  if (pulse >= pulseStop) {
-    compteRoueCodeuse++;
-  } else {
-    compteRoueCodeuse--;
-  }
-  interruptRoueCodeuse = false; //libération de l'anti-rebond
 }
 
 

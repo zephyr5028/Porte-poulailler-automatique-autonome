@@ -54,10 +54,15 @@ const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 #include "progmem.h"
 
 /* lecture Clavier */
+#include "Clavier.h"
+Clavier clav(menuManuel); // class Clavier avec le nombre de lignes du menu
 #include "clavier.h"
 
 /* radio 43MHz */
-#include "radio.h"
+/*-----virtualWire pour la liaison RF 433Mhz-----*/
+#include <VirtualWire.h>
+#include "Radio.h"
+Radio rad(RADIO,DEBUG); // class Radio avec true pour envoi par radio
 
 /* temperature */
 #include "temperature.h"

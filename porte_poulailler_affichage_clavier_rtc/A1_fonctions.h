@@ -26,9 +26,6 @@ void affiChoixOuvFerm();//------affichage du choix de l'ouverture et la fermetur
 void choixOuvFerm ();//-----routine choix ouverture fermeture
 
 /* Clavier */
-//int get_key(unsigned int input); //------routine get_key : Convert ADC value to key number
-//int read_key(int sensor); //-----routine read_key : lecture du clavier
-//byte positionMenu(); //-----position du menu pour l'affichage
 void lectureClavier(); //-----lecture clavier
 
 /* eeprom */
@@ -58,9 +55,6 @@ void ouvFermLum(); //-----ouverture/fermeture par test de la lumière
 void deroulementMenu (byte increment);//-----routine affichage menus
 
 /* radio */
-//void envoiMessage(char chaine1[]);//----routine assemblage puis envoi message radio
-//void chaineVide();//----chaine radio vide pour espacer
-//void messageRadio(char chaine1[]);// routine envoi message
 
 /* reglage heure fermeture */
 void reglageHeureFermeture();//-----reglage de l'heure de fermeture

@@ -1,10 +1,5 @@
 /* clavier */
 
-#include "Clavier.h"
-
-Clavier clav(menuManuel); // class Clavier avec le nombre de lignes du menu
-
-
 //-----lecture clavier------
 void  lectureClavier() {
   touche = clav.read_key(sensorClavier); // read key sensor = A1

@@ -58,18 +58,10 @@ boolean retroEclairage = true; // etat retro eclairage
 boolean  boitierOuvert = true; // le boitier est ouvert
 
 /* Clavier */
-//const int adc_key_val[5] = {50, 200, 400, 600, 800}; // Analogique digital Keyboard Module
-//const byte NUM_KEYS = 6;
-//int adc_key_in;
-//byte key = -1;
 byte oldkey = -1;
 boolean relache = false; // relache de la touche
 byte touche; // valeur de la touche appuyee
 const byte sensorClavier = 1; //pin A1 pour le clavier
-
-/* radio */
-//int const taille=80;
-//char chaine[taille] = ""; // initialisation de la ligne envoyee par radio
 
 /* lumiere */
 byte ouve = 1; // ouverture 1 donc heure
