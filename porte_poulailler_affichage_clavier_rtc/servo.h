@@ -46,9 +46,12 @@ void monteePorte() {
     if (!digitalRead(securiteHaute)) {
       delay(300); // attente fin l'arrêt complet du servo
       compteRoueCodeuse = finDeCourseH;
-   //   sens = true; // sens de fonctionnement du servo pour éviter de bloquer le servo en cas de probleme
+      //   sens = true; // sens de fonctionnement du servo pour éviter de bloquer le servo en cas de probleme
     }
     servoAction = false; // servo arret
+  }
+  if ( boitierOuvert) { // si le boitier est ouvert
+    deroulementMenu (incrementation); // affichage du menu pour pulse
   }
 }
 
@@ -60,7 +63,6 @@ void  descentePorte() {
     } else {
       pulse = pulseDescenteReduit;
     }
-
     monServo.write(pulse);  // value should usually be 500 to 2500 (1280 = stop)
   }
   if ((compteRoueCodeuse <= finDeCourseB and descente == true and sens == true) or (touche == 5 and relache == true and descente == true) or (!digitalRead(securiteHaute) and descente == true)) {
@@ -70,8 +72,11 @@ void  descentePorte() {
     if (!digitalRead(securiteHaute)) {
       delay(300); // attente fin l'arrêt complet du servo
       compteRoueCodeuse = finDeCourseB;
-   //   sens = false ; // sens de fonctionnement pour éviter de bloquer le servo en cas de probleme
+      //   sens = false ; // sens de fonctionnement pour éviter de bloquer le servo en cas de probleme
     }
     servoAction = false; // servo arret
+  }
+  if ( boitierOuvert) { // si le boitier est ouvert
+    deroulementMenu (incrementation); // affichage du menu pour pulse
   }
 }
