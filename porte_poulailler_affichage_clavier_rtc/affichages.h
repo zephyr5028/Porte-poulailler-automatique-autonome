@@ -60,9 +60,7 @@ void displayTime () {
         Serial.println(F("m"));
       }
       if (RADIO) {
-        //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Time : ";
-        char chaine1[11] = "";
-        // strcat(chaine1, "A=");
+        char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
         char hour_temp[3];
         char minute_temp[3];
         sprintf(hour_temp, "%i",  timeHour);
@@ -137,50 +135,25 @@ void affiPulsePlusCptRoue() {
       Serial.println(pulse);
       Serial.print(F("Cpt roue codeuse = "));
       Serial.println(compteRoueCodeuse);
-      if ( compteRoueCodeuse > (finDeCourseH - 5) and compteRoueCodeuse < (finDeCourseH + 5)) {
-        if (sens) {
-          Serial.println(F("Porte ouverte"));
-        } else {
-          Serial.println(F("Porte fermee"));
-        }
+      if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
+        Serial.println(F("Porte fermee"));
       }
-      if ( compteRoueCodeuse > (finDeCourseB - 5) and compteRoueCodeuse < (finDeCourseB + 5)) {
-        if (sens) {
-          Serial.println(F("Porte fermee"));
-        } else {
-          Serial.println(F("Porte ouverte"));
-        }
+      if ( compteRoueCodeuse > (finDeCourseOuverture - 5) and compteRoueCodeuse < (finDeCourseOuverture + 5)) {
+        Serial.println(F("Porte ouverte"));
       }
     }
     if (RADIO) {
-      if ( compteRoueCodeuse > (finDeCourseH - 5) and compteRoueCodeuse < (finDeCourseH + 5)) {
-        if (sens) {
-          char chaine1[5] = "";
-          strcat(chaine1, "ouv");
-          //char chaine1[5] = "G=o";
-          rad.envoiMessage(chaine1);// on envoie le message
-        } else {
-          //char chaine1[5] = "G=f";
-          char chaine1[5] = "";
-          strcat(chaine1, "fer");
-          rad.envoiMessage(chaine1);// on envoie le message
-        }
+      if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
+        char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+        strcat(chaine1, "fer");
+        rad.envoiMessage(chaine1);// on envoie le message
       }
-      if ( compteRoueCodeuse > (finDeCourseB - 5) and compteRoueCodeuse < (finDeCourseB + 5)) {
-        if (sens) {
-          //char chaine1[5] = "G=f";
-          char chaine1[5] = "";
-          strcat(chaine1, "fer");
-          rad.envoiMessage(chaine1);// on envoie le message
-        } else {
-          //char chaine1[5] = "G=o";
-          char chaine1[5] = "";
-          strcat(chaine1, "ouv");
-          rad.envoiMessage(chaine1);// on envoie le message
-        }
+      if ( compteRoueCodeuse > (finDeCourseOuverture - 5) and compteRoueCodeuse < (finDeCourseOuverture + 5)) {
+        char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+        strcat(chaine1, "ouv");
+        rad.envoiMessage(chaine1);// on envoie le message
       }
-      char chaine1[9] = "";
-      // strcat(chaine1, "H=");
+      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       char compteRoueCodeuse_temp[5];
       sprintf(compteRoueCodeuse_temp, "%i", compteRoueCodeuse);
       strcat(chaine1, compteRoueCodeuse_temp);

@@ -5,7 +5,7 @@
 
 //-----retro eclairage de l'afficheur-----
 void eclairageAfficheur() {
-  if (touche == 5 and relache == true and descente == false and  montee == false) { // retro eclairage si appuis sur la touche 5
+  if (touche == 5 and relache == true and fermeture == false and  ouverture == false) { // retro eclairage si appuis sur la touche 5
     relache = false;
     if (retroEclairage)  {
       mydisp.backLightOn(); // retro eclairage on

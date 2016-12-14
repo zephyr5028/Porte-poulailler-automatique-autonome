@@ -32,11 +32,11 @@ void lectureClavier(); //-----lecture clavier
 void i2c_eeprom_write_byte( int deviceaddress, unsigned int eeaddress, byte data );//-----ecriture dans l'eeprom at24c32 de la carte rtc
 byte i2c_eeprom_read_byte( int deviceaddress, unsigned int eeaddress );//-----lecture de l'eeprom at24c32 de la carte rtc
 
-/* fins de course haut et bas */
-void affiFinDeCourseHaut();//------affichage fin de course Haut
-void affiFinDeCourseBas();//------affichage fin de course Bas
-void regFinDeCourseHaut();//------reglage fin de course Haut
-void regFinDeCourseBas();//-----regalge fin de course Bas
+/* fins de course fermeture et ouverture */
+void affiFinDeCourseFermeture();//------affichage fin de course fermeture
+void affiFinDeCourseOuverture();//------affichage fin de course ouverture
+void regFinDeCourseFermeture();//------reglage fin de course fermeture
+void regFinDeCourseOuverture();//-----regalge fin de course ouverture
 
 /* interruptions */
 void myInterruptINT0();//-----routine interruption D2 INT0

@@ -8,10 +8,9 @@ byte alarm_2 = 2; //alarme 2
 /* roue codeuse */
 // digital pin D7 has a détecteur roue codeuse
 const byte roueCodeuse = 7;//digital pin D7 pour entrée roue codeuse
-volatile unsigned int compteRoueCodeuse;  // un compteur de position
-boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
-boolean positionRoueCodeuse;
-//int compteRoueCodeuse = 200; // compteur roue codeuse, valeur au reset du montage
+volatile unsigned int compteRoueCodeuse(200);  // un compteur de position
+volatile boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
+volatile boolean positionRoueCodeuse;
 const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
 
 /* servo */
@@ -25,13 +24,12 @@ const int pulseOuverture = pulseStop - 140; // vitesse montée
 const int pulseFermeture = pulseStop + 140; // vitesse descente
 const int pulseOuvertureReduit = pulseStop - 70; // vitesse montée réduite
 const int pulseFermetureReduit = pulseStop + 70; // vitesse descente réduite
-//const int pulseMonteeReduitSens = pulseStop + 50 ; // pour ralentir la descente en fonction du sens de rotation du servo
-//const int pulseDescenteReduitSens = pulseStop - 50 ; // pour ralentir la descente en fonction du sens de rotation du servo
-unsigned int finDeCourseH = 250; // initialisation de la valeur de la fin de course haute
-unsigned int finDeCourseB = 150; // initialisation de la valeur de la fin de course basse
-boolean montee = false; // montee de la porte
-boolean descente = false; // descente de la porte
-bool sens = false; //sens de fonctionnement du servo ... en cas de problème...permet de ne pas bloquer le servomoteur
+unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
+unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
+boolean ouverture = false; // montee de la porte
+boolean fermeture = false; // descente de la porte
+byte boucleTempo(0); // boucle tempo pour l'affichage lcd
+byte tempoLcd(5);// tempo pour l'afficahge lcd
 
 /* watchdog - Optimisation de la consommation */
 #include <avr/power.h>
@@ -90,8 +88,8 @@ const byte menuLumiere = 6;
 const byte menuLumiereMatin = 7;
 const byte menuLumiereSoir = 8;
 const byte menuChoix = 9;
-const byte menuFinDeCourseH = 10;
-const byte menuFinDeCourseB = 11;
+const byte menuFinDeCourseFermeture = 10;
+const byte menuFinDeCourseOuverture = 11;
 const byte menuTensionBatCdes = 12; // tension batterie commandes
 const byte menuTensionBatServo = 13; // tension batterie servo
 const byte menuManuel = 14; // nombre de lignes du  menu

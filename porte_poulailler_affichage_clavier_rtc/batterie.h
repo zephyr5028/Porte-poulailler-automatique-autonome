@@ -22,9 +22,7 @@ void affiTensionBatCdes() {
       Serial.println(F(" V"));
     }
     if (RADIO) {
-      //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Ten. Cdes = ";
-      char chaine1[11] = "";
-      //strcat(chaine1, "C=");
+      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       char voltage_temp[6];
       dtostrf(voltage, 1, 2, voltage_temp);
       strcat(chaine1, voltage_temp);
@@ -56,9 +54,7 @@ void affiTensionBatServo() {
       Serial.println(F(" V"));
     }
     if (RADIO) {
-      //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Ten. Servo = ";
-      char chaine1[11] = "";
-      //strcat(chaine1, "D=");
+      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       char voltage_temp[6];
       dtostrf(voltage, 1, 2, voltage_temp);
       strcat(chaine1, voltage_temp);

@@ -41,12 +41,12 @@ void setup() {
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x21); // lecture Pf fin de course haut (byte)
   delay(10);
-  finDeCourseH = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseH
+  finDeCourseFermeture = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseFermeture
   val1 = i2c_eeprom_read_byte(0x57, 0x22); // lecture pf fin de course bas (byte)
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x23); // lecture Pf fin de course bas (byte)
   delay(10);
-  finDeCourseB = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseB
+  finDeCourseOuverture = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseOuverture
   // roue codeuse
   pinMode(roueCodeuse, INPUT); // make the roueCodeuse's pin 7 an input
   // servo

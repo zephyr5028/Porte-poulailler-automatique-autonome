@@ -14,8 +14,8 @@ void loop() {
     choixOuvFerm (); // choix de l'ouverture et la fermeture
     choixLumMatin();//  reglage de la lumiere du matin
     choixLumSoir();//  reglage de la lumiere du soir
-    regFinDeCourseHaut(); // reglage fin de course Haut
-    regFinDeCourseBas(); // reglage fin de course bas
+    regFinDeCourseFermeture(); // reglage fin de course fermeture
+    regFinDeCourseOuverture(); // reglage fin de course ouverture
     eclairageAfficheur(); // retro eclairage de l'afficheur
     monteeDescenteManuelle();// initialisation butée roue codeuse
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
@@ -27,16 +27,13 @@ void loop() {
   if (!boitierOuvert and  !servoAction) {
     ouvFermLum() ;  // ouverture/fermeture par test de la lumière
   }
-  //compteurRoueCodeuse(); //compteur roue codeuse
   batterieCdesFaible(); // batterie cdes < 4 volt
   ouverturePorte();
   fermeturePorte();
-  //monteePorte(); // sequence de montee de la porte
- // descentePorte();// sequence de descente de la porte
   routineTestFermetureBoitier(); // test fermeture boitier
   routineInterruptionBp(); // routine interruption Bp
   routineInterrruptionAlarme2() ; // routine alarme 2
   routineInterruptionAlarme1(); // routine alarme 1
   routineInterruptionBoitierOuvert(); // routine interruption boitier ouvert
-  routineGestionWatchdog(); // routine de gestion du watchdog
+ // routineGestionWatchdog(); // routine de gestion du watchdog
 }

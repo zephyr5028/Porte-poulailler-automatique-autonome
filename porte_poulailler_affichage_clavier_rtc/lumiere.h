@@ -20,9 +20,7 @@ void lumiere() {
       Serial.println(lumValue);
     }
     if (RADIO) {
-      //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Lum : ";
-      char chaine1[12] = "";
-      //strcat(chaine1, "I=");
+      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       char lumSoir_temp[5];
       sprintf(lumSoir_temp, "%i",  lumSoir);
       strcat(chaine1, lumSoir_temp);
@@ -45,7 +43,7 @@ void ouvFermLum() {
   if ((ouve == 1 and valHeure < 16) or (ferm == 1 and valHeure > 16)) { // pour ne pas declencher la fermeture avant 16h00 et l'ouverture après 16h00 si utilisation de l'heure
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
-  if ((compteRoueCodeuse <= (finDeCourseB + 2) and sens) or (compteRoueCodeuse >= (finDeCourseH - 2) and !sens )) {
+  if ((compteRoueCodeuse <= (finDeCourseOuverture + 2) ) or (compteRoueCodeuse >= (finDeCourseFermeture - 2))) {
     compteurWatchdogLumiere = 0; // pour ne pas relancer l'action une fois effectuée.
   }
   if ((sensorValue <= lumMatin) and (ouve == 0) and (compteurWatchdogLumiere >= tempsLum)) {

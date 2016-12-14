@@ -37,13 +37,12 @@ void enterSleep(void) {
 //-----routine de gestion du watchdog-----
 void routineGestionWatchdog() {
   if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
-    if ((( compteRoueCodeuse <= finDeCourseB + 1 ) or  (compteRoueCodeuse >= finDeCourseH - 1 )) and !servoAction) {
+    if ((( compteRoueCodeuse <= finDeCourseOuverture + 1 ) or  (compteRoueCodeuse >= finDeCourseFermeture - 1 )) and !servoAction) {
       tempsWatchdog--; // decrementation
       if (tempsWatchdog <= 0) {
         if (batterieFaible) { // affichage si la batterie est faible
           // N.B. La constante VW_MAX_MESSAGE_LEN est fournie par la lib VirtualWire
-          //char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Batterie faible !!!!";
-          char chaine1[21] = "Batterie faible !!!!";
+          char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Batterie faible !!!!";
           rad.messageRadio(chaine1);// on envoie le message
         }
         // informations à afficher
@@ -52,7 +51,7 @@ void routineGestionWatchdog() {
         affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
         affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
         affiFinDeCourseHaut();
-        affiFinDeCourseBas();
+        affiFinDeCourseOuverture();
         affiPulsePlusCptRoue();
         affiChoixOuvFerm();
         lumiere();

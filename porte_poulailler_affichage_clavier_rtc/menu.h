@@ -45,13 +45,13 @@ void deroulementMenu (byte increment) {
       mydisp.drawStr(0, 1, "");
       affiChoixOuvFerm(); // choix
       break;
-    case 10:  // fin de course H
+    case 10:  // fin de course Fermeture
       mydisp.drawStr(0, 1, "");
       affiFinDeCourseHaut(); // fin de course Haut
       break;
-    case 11:  // fin de course B
+    case 11:  // fin de course ouverture
       mydisp.drawStr(0, 1, "");
-      affiFinDeCourseBas();  // fin de course Bas
+      affiFinDeCourseOuverture();  // fin de course ouverture
       break;
     case 12:  // tension batterie commandes
       mydisp.drawStr(0, 1, "");

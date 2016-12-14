@@ -52,8 +52,8 @@ void testServo() {
     else if (commande == 'r' ) {
       //servoMontee(); // mise sous tension du servo et montee de la porte
       servoAction = true; // servo en action
-      montee = true;
-      descente = false;
+      ouverture = true;
+      fermeture = false;
       digitalWrite(servoPin, HIGH); // mise soustension du servo
       delay(50);
       pulse = pulseOuverture;
@@ -64,8 +64,8 @@ void testServo() {
     else if (commande == 'f') {
       //servoDescente(); // mise sous tension du servo et descente de la porte
       servoAction = true; // servo en action
-      descente = true;
-      montee = false;
+      fermeture = true;
+      ouverture = false;
       digitalWrite(servoPin, HIGH); // mise soustension du servo
       delay(50);
       pulse = pulseFermeture;

@@ -3,10 +3,10 @@
 //----montee , descente manuelle, position de la trappe-----
 void monteeDescenteManuelle() {
   if (touche == 1 and incrementation == menuManuel ) {
-    compteRoueCodeuse = finDeCourseB;
+    compteRoueCodeuse = finDeCourseOuverture;
     pulse = pulseFermetureReduit;
   }  else if (touche == 4 and incrementation == menuManuel) {
-    compteRoueCodeuse = finDeCourseH;
+    compteRoueCodeuse = finDeCourseFermeture;
     pulse = pulseOuvertureReduit;
   }
 }
