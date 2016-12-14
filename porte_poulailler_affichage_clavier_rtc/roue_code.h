@@ -4,10 +4,10 @@
 void monteeDescenteManuelle() {
   if (touche == 1 and incrementation == menuManuel ) {
     compteRoueCodeuse = finDeCourseB;
-    pulse = pulseDescenteReduit;
+    pulse = pulseFermetureReduit;
   }  else if (touche == 4 and incrementation == menuManuel) {
     compteRoueCodeuse = finDeCourseH;
-    pulse = pulseMonteeReduit;
+    pulse = pulseOuvertureReduit;
   }
 }
 

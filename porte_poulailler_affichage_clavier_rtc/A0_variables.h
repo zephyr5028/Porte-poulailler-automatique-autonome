@@ -11,7 +11,6 @@ const byte roueCodeuse = 7;//digital pin D7 pour entrée roue codeuse
 volatile unsigned int compteRoueCodeuse;  // un compteur de position
 boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
 boolean positionRoueCodeuse;
-
 //int compteRoueCodeuse = 200; // compteur roue codeuse, valeur au reset du montage
 const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
 
@@ -22,12 +21,12 @@ const byte servoPin = 4; // pin D4 relais du servo
 const byte servoCde = 8; // pin D8 cde du servo
 const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
 int pulse = pulseStop; // stop
-const int pulseMontee = pulseStop + 140; // vitesse montée
-const int pulseDescente = pulseStop - 140; // vitesse descente
-const int pulseMonteeReduit = pulseStop + 70; // vitesse montée réduite
-const int pulseDescenteReduit = pulseStop - 70; // vitesse descente réduite
-const int pulseMonteeReduitSens = pulseStop + 50 ; // pour ralentir la descente en fonction du sens de rotation du servo
-const int pulseDescenteReduitSens = pulseStop - 50 ; // pour ralentir la descente en fonction du sens de rotation du servo
+const int pulseOuverture = pulseStop - 140; // vitesse montée
+const int pulseFermeture = pulseStop + 140; // vitesse descente
+const int pulseOuvertureReduit = pulseStop - 70; // vitesse montée réduite
+const int pulseFermetureReduit = pulseStop + 70; // vitesse descente réduite
+//const int pulseMonteeReduitSens = pulseStop + 50 ; // pour ralentir la descente en fonction du sens de rotation du servo
+//const int pulseDescenteReduitSens = pulseStop - 50 ; // pour ralentir la descente en fonction du sens de rotation du servo
 unsigned int finDeCourseH = 250; // initialisation de la valeur de la fin de course haute
 unsigned int finDeCourseB = 150; // initialisation de la valeur de la fin de course basse
 boolean montee = false; // montee de la porte

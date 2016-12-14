@@ -30,7 +30,7 @@ void lumiere() {
       char lumValue_temp[5];
       sprintf(lumValue_temp, "%i",  lumValue);
       strcat(chaine1, lumValue_temp);
-     rad.envoiMessage(chaine1);// on envoie le message
+      rad.envoiMessage(chaine1);// on envoie le message
     }
   }
 }
@@ -50,20 +50,11 @@ void ouvFermLum() {
   }
   if ((sensorValue <= lumMatin) and (ouve == 0) and (compteurWatchdogLumiere >= tempsLum)) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-    if (sens) {
-      servoMontee(); // mise sous tension du servo et montee de la porte
-    } else {
-      servoDescente(); // mise sous tension du servo et descente de la porte
-    }
+    servoOuverture(); // mise sous tension du servo et montee de la porte
   }
   if ((sensorValue >= lumSoir) and (ferm == 0) and (compteurWatchdogLumiere >= tempsLum)) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-    if (sens) {
-      servoDescente(); // mise sous tension du servo et descente de la porte
-    } else {
-      servoMontee(); // mise sous tension du servo et montee de la porte
-    }
-
+    servoFermeture(); // mise sous tension du servo et descente de la porte
   }
 }
 

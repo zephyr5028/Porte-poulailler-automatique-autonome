@@ -56,7 +56,7 @@ void testServo() {
       descente = false;
       digitalWrite(servoPin, HIGH); // mise soustension du servo
       delay(50);
-      pulse = pulseMontee;
+      pulse = pulseOuverture;
       Serial.println(monServo.read());
       monServo.write(pulse); // modification vitesse servo
       Serial.println(monServo.read());
@@ -68,7 +68,7 @@ void testServo() {
       montee = false;
       digitalWrite(servoPin, HIGH); // mise soustension du servo
       delay(50);
-      pulse = pulseDescente;
+      pulse = pulseFermeture;
       Serial.println(monServo.read());
       monServo.write(pulse); // modification vitesse servo
       Serial.println(monServo.read());

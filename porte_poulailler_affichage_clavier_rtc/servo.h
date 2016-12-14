@@ -4,49 +4,44 @@
 */
 
 //------mise sous tension du servo et montee de la porte-------
-void servoMontee() {
+void servoOuverture() {
   if (!batterieFaible) { // si la batterie n'est pas faible
     servoAction = true; // servo en action
-    montee = true;
-    descente = false;
+    montee = false;
+    descente = true;
     digitalWrite(servoPin, HIGH); // mise soustension du servo
-    pulse = pulseMontee;
+    pulse = pulseOuverture;
     monServo.write(pulse); // modification vitesse servo
     delay(100);
   }
 }
 
 //-----mise sous tension du servo et descente de la porte-----
-void  servoDescente() {
+void  servoFermeture() {
   if (!batterieFaible) { // si la batterie n'est pas faible
     servoAction = true; // servo en action
-    descente = true;
-    montee = false;
+    descente = false;
+    montee = true;
     digitalWrite(servoPin, HIGH); // mise soustension du servo
-    pulse = pulseDescente;
+    pulse = pulseFermeture;
     monServo.write(pulse); // modification vitesse servo
     delay(100);
   }
 }
 
-//------sequence de montee de la porte------
-void monteePorte() {
-  if ((compteRoueCodeuse >= finDeCourseH - 10) and montee == true) {
-    if (sens) {
-      pulse = pulseMonteeReduit;
-    } else {
-      pulse = pulseMonteeReduitSens;
-    }
+//------sequence montee de la porte------
+void ouverturePorte() {
+  if ((compteRoueCodeuse <= finDeCourseB + 20) and montee == false) {  // 132 + 20
+    pulse = pulseOuvertureReduit;
     monServo.write(pulse);  // value should usually be 500 to 2500 (environ 1280 = stop)
   }
-  if ((compteRoueCodeuse >= finDeCourseH + 2 and montee == true and sens == false) or (touche == 5 and relache == true and montee == true) or (!digitalRead(securiteHaute) and montee == true)) {
+  if ((touche == 5 and relache == true and montee == false) or (!digitalRead(securiteHaute) and montee == false)) {
     relache = false;
     digitalWrite(servoPin, LOW); // mise hors tension du servo led verte éteinte
-    montee = false;
+    montee = true;
     if (!digitalRead(securiteHaute)) {
-      delay(300); // attente fin l'arrêt complet du servo
-      compteRoueCodeuse = finDeCourseH;
-      //   sens = true; // sens de fonctionnement du servo pour éviter de bloquer le servo en cas de probleme
+      delay(200); // attente fin l'arrêt complet du servo
+      compteRoueCodeuse = finDeCourseB;
     }
     servoAction = false; // servo arret
   }
@@ -55,24 +50,19 @@ void monteePorte() {
   }
 }
 
-//-----sequence de descente de la porte-----
-void  descentePorte() {
-  if ((compteRoueCodeuse <= finDeCourseB + 20) and descente == true) {
-    if (sens) {
-      pulse =  pulseDescenteReduitSens;
-    } else {
-      pulse = pulseDescenteReduit;
-    }
+//-----sequence descente de la porte-----
+void  fermeturePorte() {
+  if ((compteRoueCodeuse >= finDeCourseH - 20) and descente == false) { // 225 - 20
+    pulse = pulseFermetureReduit;
     monServo.write(pulse);  // value should usually be 500 to 2500 (1280 = stop)
   }
-  if ((compteRoueCodeuse <= finDeCourseB and descente == true and sens == true) or (touche == 5 and relache == true and descente == true) or (!digitalRead(securiteHaute) and descente == true)) {
+  if ((compteRoueCodeuse >= finDeCourseH and descente == false ) or (touche == 5 and relache == true and descente == false) or (!digitalRead(securiteHaute) and descente == false)) {
     relache = false;
     digitalWrite(servoPin, LOW); // mise hors tension du servo led verte éteinte
-    descente = false;
+    descente = true;
     if (!digitalRead(securiteHaute)) {
-      delay(300); // attente fin l'arrêt complet du servo
+      delay(200); // attente fin l'arrêt complet du servo
       compteRoueCodeuse = finDeCourseB;
-      //   sens = false ; // sens de fonctionnement pour éviter de bloquer le servo en cas de probleme
     }
     servoAction = false; // servo arret
   }
@@ -80,3 +70,4 @@ void  descentePorte() {
     deroulementMenu (incrementation); // affichage du menu pour pulse
   }
 }
+

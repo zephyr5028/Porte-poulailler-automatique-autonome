@@ -73,5 +73,5 @@ void setup() {
   setup_watchdog(9); // maxi de 8 secondes
   vw_set_tx_pin(pinEmRadio); // broche d10 emetteur
   vw_setup(600); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
-  servoDescente(); // initialisation des paramétres par la mise sous tension du servo pour la montee de la porte (fonction du sens de rotation du servo)
+  servoOuverture(); // initialisation des paramétres par la mise sous tension du servo pour la montee de la porte (fonction du sens de rotation du servo)
 }

@@ -1,4 +1,5 @@
 /* porte-poulailler : affichage + clavier + rtc */
+//pb avec l'ouverture et la fermeture au bout d'un moment : utilisation du contact fermeture....tjs pas resolu !!!
 //first commit sur gihub le 01 12 2016
 // 20 septembre 2016
 /* 20 septembre 2016 :
@@ -34,7 +35,7 @@
 */
 
 /*-----debug-----*/
-const boolean DEBUG = false; // positionner debug pour l'utiliser ou pas
+const boolean DEBUG = true; // positionner debug pour l'utiliser ou pas
 const boolean RADIO = true; // positionner radio pour l'utiliser ou pas
 const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 

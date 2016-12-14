@@ -77,10 +77,13 @@ void choixLumSoir();//------reglage du choix de la lumiere du soir
 void reglageTime ();//-----routine reglage heure , minute , seconde
 
 /* servo */
-void servoMontee();//------mise sous tension du servo et montee de la porte
-void  servoDescente();//-----mise sous tension du servo et descente de la porte
-void monteePorte();//------sequence de montee de la porte
-void  descentePorte();//-----sequence de descente de la porte
+void servoOuverture();//------mise sous tension du servo et montee de la porte
+void  servoFermeture();//-----mise sous tension du servo et descente de la porte
+
+//------sequence d'ouverture de la porte------
+void ouverturePorte();
+//-----sequence de descente de la porte-----
+void  fermeturePorte();
 
 /* temperature */
 void read_temp(boolean type);//-----routine lecture température sur ds3231 rtc type celsius=true ,fahrenheit=false

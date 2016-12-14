@@ -29,8 +29,10 @@ void loop() {
   }
   //compteurRoueCodeuse(); //compteur roue codeuse
   batterieCdesFaible(); // batterie cdes < 4 volt
-  monteePorte(); // sequence de montee de la porte
-  descentePorte();// sequence de descente de la porte
+  ouverturePorte();
+  fermeturePorte();
+  //monteePorte(); // sequence de montee de la porte
+ // descentePorte();// sequence de descente de la porte
   routineTestFermetureBoitier(); // test fermeture boitier
   routineInterruptionBp(); // routine interruption Bp
   routineInterrruptionAlarme2() ; // routine alarme 2

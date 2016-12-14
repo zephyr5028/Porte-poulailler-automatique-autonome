@@ -10,7 +10,7 @@
 
 //-----routine interruption D2 INT0------
 void myInterruptINT0() {
-    compteurRoueCodeuse();
+  compteurRoueCodeuse();
 }
 
 //-----routine interruption D3 INT1-----
@@ -34,9 +34,9 @@ void routineInterruptionBp() {
     if (((millis() - tempoDebounce) > debounce)  and  relacheBpOF == true and !digitalRead(BpOF) ) {
       relacheBpOF = false;
       if (pulse >= pulseStop) {
-        servoDescente(); // mise sous tension du servo et descente de la porte
+        servoOuverture(); // mise sous tension du servo et montee de la porte
       } else {
-        servoMontee(); // mise sous tension du servo et montee de la porte
+        servoFermeture(); // mise sous tension du servo et descente de la porte
       }
       tempoDebounce = millis() + 1000; // attente relache du bouton
     }
@@ -50,11 +50,7 @@ void routineInterruptionBp() {
 //-----routine alarme 2-----
 void  routineInterrruptionAlarme2() {
   if ( RTC.alarm(alarm_2) and interruptRTC ) {    // has Alarm2 (fermeture) triggered?  alarme rtc
-    if (!sens) {
-      servoMontee(); // mise sous tension du servo et montee de la porte
-    } else {
-      servoDescente(); // mise sous tension du servo et descente de la porte
-    }
+      servoFermeture(); // mise sous tension du servo et descente de la porte
     interruptRTC = false; // autorisation de la prise en compte de l'IT
   }
 }
@@ -62,11 +58,7 @@ void  routineInterrruptionAlarme2() {
 //-----routine alarme 1-----
 void  routineInterruptionAlarme1() {
   if ( RTC.alarm(alarm_1) and interruptRTC ) {    // has Alarm1 (ouverture) triggered?  alarme rtc
-    if (!sens) {
-      servoDescente(); // mise sous tension du servo et descente de la porte
-    } else {
-      servoMontee(); // mise sous tension du servo et montee de la porte
-    }
+      servoOuverture(); // mise sous tension du servo et montee de la porte
     interruptRTC = false; // autorisation de la prise en compte de l'IT
   }
 }
