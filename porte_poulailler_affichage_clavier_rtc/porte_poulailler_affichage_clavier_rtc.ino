@@ -35,7 +35,7 @@
 */
 
 /*-----debug-----*/
-const boolean DEBUG = true; // positionner debug pour l'utiliser ou pas
+const boolean DEBUG = false; // positionner debug pour l'utiliser ou pas
 const boolean RADIO = true; // positionner radio pour l'utiliser ou pas
 const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 

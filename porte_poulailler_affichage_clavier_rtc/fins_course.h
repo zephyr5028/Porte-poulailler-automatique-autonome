@@ -2,7 +2,7 @@
 
 //------affichage fin de course Haut-----
 void affiFinDeCourseHaut() {
-  if ( boitierOuvert) { // si le boitier est ouvert
+  if ( TboitierOuvert) { // si le boitier est ouvert
     mydisp.print(F("   Fer : "));
     mydisp.print(finDeCourseFermeture);
     if (finDeCourseFermeture < 10) {
@@ -27,7 +27,7 @@ void affiFinDeCourseHaut() {
 
 //------affichage fin de course Ouverture-------
 void affiFinDeCourseOuverture() {
-  if ( boitierOuvert) { // si le boitier est ouvert
+  if ( TboitierOuvert) { // si le boitier est ouvert
     mydisp.print(F("   Ouv : "));
     mydisp.print(finDeCourseOuverture);
     if (finDeCourseOuverture < 10) {

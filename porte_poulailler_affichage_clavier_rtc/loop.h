@@ -3,10 +3,13 @@
 void loop() {
   // le boitier est ouvert
   if ( boitierOuvert) {
+    
+
+  }
     lectureClavier(); // lecture du clavier
-    // affichage du menu lorsque temps est >....
+    //affichage du menu lorsque temps est > ....
     temporisationAffichage() ; // temporisation pour l'affichage
-    // reglages
+    //reglages
     reglageTime(); // reglages de l'heure, minute, seconde si touche fleche droite
     reglageDate(); // reglage de la date si touche fleche droite
     reglageHeureOuverture();// reglage de l'heure d'ouverture
@@ -22,12 +25,12 @@ void loop() {
     if (TESTSERVO) {
       testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
     }
-  }
+  
   // le boitier est fermé et le servo n'est pas en action
-  if (!boitierOuvert and  !servoAction) {
+//  if (!boitierOuvert and  !servoAction) {
     ouvFermLum() ;  // ouverture/fermeture par test de la lumière
-  }
-  batterieCdesFaible(); // batterie cdes < 4 volt
+//  }
+  accusFaible(); // batterie cdes < 4 volt
   ouverturePorte();
   fermeturePorte();
   routineTestFermetureBoitier(); // test fermeture boitier
@@ -35,5 +38,5 @@ void loop() {
   routineInterrruptionAlarme2() ; // routine alarme 2
   routineInterruptionAlarme1(); // routine alarme 1
   routineInterruptionBoitierOuvert(); // routine interruption boitier ouvert
- // routineGestionWatchdog(); // routine de gestion du watchdog
+  routineGestionWatchdog(); // routine de gestion du watchdog
 }

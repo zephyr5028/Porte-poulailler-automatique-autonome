@@ -30,7 +30,7 @@ void displayDate() {
 
 //-----routine display Time-----
 void displayTime () {
-  if ( boitierOuvert) { // si le boitier est ouvert
+  if ( TboitierOuvert) { // si le boitier est ouvert
     RTC.read(tm); // lecture date et heure
     if (tm.Hour < 10) {
       mydisp.print(F("0"));  // si < 10
@@ -122,7 +122,7 @@ void closeTime() {
 
 //------affichage pulse et comptage roue codeuse------
 void affiPulsePlusCptRoue() {
-  if ( boitierOuvert) { // si le boitier est ouvert
+  if ( TboitierOuvert) { // si le boitier est ouvert
     mydisp.print(F("P: "));
     mydisp.print(pulse);
     mydisp.print(F("  R: "));

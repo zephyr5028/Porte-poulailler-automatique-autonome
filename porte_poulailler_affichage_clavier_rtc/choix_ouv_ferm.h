@@ -5,7 +5,7 @@
 
 //------affichage du choix de l'ouverture et la fermeture------
 void affiChoixOuvFerm() {
-  if ( boitierOuvert) { // si le boitier est ouvert
+  if ( TboitierOuvert) { // si le boitier est ouvert
     mydisp.print(F(" Ouv:"));
     if (ouve == 1) {
       mydisp.print(F("Hre"));

@@ -7,7 +7,7 @@ void lumiere() {
   int lumValue = analogRead(A0); // read the input on analog pin 0
   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V)
   float voltage = lumValue * (5.0 / 1023.0);
-  if ( boitierOuvert) { // si le boitier est ouvert
+  if ( TboitierOuvert) { // si le boitier est ouvert
     // print out the value you read:
     mydisp.print(F(" "));
     mydisp.print(lumValue);

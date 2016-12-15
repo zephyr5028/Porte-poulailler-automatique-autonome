@@ -2,7 +2,7 @@
 
 //-----lecture clavier------
 void  lectureClavier() {
-  touche = clav.read_key(sensorClavier); // read key sensor = A1
+    touche = clav.read_key(sensorClavier); // read key sensor = A1     
   if (touche == oldkey ) { // si touche == -1, donc touche relache=true
     relache = true;
   }

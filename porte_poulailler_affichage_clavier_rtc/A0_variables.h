@@ -26,6 +26,7 @@ const int pulseOuvertureReduit = pulseStop - 70; // vitesse montée réduite
 const int pulseFermetureReduit = pulseStop + 70; // vitesse descente réduite
 unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
 unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
+boolean servoAction(false) ; // servo à l'arrêt
 boolean ouverture = false; // montee de la porte
 boolean fermeture = false; // descente de la porte
 byte boucleTempo(0); // boucle tempo pour l'affichage lcd
@@ -36,7 +37,7 @@ byte tempoLcd(5);// tempo pour l'afficahge lcd
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
-byte bouclesWatchdog = 8; // nombre de boucles du watchdog
+const byte bouclesWatchdog = 8; // nombre de boucles du watchdog
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean batterieFaible = false; // si batterie < 4,8v = true
 
@@ -45,7 +46,6 @@ byte incrementation = 0; // incrementation verticale
 byte decalage = 0; // decalage à droite pour reglage
 boolean reglage = false; // menu=false ou reglage=true
 int temps = 0; // temps entre deux affichages de l heure
-boolean servoAction = false ; // servo à l'arrêt
 int debounce = 250; // debounce latency in ms
 unsigned long tempoDebounce; // temporisation pour debounce
 boolean relacheBpOF = true; // relache Bp
@@ -54,10 +54,12 @@ byte interOuvBoitier = 6; //pin D6 interrupteur ouverture boitier
 boolean retroEclairage = true; // etat retro eclairage
 boolean  boitierOuvert = true; // le boitier est ouvert
 
+boolean TboitierOuvert(true); // pour la recherche de la panne boitier ouvert / ferme
+
 /* Clavier */
 byte oldkey = -1;
 boolean relache = false; // relache de la touche
-byte touche; // valeur de la touche appuyee
+byte touche(-1); // valeur de la touche appuyee
 const byte sensorClavier = 1; //pin A1 pour le clavier
 
 /* lumiere */
@@ -66,7 +68,7 @@ byte ferm = 0; // fermeture 0 donc lumière
 int sensorValue; // valeur de la lumiere
 unsigned int lumMatin = 300; // valeur de la lumière du matin
 unsigned int lumSoir = 900; // valeur de la lumiere du soir
-byte tempsLum = 2 ; // boucles pour valider l'ouverture - fermeture avec la lumière (compteur watchdog)
+const byte tempsLum = 2 ; // boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 unsigned int  compteurWatchdogLumiere = 0; // compteur watchdog lumiere
 
 /* emetteur 433Mhz */
@@ -76,7 +78,6 @@ const byte pinEmRadio = 10; // pin D10 emetteur radio
 volatile boolean interruptBp = false; // etat interruption entree 9
 volatile boolean interruptRTC = false; // etat interruption entree 10
 volatile boolean interruptOuvBoi = false; // etat interruption entree 6
-//volatile boolean interruptRoueCodeuse = false; // etat interruption roue codeuse   entree D2 et D7
 
 /* menus */
 const byte menuDate = 1;

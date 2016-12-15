@@ -50,7 +50,7 @@ void routineInterruptionBp() {
 //-----routine alarme 2-----
 void  routineInterrruptionAlarme2() {
   if ( RTC.alarm(alarm_2) and interruptRTC ) {    // has Alarm2 (fermeture) triggered?  alarme rtc
-      servoFermeture(); // mise sous tension du servo et descente de la porte
+    servoFermeture(); // mise sous tension du servo et descente de la porte
     interruptRTC = false; // autorisation de la prise en compte de l'IT
   }
 }
@@ -58,14 +58,14 @@ void  routineInterrruptionAlarme2() {
 //-----routine alarme 1-----
 void  routineInterruptionAlarme1() {
   if ( RTC.alarm(alarm_1) and interruptRTC ) {    // has Alarm1 (ouverture) triggered?  alarme rtc
-      servoOuverture(); // mise sous tension du servo et montee de la porte
+    servoOuverture(); // mise sous tension du servo et montee de la porte
     interruptRTC = false; // autorisation de la prise en compte de l'IT
   }
 }
 
 //-----routine interruption boitier ouvert------
 void  routineInterruptionBoitierOuvert() {
-  if ( interruptOuvBoi and  (boitierOuvert == false)) {    //  interruption ouverture boitier
+  if ( interruptOuvBoi) {    //  interruption ouverture boitier
     if (!digitalRead(interOuvBoitier) ) { // ouverture boitier
       boitierOuvert = true; // boitier ouvert
     }
@@ -74,7 +74,7 @@ void  routineInterruptionBoitierOuvert() {
 
 //-----test fermeture boitier-----
 void  routineTestFermetureBoitier() {
-  if (digitalRead(interOuvBoitier) and  (boitierOuvert == true)) { //  fermeture boitier
+  if (digitalRead(interOuvBoitier)) { //  fermeture boitier
     if (!retroEclairage)  {
       mydisp.backLightOff(); // retro eclairage off
       retroEclairage = true;

@@ -7,7 +7,7 @@ ISR(WDT_vect) {
   }
 }
 
-//-----paramètre : 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms, 6=1 sec,7=2 sec, 8=4 sec, 9=8 sec-----
+//-----paramètre : 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms, 6=1 sec,7=2 sec, 8=4 sec, 9=8 secondes-----
 void setup_watchdog(int ii) {
   byte bb;
   int ww;
@@ -36,13 +36,16 @@ void enterSleep(void) {
 
 //-----routine de gestion du watchdog-----
 void routineGestionWatchdog() {
-  if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
-    if ((( compteRoueCodeuse <= finDeCourseOuverture + 1 ) or  (compteRoueCodeuse >= finDeCourseFermeture - 1 )) and !servoAction) {
-      tempsWatchdog--; // decrementation
+ // if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
+
+ 
+ if (f_wdt == 1 ) { // si  watchdog=1
+    if ( !servoAction) { // servo à l'arrêt
+      tempsWatchdog--;
       if (tempsWatchdog <= 0) {
         if (batterieFaible) { // affichage si la batterie est faible
           // N.B. La constante VW_MAX_MESSAGE_LEN est fournie par la lib VirtualWire
-          char chaine1[VW_MAX_MESSAGE_LEN - 1] = "Batterie faible !!!!";
+          char chaine1[VW_MAX_MESSAGE_LEN - 1] = "*** Batterie faible ! ***";
           rad.messageRadio(chaine1);// on envoie le message
         }
         // informations à afficher
