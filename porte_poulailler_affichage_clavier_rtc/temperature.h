@@ -5,7 +5,7 @@ void read_temp(boolean type) {
   int t = RTC.temperature();
   float celsius = t / 4.0;
   float fahrenheit = celsius * 9.0 / 5.0 + 32.0;
-  if ( TboitierOuvert) { // si le boitier est ouvert
+  if ( boitierOuvert) { // si le boitier est ouvert
     if (type) {
       mydisp.print(celsius); // affichage celsius
       mydisp.print(F(" C     "));

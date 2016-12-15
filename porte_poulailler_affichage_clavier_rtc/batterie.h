@@ -6,29 +6,28 @@ void affiTensionBatCdes() {
   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 6V)
   float voltage = valBatCdes * (7.50 / 1023.0);
   // print out the value you read:
-  if ( TboitierOuvert) { // si le boitier est ouvert
+  if ( boitierOuvert) { // si le boitier est ouvert
     mydisp.print(F(" "));
     mydisp.print(valBatCdes);
     mydisp.print(F(" = "));
     mydisp.print(voltage);
     mydisp.print(F("V    "));
     mydisp.drawStr(0, 0, "");
-  } else {
-    if (DEBUG) {
-      Serial.print(F("Ten bat cdes = "));
-      Serial.print(valBatCdes);
-      Serial.print(F(" = "));
-      Serial.print(voltage);
-      Serial.println(F(" V"));
-    }
-    if (RADIO) {
-      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-      char voltage_temp[6];
-      dtostrf(voltage, 1, 2, voltage_temp);
-      strcat(chaine1, voltage_temp);
-      strcat(chaine1, "V");
-      rad.envoiMessage(chaine1);// on envoie le message
-    }
+  }
+  if (DEBUG) {
+    Serial.print(F("Ten bat cdes = "));
+    Serial.print(valBatCdes);
+    Serial.print(F(" = "));
+    Serial.print(voltage);
+    Serial.println(F(" V"));
+  }
+  if (RADIO) {
+    char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+    char voltage_temp[6];
+    dtostrf(voltage, 1, 2, voltage_temp);
+    strcat(chaine1, voltage_temp);
+    strcat(chaine1, "V");
+    rad.envoiMessage(chaine1);// on envoie le message
   }
 }
 
@@ -38,29 +37,28 @@ void affiTensionBatServo() {
   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 6V)
   float voltage = valBatServo * (7.50 / 1023.0);
   // print out the value you read:
-  if ( TboitierOuvert) { // si le boitier est ouvert
+  if ( boitierOuvert) { // si le boitier est ouvert
     mydisp.print(F(" "));
     mydisp.print(valBatServo); //print tension batterie servo moteur
     mydisp.print(F(" = "));
     mydisp.print(voltage);
     mydisp.print(F("V    "));
     mydisp.drawStr(0, 0, "");
-  } else {
-    if (DEBUG) {
-      Serial.print(F("Ten bat servo = "));
-      Serial.print(valBatServo);
-      Serial.print(F(" = "));
-      Serial.print(voltage);
-      Serial.println(F(" V"));
-    }
-    if (RADIO) {
-      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-      char voltage_temp[6];
-      dtostrf(voltage, 1, 2, voltage_temp);
-      strcat(chaine1, voltage_temp);
-      strcat(chaine1, "V");
-      rad.envoiMessage(chaine1);// on envoie le message
-    }
+  }
+  if (DEBUG) {
+    Serial.print(F("Ten bat servo = "));
+    Serial.print(valBatServo);
+    Serial.print(F(" = "));
+    Serial.print(voltage);
+    Serial.println(F(" V"));
+  }
+  if (RADIO) {
+    char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+    char voltage_temp[6];
+    dtostrf(voltage, 1, 2, voltage_temp);
+    strcat(chaine1, voltage_temp);
+    strcat(chaine1, "V");
+    rad.envoiMessage(chaine1);// on envoie le message
   }
 }
 

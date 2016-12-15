@@ -7,29 +7,28 @@ void lumiere() {
   int lumValue = analogRead(A0); // read the input on analog pin 0
   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V)
   float voltage = lumValue * (5.0 / 1023.0);
-  if ( TboitierOuvert) { // si le boitier est ouvert
+  if ( boitierOuvert) { // si le boitier est ouvert
     // print out the value you read:
     mydisp.print(F(" "));
     mydisp.print(lumValue);
     mydisp.print(F(" = "));
     mydisp.print(voltage);
     mydisp.print(F("V    "));
-  } else {
-    if (DEBUG) {
-      Serial.print(F("lum : "));
-      Serial.println(lumValue);
-    }
-    if (RADIO) {
-      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-      char lumSoir_temp[5];
-      sprintf(lumSoir_temp, "%i",  lumSoir);
-      strcat(chaine1, lumSoir_temp);
-      strcat(chaine1, ";");
-      char lumValue_temp[5];
-      sprintf(lumValue_temp, "%i",  lumValue);
-      strcat(chaine1, lumValue_temp);
-      rad.envoiMessage(chaine1);// on envoie le message
-    }
+  }
+  if (DEBUG) {
+    Serial.print(F("lum : "));
+    Serial.println(lumValue);
+  }
+  if (RADIO) {
+    char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+    char lumSoir_temp[5];
+    sprintf(lumSoir_temp, "%i",  lumSoir);
+    strcat(chaine1, lumSoir_temp);
+    strcat(chaine1, ";");
+    char lumValue_temp[5];
+    sprintf(lumValue_temp, "%i",  lumValue);
+    strcat(chaine1, lumValue_temp);
+    rad.envoiMessage(chaine1);// on envoie le message
   }
 }
 

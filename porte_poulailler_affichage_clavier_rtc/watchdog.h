@@ -36,10 +36,10 @@ void enterSleep(void) {
 
 //-----routine de gestion du watchdog-----
 void routineGestionWatchdog() {
- // if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
+  // if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
 
- 
- if (f_wdt == 1 ) { // si  watchdog=1
+
+  if (f_wdt == 1 ) { // si  watchdog=1
     if ( !servoAction) { // servo à l'arrêt
       tempsWatchdog--;
       if (tempsWatchdog <= 0) {
@@ -49,16 +49,18 @@ void routineGestionWatchdog() {
           rad.messageRadio(chaine1);// on envoie le message
         }
         // informations à afficher
-        displayTime();
-        read_temp(true); // read temperature celsius=true
-        affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
-        affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
-        affiFinDeCourseHaut();
-        affiFinDeCourseOuverture();
-        affiPulsePlusCptRoue();
-        affiChoixOuvFerm();
-        lumiere();
-        rad.chaineVide();
+        if (RADIO) {
+          displayTime();
+          read_temp(true); // read temperature celsius=true
+          affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
+          affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
+          affiFinDeCourseHaut();
+          affiFinDeCourseOuverture();
+          affiPulsePlusCptRoue();
+          affiChoixOuvFerm();
+          lumiere();
+          rad.chaineVide();
+        }
         if (DEBUG) {
           Serial.print(F("compt watchdog lum : x * 8s  = ")); Serial.println(compteurWatchdogLumiere);
           Serial.print(F("Bat faible : "));

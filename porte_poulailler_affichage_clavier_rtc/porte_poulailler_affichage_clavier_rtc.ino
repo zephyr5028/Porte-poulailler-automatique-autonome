@@ -52,6 +52,10 @@ const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 #include "RTC_DS3231.h"
 
 /* Progmem  mémoire flash */
+
+/*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
+#include <Flash.h>
+#include <avr/pgmspace.h> // non nécessaire maintenant
 #include "progmem.h"
 
 /* lecture Clavier */
@@ -69,6 +73,8 @@ Radio rad(RADIO,DEBUG); // class Radio avec true pour envoi par radio
 #include "temperature.h"
 
 /* affichages */
+#define LCDCol 16
+#define LCDRow 2
 #include "affichages.h"
 
 /* lumiere */
@@ -105,6 +111,8 @@ Radio rad(RADIO,DEBUG); // class Radio avec true pour envoi par radio
 #include"batterie.h"
 
 /* servo - montée et descente de la porte */
+#include <ServoTimer2.h> // the servo library
+ServoTimer2 monServo;
 #include "servo.h"
 
 /* roue codeuse - montee descente manuelle */

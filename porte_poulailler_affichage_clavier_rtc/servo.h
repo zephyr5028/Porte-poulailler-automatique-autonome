@@ -45,13 +45,13 @@ void ouverturePorte() {
     }
     servoAction = false; // servo arret
   }
-  if ( boitierOuvert) { // si le boitier est ouvert
+ /* if ( boitierOuvert) { // si le boitier est ouvert
     boucleTempo++;
     if (boucleTempo >= tempoLcd) {
       deroulementMenu (incrementation); // affichage du menu pour pulse
       boucleTempo = 0;
     }
-  }
+  }*/
 }
 
 //-----sequence fermeture de la porte-----
@@ -70,12 +70,12 @@ void  fermeturePorte() {
     }
     servoAction = false; // servo arret
   }
-  if ( boitierOuvert) { // si le boitier est ouvert
+ /* if ( boitierOuvert) { // si le boitier est ouvert
     boucleTempo++;
     if (boucleTempo >= tempoLcd) {
       deroulementMenu (incrementation); // affichage du menu pour pulse
       boucleTempo = 0;
     }
-  }
+  }*/
 }
 

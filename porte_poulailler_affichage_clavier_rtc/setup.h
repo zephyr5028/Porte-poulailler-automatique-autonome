@@ -23,30 +23,36 @@ void setup() {
   }
   incrementation = menuManuel; // pour affichage menu
   deroulementMenu (incrementation); // affichage du menu
+  
   ouve = i2c_eeprom_read_byte(0x57, 0x14); // lecture du type d'ouverture @14  de l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
   ferm = i2c_eeprom_read_byte(0x57, 0x15); // lecture du type de fermeture @15   de l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
+  
   byte val1 = i2c_eeprom_read_byte(0x57, 0x16); // lecture pf lumière du matin (byte)
   delay(10);
   byte val2 = i2c_eeprom_read_byte(0x57, 0x17); // lecture Pf lumiere du matin (byte)
   delay(10);
   lumMatin = (val2 << 8) + val1;  // mots 2 byte vers mot int lumMatin
+ 
   val1 = i2c_eeprom_read_byte(0x57, 0x18); // lecture pf lumière du soir (byte)
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x19); // lecture Pf lumiere du soir (byte)
   delay(10);
   lumSoir = (val2 << 8) + val1;  // mots 2 byte vers mot int lumMatin
+ 
   val1 = i2c_eeprom_read_byte(0x57, 0x20); // lecture pf fin de course haut (byte)
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x21); // lecture Pf fin de course haut (byte)
   delay(10);
   finDeCourseFermeture = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseFermeture
+ 
   val1 = i2c_eeprom_read_byte(0x57, 0x22); // lecture pf fin de course bas (byte)
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x23); // lecture Pf fin de course bas (byte)
   delay(10);
   finDeCourseOuverture = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseOuverture
+  
   // roue codeuse
   pinMode(roueCodeuse, INPUT); // make the roueCodeuse's pin 7 an input
   // servo
@@ -55,11 +61,13 @@ void setup() {
   monServo.attach(servoCde); // use digital pin D8 for commande du servo
   // on démarre à une valeur censée être la moitié de l'excursion totale de l'angle réalisé par le servomoteur
   monServo.write(pulse);  // value should usually be 750 to 2200 (environ 1500 = stop)
+  
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
+  
   //RTC.writeRTC(0x0E,0x06); // registre control rtc
   RTC.writeRTC(0x0F, 0x00); // registre status rtc
-  tempoDebounce = debounce; // initialisation de la temporisation pour le debounce d'un Bp
+
   //Optimisation de la consommation
   //power_adc_disable(); // Convertisseur Analog / Digital pour les entrées analogiques
   power_spi_disable();
@@ -70,8 +78,11 @@ void setup() {
   //power_timer0_disable();
   //power_timer1_disable();
   //power_timer2_disable();
+  
   setup_watchdog(9); // maxi de 8 secondes
+  
   vw_set_tx_pin(pinEmRadio); // broche d10 emetteur
   vw_setup(600); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
-  servoOuverture(); // initialisation des paramétres par la mise sous tension du servo pour la montee de la porte (fonction du sens de rotation du servo)
+  
+//  servoOuverture(); // initialisation des paramétres par la mise sous tension du servo pour la montee de la porte (fonction du sens de rotation du servo)
 }

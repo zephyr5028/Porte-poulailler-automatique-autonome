@@ -2,19 +2,21 @@
 
 //----montee , descente manuelle, position de la trappe-----
 void monteeDescenteManuelle() {
-  if (touche == 1 and incrementation == menuManuel ) {
-    compteRoueCodeuse = finDeCourseOuverture;
-    pulse = pulseFermetureReduit;
-  }  else if (touche == 4 and incrementation == menuManuel) {
-    compteRoueCodeuse = finDeCourseFermeture;
-    pulse = pulseOuvertureReduit;
+  if (boitierOuvert) {
+    if (touche == 1 and incrementation == menuManuel ) {
+      compteRoueCodeuse = finDeCourseOuverture;
+      pulse = pulseFermetureReduit;
+    }  else if (touche == 4 and incrementation == menuManuel) {
+      compteRoueCodeuse = finDeCourseFermeture;
+      pulse = pulseOuvertureReduit;
+    }
   }
 }
 
 //-----compteur roue codeuse-----
 void compteurRoueCodeuse() {
   // debounce
- // if (interruptRoueCodeuse) delay (2);  // attendre
+  // if (interruptRoueCodeuse) delay (2);  // attendre
   interruptRoueCodeuse = true; //activation de l'anti-rebond
   bool cpt = digitalRead(roueCodeuse);
   // Confirmation du changement

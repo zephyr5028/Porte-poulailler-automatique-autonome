@@ -14,8 +14,6 @@ volatile boolean positionRoueCodeuse;
 const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
 
 /* servo */
-#include <ServoTimer2.h> // the servo library
-ServoTimer2 monServo;
 const byte servoPin = 4; // pin D4 relais du servo
 const byte servoCde = 8; // pin D8 cde du servo
 const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
@@ -46,15 +44,13 @@ byte incrementation = 0; // incrementation verticale
 byte decalage = 0; // decalage à droite pour reglage
 boolean reglage = false; // menu=false ou reglage=true
 int temps = 0; // temps entre deux affichages de l heure
-int debounce = 250; // debounce latency in ms
-unsigned long tempoDebounce; // temporisation pour debounce
+const int debounce = 250; // debounce latency in ms
+unsigned long tempoDebounce(debounce); // temporisation pour debounce
 boolean relacheBpOF = true; // relache Bp
 byte BpOF = 9; // pin D9 bouton poussoir ouverture / fermeture
 byte interOuvBoitier = 6; //pin D6 interrupteur ouverture boitier
 boolean retroEclairage = true; // etat retro eclairage
 boolean  boitierOuvert = true; // le boitier est ouvert
-
-boolean TboitierOuvert(true); // pour la recherche de la panne boitier ouvert / ferme
 
 /* Clavier */
 byte oldkey = -1;

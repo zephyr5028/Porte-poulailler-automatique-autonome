@@ -44,8 +44,8 @@ void myInterruptINT1();//-----routine interruption D3 INT1
 void routineInterruptionBp();//-----routine interruption Bp
 void  routineInterrruptionAlarme2();//-----routine alarme 2
 void  routineInterruptionAlarme1();//-----routine alarme 1
-//void  routineInterruptionBoitierOuvert();//-----routine interruption boitier ouvert
-//void  routineTestFermetureBoitier();//-----test fermeture boitier
+void  routineInterruptionBoitierOuvert();//-----routine interruption boitier ouvert
+void  routineTestFermetureBoitier();//-----test fermeture boitier
 
 /* lumiere */
 void lumiere(); //-----routine lecture et affichage de la lumière
