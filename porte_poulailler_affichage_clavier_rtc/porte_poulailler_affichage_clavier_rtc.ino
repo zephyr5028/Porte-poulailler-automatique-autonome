@@ -36,7 +36,7 @@
 
 /*-----debug-----*/
 const boolean DEBUG = false; // positionner debug pour l'utiliser ou pas
-const boolean RADIO = true; // positionner radio pour l'utiliser ou pas
+const boolean RADIO = false; // positionner radio pour l'utiliser ou pas
 const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 
 /*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
@@ -47,11 +47,14 @@ const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 /*-----virtualWire pour la liaison RF 433Mhz-----*/
 #include <VirtualWire.h>
 #include "Radio.h"
-Radio rad(RADIO,DEBUG); // class Radio avec true pour envoi par radio
+Radio rad(RADIO, DEBUG); // class Radio avec true pour envoi par radio
 
 /* affichages */
 #define LCDCol 16
 #define LCDRow 2
+
+/* led broche 13 */
+#define LED_PIN 13
 
 /* servo - montée et descente de la porte */
 #include <ServoTimer2.h> // the servo library
@@ -101,7 +104,7 @@ byte incrementation = 0; // incrementation verticale
 byte decalage = 0; // decalage à droite pour reglage
 boolean reglage = false; // menu=false ou reglage=true
 int temps = 0; // temps entre deux affichages de l heure
-const int debounce = 250; // debounce latency in ms
+const int debounce = 350; // debounce latency in ms
 unsigned long tempoDebounce(debounce); // temporisation pour debounce
 boolean relacheBpOF = true; // relache Bp
 byte BpOF = 9; // pin D9 bouton poussoir ouverture / fermeture
@@ -116,7 +119,6 @@ byte touche(-1); // valeur de la touche appuyee
 const byte sensorClavier = 1; //pin A1 pour le clavier
 
 /* progmem  mémoire flash */
-
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
 const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin de course  . Fin de course  . Volt bat Cdes  . Volt bat servo . Commande Manuel.";
 const char affichageRadio[] PROGMEM = "Batterie faible !!!!.Temp = .Time : .Lum : .Fin course F = .Fin course O = .Ten Cdes = . Ten Servo = .Porte ouv !.Porte ferm !.";
@@ -406,12 +408,12 @@ void eclairageAfficheur() {
 
 //---- temporisation pour l'affichage, affichage du menu lorsque temps est >....
 void temporisationAffichage() {
-  // if ( temps > 1000) {
-  deroulementMenu (incrementation); // affichage du menu en fonction de incrementation
-  //  temps = 0;
-  // } else {
-  //  temps = temps + 1;
-  // }
+  if ( temps > 1000) {
+    deroulementMenu (incrementation); // affichage du menu en fonction de incrementation
+    temps = 0;
+  } else {
+    temps = temps + 1;
+  }
 }
 
 /* batteries */
@@ -1318,19 +1320,6 @@ void read_temp(boolean type) {
 }
 
 /* roue codeuse */
-//----montee , descente manuelle, position de la trappe-----
-void monteeDescenteManuelle() {
-  if (boitierOuvert) {
-    if (touche == 1 and incrementation == menuManuel ) {
-      compteRoueCodeuse = finDeCourseOuverture;
-      pulse = pulseFermetureReduit;
-    }  else if (touche == 4 and incrementation == menuManuel) {
-      compteRoueCodeuse = finDeCourseFermeture;
-      pulse = pulseOuvertureReduit;
-    }
-  }
-}
-
 //-----compteur roue codeuse-----
 void compteurRoueCodeuse() {
   // debounce
@@ -1375,7 +1364,7 @@ void  servoFermeture() {
     digitalWrite(servoPin, HIGH); // mise soustension du servo
     pulse = pulseFermeture;
     monServo.write(pulse); // modification vitesse servo
-    delay(100);
+    delay(200);
   }
 }
 
@@ -1395,13 +1384,13 @@ void ouverturePorte() {
     }
     servoAction = false; // servo arret
   }
- /* if ( boitierOuvert) { // si le boitier est ouvert
-    boucleTempo++;
-    if (boucleTempo >= tempoLcd) {
-      deroulementMenu (incrementation); // affichage du menu pour pulse
-      boucleTempo = 0;
-    }
-  }*/
+  /* if ( boitierOuvert) { // si le boitier est ouvert
+     boucleTempo++;
+     if (boucleTempo >= tempoLcd) {
+       deroulementMenu (incrementation); // affichage du menu pour pulse
+       boucleTempo = 0;
+     }
+    }*/
 }
 
 //-----sequence fermeture de la porte-----
@@ -1420,13 +1409,13 @@ void  fermeturePorte() {
     }
     servoAction = false; // servo arret
   }
- /* if ( boitierOuvert) { // si le boitier est ouvert
-    boucleTempo++;
-    if (boucleTempo >= tempoLcd) {
-      deroulementMenu (incrementation); // affichage du menu pour pulse
-      boucleTempo = 0;
-    }
-  }*/
+  /* if ( boitierOuvert) { // si le boitier est ouvert
+     boucleTempo++;
+     if (boucleTempo >= tempoLcd) {
+       deroulementMenu (incrementation); // affichage du menu pour pulse
+       boucleTempo = 0;
+     }
+    }*/
 }
 
 /* interruptions
@@ -1468,7 +1457,7 @@ void routineInterruptionBp() {
       } else {
         servoFermeture(); // mise sous tension du servo et descente de la porte
       }
-      tempoDebounce = millis() + 1000; // attente relache du bouton
+      tempoDebounce = millis(); // attente relache du bouton
     }
     if (((millis() - tempoDebounce) > debounce)  and  relacheBpOF == false and digitalRead(BpOF) ) {
       interruptBp = false; // autorisation de la prise en compte de l'IT
@@ -1573,7 +1562,7 @@ void ouvFermLum() {
 /* menu */
 //-----routine affichage menus------
 void deroulementMenu (byte increment) {
- // if (boitierOuvert) {
+  if (boitierOuvert) {
     byte j = ((increment - 1) * (colonnes + 1)); // tous les 16 caractères
     mydisp.drawStr(0, 0, ""); // position du curseur en 0,0
     for (byte i = j; i < j + colonnes; i++) { // boucle pour afficher 16 caractères sur le lcd
@@ -1638,7 +1627,7 @@ void deroulementMenu (byte increment) {
         affiPulsePlusCptRoue(); // affichage pulse et comptage roue codeuse
         break;
     }
- // }
+  }
 }
 
 /* watchdog */
@@ -1678,11 +1667,11 @@ void enterSleep(void) {
 
 //-----routine de gestion du watchdog-----
 void routineGestionWatchdog() {
-  // if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
-
-
-  if (f_wdt == 1 ) { // si  watchdog=1
+  if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
     if ( !servoAction) { // servo à l'arrêt
+      digitalWrite(LED_PIN, HIGH);
+      delay(100);
+      digitalWrite(LED_PIN, LOW);
       tempsWatchdog--;
       if (tempsWatchdog <= 0) {
         if (batterieFaible) { // affichage si la batterie est faible
@@ -1746,38 +1735,39 @@ void setup() {
       delay(200);
     }
   }
+  pinMode(LED_PIN, OUTPUT); // led broche 13
   incrementation = menuManuel; // pour affichage menu
   deroulementMenu (incrementation); // affichage du menu
-  
+
   ouve = i2c_eeprom_read_byte(0x57, 0x14); // lecture du type d'ouverture @14  de l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
   ferm = i2c_eeprom_read_byte(0x57, 0x15); // lecture du type de fermeture @15   de l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
-  
+
   byte val1 = i2c_eeprom_read_byte(0x57, 0x16); // lecture pf lumière du matin (byte)
   delay(10);
   byte val2 = i2c_eeprom_read_byte(0x57, 0x17); // lecture Pf lumiere du matin (byte)
   delay(10);
   lumMatin = (val2 << 8) + val1;  // mots 2 byte vers mot int lumMatin
- 
+
   val1 = i2c_eeprom_read_byte(0x57, 0x18); // lecture pf lumière du soir (byte)
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x19); // lecture Pf lumiere du soir (byte)
   delay(10);
   lumSoir = (val2 << 8) + val1;  // mots 2 byte vers mot int lumMatin
- 
+
   val1 = i2c_eeprom_read_byte(0x57, 0x20); // lecture pf fin de course haut (byte)
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x21); // lecture Pf fin de course haut (byte)
   delay(10);
   finDeCourseFermeture = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseFermeture
- 
+
   val1 = i2c_eeprom_read_byte(0x57, 0x22); // lecture pf fin de course bas (byte)
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x23); // lecture Pf fin de course bas (byte)
   delay(10);
   finDeCourseOuverture = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseOuverture
-  
+
   // roue codeuse
   pinMode(roueCodeuse, INPUT); // make the roueCodeuse's pin 7 an input
   // servo
@@ -1786,10 +1776,10 @@ void setup() {
   monServo.attach(servoCde); // use digital pin D8 for commande du servo
   // on démarre à une valeur censée être la moitié de l'excursion totale de l'angle réalisé par le servomoteur
   monServo.write(pulse);  // value should usually be 750 to 2200 (environ 1500 = stop)
-  
+
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
-  
+
   //RTC.writeRTC(0x0E,0x06); // registre control rtc
   RTC.writeRTC(0x0F, 0x00); // registre status rtc
 
@@ -1803,60 +1793,61 @@ void setup() {
   //power_timer0_disable();
   //power_timer1_disable();
   //power_timer2_disable();
-  
+
   setup_watchdog(9); // maxi de 8 secondes
-  
+
   vw_set_tx_pin(pinEmRadio); // broche d10 emetteur
   vw_setup(600); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
-  
-//  servoOuverture(); // initialisation des paramétres par la mise sous tension du servo pour la montee de la porte (fonction du sens de rotation du servo)
+
+  servoOuverture(); // initialisation des paramétres par la mise sous tension du servo pour la montee de la porte (fonction du sens de rotation du servo)
 }
 
 /* loop */
 void loop() {
 
   lectureClavier(); // lecture du clavier
-
   //affichage du menu lorsque temps est > ....
   temporisationAffichage() ; // temporisation pour l'affichage
 
   //reglages
-//  reglageTime(); // reglages de l'heure, minute, seconde si touche fleche droite
-//  reglageDate(); // reglage de la date si touche fleche droite
- // reglageHeureOuverture();// reglage de l'heure d'ouverture
- // reglageHeureFermeture();// reglage de l'heure de fermeture
- // choixOuvFerm (); // choix de l'ouverture et la fermeture
-//  choixLumMatin();//  reglage de la lumiere du matin
- // choixLumSoir();//  reglage de la lumiere du soir
- // regFinDeCourseFermeture(); // reglage fin de course fermeture
- // regFinDeCourseOuverture(); // reglage fin de course ouverture
-//  eclairageAfficheur(); // retro eclairage de l'afficheur
+  reglageTime(); // reglages de l'heure, minute, seconde si touche fleche droite
+  reglageDate(); // reglage de la date si touche fleche droite
+  reglageHeureOuverture();// reglage de l'heure d'ouverture
+  reglageHeureFermeture();// reglage de l'heure de fermeture
+  choixOuvFerm (); // choix de l'ouverture et la fermeture
+  choixLumMatin();//  reglage de la lumiere du matin
+  choixLumSoir();//  reglage de la lumiere du soir
+  regFinDeCourseFermeture(); // reglage fin de course fermeture
+  regFinDeCourseOuverture(); // reglage fin de course ouverture
+  eclairageAfficheur(); // retro eclairage de l'afficheur
 
-  //   monteeDescenteManuelle();// initialisation butée roue codeuse
-  //   compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-  /*  if (TESTSERVO) {
-      testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
-    }*/
+  compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
+  if (TESTSERVO) {
+    testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
+  }
 
   // le boitier est fermé et le servo n'est pas en action
   //  if (!boitierOuvert and  !servoAction) {
-  //   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
+  ouvFermLum() ;  // ouverture/fermeture par test de la lumière
   //  }
-  Serial.println(boitierOuvert);
-  //accusFaible(); // batterie cdes < 4 volt
-  //ouverturePorte();
-  // fermeturePorte();
+  accusFaible(); // batterie cdes < 4 volt
+  ouverturePorte();
+  fermeturePorte();
 
-  // routineTestFermetureBoitier(); // test fermeture boitier
+  routineTestFermetureBoitier(); // test fermeture boitier
+  routineInterruptionBoitierOuvert(); // routine interruption boitier ouvert
+  routineInterruptionBp(); // routine interruption Bp
+  if (interruptBp or boitierOuvert) {
+    digitalWrite(LED_PIN, HIGH);
+  } else  {
+    digitalWrite(LED_PIN, LOW);
+  }
+  //Serial.println(tempsLum);
+  routineInterrruptionAlarme2() ; // routine alarme 2
+  routineInterruptionAlarme1(); // routine alarme 1
 
-  // routineInterruptionBp(); // routine interruption Bp
 
-  // routineInterrruptionAlarme2() ; // routine alarme 2
-
-  //routineInterruptionAlarme1(); // routine alarme 1
-
-  // routineInterruptionBoitierOuvert(); // routine interruption boitier ouvert
-  // routineGestionWatchdog(); // routine de gestion du watchdog
+  routineGestionWatchdog(); // routine de gestion du watchdog
 
 }
 
