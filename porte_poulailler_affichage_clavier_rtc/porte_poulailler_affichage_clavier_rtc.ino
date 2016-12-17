@@ -47,7 +47,7 @@ const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 /*-----virtualWire pour la liaison RF 433Mhz-----*/
 #include <VirtualWire.h>
 #include "Radio.h"
-Radio rad(RADIO, DEBUG); // class Radio avec true pour envoi par radio
+Radio rad(RADIO); // classe Radio
 
 /* affichages */
 #define LCDCol 16
@@ -87,15 +87,13 @@ unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fi
 boolean servoAction(false) ; // servo à l'arrêt
 boolean ouverture = false; // montee de la porte
 boolean fermeture = false; // descente de la porte
-byte boucleTempo(0); // boucle tempo pour l'affichage lcd
-byte tempoLcd(5);// tempo pour l'afficahge lcd
 
 /* watchdog - Optimisation de la consommation */
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
-const byte bouclesWatchdog = 8; // nombre de boucles du watchdog
+const byte bouclesWatchdog(2); // nombre de boucles du watchdog
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean batterieFaible = false; // si batterie < 4,8v = true
 
@@ -206,6 +204,45 @@ byte decToBcd(byte val) {
 //-----routine bcdToDec : Convert binary coded decimal to normal decimal numbers-----
 byte bcdToDec(byte val) {
   return ( (val / 16 * 10) + (val % 16) );
+}
+
+/* eeprom at24c32 */
+//-----ecriture dans l'eeprom at24c32 de la carte rtc------
+void i2c_eeprom_write_byte( int deviceaddress, unsigned int eeaddress, byte data ) {
+  int rdata = data;
+  Wire.beginTransmission(deviceaddress);   // adresse 0x57 pour l'i2c de l'eeprom de la carte rtc
+  Wire.write((int)(eeaddress >> 8)); // MSB
+  Wire.write((int)(eeaddress & 0xFF)); // LSB
+  Wire.write(rdata);
+  Wire.endTransmission();
+}
+
+//-----lecture de l'eeprom at24c32 de la carte rtc------
+byte i2c_eeprom_read_byte( int deviceaddress, unsigned int eeaddress ) {
+  byte rdata = 0xFF;
+  Wire.beginTransmission(deviceaddress); // adresse 0x57 pour l'i2c de l'eeprom de la carte rtc
+  Wire.write((int)(eeaddress >> 8)); // MSB
+  Wire.write((int)(eeaddress & 0xFF)); // LSB
+  Wire.endTransmission();
+  Wire.requestFrom(deviceaddress, 1);
+  if (Wire.available()) rdata = Wire.read();
+  return rdata;
+}
+
+/* clavier */
+//-----lecture clavier------
+void  lectureClavier() {
+  if (boitierOuvert) {
+    touche = clav.read_key(sensorClavier); // read key sensor = A1
+    if (touche == oldkey ) { // si touche == -1, donc touche relache=true
+      relache = true;
+    }
+    if ((touche == 2 or touche == 3) and relache and !reglage) { // si appui sur les touches 2 ou 3 et la touche relache=true et mode reglage
+      relache = false;
+      incrementation = clav.positionMenu(incrementation, touche); // position du menu pour l'affichage
+      deroulementMenu (incrementation); // affichage du menu
+    }
+  }
 }
 
 //----routine lecture et ecriture date and time-----
@@ -393,7 +430,7 @@ void affiPulsePlusCptRoue() {
 //-----retro eclairage de l'afficheur-----
 void eclairageAfficheur() {
   if (boitierOuvert) {
-    if (touche == 5 and relache == true and fermeture == false and  ouverture == false) { // retro eclairage si appuis sur la touche 5
+    if (touche == 5 and relache == true ) { // retro eclairage si appuis sur la touche 5
       relache = false;
       if (retroEclairage)  {
         mydisp.backLightOn(); // retro eclairage on
@@ -493,7 +530,6 @@ void accusFaible() {
      - heure
      - lumiere
 */
-
 //------affichage du choix de l'ouverture et la fermeture------
 void affiChoixOuvFerm() {
   if ( boitierOuvert) { // si le boitier est ouvert
@@ -573,45 +609,6 @@ void choixOuvFerm () {
       }
     }
   }
-}
-
-/* clavier */
-//-----lecture clavier------
-void  lectureClavier() {
-  if (boitierOuvert) {
-    touche = clav.read_key(sensorClavier); // read key sensor = A1
-    if (touche == oldkey ) { // si touche == -1, donc touche relache=true
-      relache = true;
-    }
-    if ((touche == 2 or touche == 3) and relache and !reglage) { // si appui sur les touches 2 ou 3 et la touche relache=true et mode reglage
-      relache = false;
-      incrementation = clav.positionMenu(incrementation, touche); // position du menu pour l'affichage
-      deroulementMenu (incrementation); // affichage du menu
-    }
-  }
-}
-
-/* eeprom at24c32 */
-//-----ecriture dans l'eeprom at24c32 de la carte rtc------
-void i2c_eeprom_write_byte( int deviceaddress, unsigned int eeaddress, byte data ) {
-  int rdata = data;
-  Wire.beginTransmission(deviceaddress);   // adresse 0x57 pour l'i2c de l'eeprom de la carte rtc
-  Wire.write((int)(eeaddress >> 8)); // MSB
-  Wire.write((int)(eeaddress & 0xFF)); // LSB
-  Wire.write(rdata);
-  Wire.endTransmission();
-}
-
-//-----lecture de l'eeprom at24c32 de la carte rtc------
-byte i2c_eeprom_read_byte( int deviceaddress, unsigned int eeaddress ) {
-  byte rdata = 0xFF;
-  Wire.beginTransmission(deviceaddress); // adresse 0x57 pour l'i2c de l'eeprom de la carte rtc
-  Wire.write((int)(eeaddress >> 8)); // MSB
-  Wire.write((int)(eeaddress & 0xFF)); // LSB
-  Wire.endTransmission();
-  Wire.requestFrom(deviceaddress, 1);
-  if (Wire.available()) rdata = Wire.read();
-  return rdata;
 }
 
 /* reglage heure fermeture */
@@ -1114,7 +1111,7 @@ void regFinDeCourseFermeture() {
     if (touche == 4 and relache == true and incrementation == menuFinDeCourseFermeture) {
       relache = false;
       if (decalage < 15 ) { // boucle de reglage
-        decalage += 8;   // incrementation decalage
+        decalage += 9;   // incrementation decalage
         reglage = true; // reglages
       }
       if (decalage > 12 ) { // fin de la ligne d'affichage si >12
@@ -1125,7 +1122,7 @@ void regFinDeCourseFermeture() {
     }
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == 8) {
+      if (decalage == 9) {
         if (touche == 2 ) {
           if (finDeCourseFermeture < 500) {
             finDeCourseFermeture++; //incrementation de la fin de course haut
@@ -1160,7 +1157,7 @@ void regFinDeCourseOuverture() {
     if (touche == 4 and relache == true and incrementation == menuFinDeCourseOuverture) {
       relache = false;
       if (decalage < 15 ) { // boucle de reglage
-        decalage +=  8;   // incrementation decalage
+        decalage +=  9;   // incrementation decalage
         reglage = true; // reglages
       }
       if (decalage > 12 ) { // fin de la ligne d'affichage si >12
@@ -1171,7 +1168,7 @@ void regFinDeCourseOuverture() {
     }
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == 8) {
+      if (decalage == 9) {
         if (touche == 2 ) {
           if (finDeCourseOuverture < 500) {
             finDeCourseOuverture++; //incrementation de la fin de course bas
@@ -1344,7 +1341,7 @@ void compteurRoueCodeuse() {
 */
 //------mise sous tension du servo et montee de la porte-------
 void servoOuverture() {
-  if (!batterieFaible) { // si la batterie n'est pas faible
+  if (!batterieFaible and  !servoAction) { // si la batterie n'est pas faible et le servo non en action
     servoAction = true; // servo en action
     ouverture = false;
     fermeture = true;
@@ -1357,7 +1354,7 @@ void servoOuverture() {
 
 //-----mise sous tension du servo et descente de la porte-----
 void  servoFermeture() {
-  if (!batterieFaible) { // si la batterie n'est pas faible
+  if (!batterieFaible and  !servoAction) { // si la batterie n'est pas faible et le servo non en action
     servoAction = true; // servo en action
     fermeture = false;
     ouverture = true;
@@ -1384,13 +1381,6 @@ void ouverturePorte() {
     }
     servoAction = false; // servo arret
   }
-  /* if ( boitierOuvert) { // si le boitier est ouvert
-     boucleTempo++;
-     if (boucleTempo >= tempoLcd) {
-       deroulementMenu (incrementation); // affichage du menu pour pulse
-       boucleTempo = 0;
-     }
-    }*/
 }
 
 //-----sequence fermeture de la porte-----
@@ -1409,13 +1399,6 @@ void  fermeturePorte() {
     }
     servoAction = false; // servo arret
   }
-  /* if ( boitierOuvert) { // si le boitier est ouvert
-     boucleTempo++;
-     if (boucleTempo >= tempoLcd) {
-       deroulementMenu (incrementation); // affichage du menu pour pulse
-       boucleTempo = 0;
-     }
-    }*/
 }
 
 /* interruptions
@@ -1543,11 +1526,11 @@ void ouvFermLum() {
   if (sensorValue > lumMatin and sensorValue < lumSoir) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
-  if ((ouve == 1 and valHeure < 16) or (ferm == 1 and valHeure > 16)) { // pour ne pas declencher la fermeture avant 16h00 et l'ouverture après 16h00 si utilisation de l'heure
+  if ((ouve == 1 and valHeure < 17) or (ferm == 1 and valHeure > 17)) { // pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 si utilisation de l'heure
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
-  if ((compteRoueCodeuse <= (finDeCourseOuverture + 2) ) or (compteRoueCodeuse >= (finDeCourseFermeture - 2))) {
-    compteurWatchdogLumiere = 0; // pour ne pas relancer l'action une fois effectuée.
+  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and (ouve == 0)) or (( compteRoueCodeuse >= (finDeCourseFermeture - 2)) and (ferm == 0))) {
+    compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
   if ((sensorValue <= lumMatin) and (ouve == 0) and (compteurWatchdogLumiere >= tempsLum)) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
@@ -1669,8 +1652,9 @@ void enterSleep(void) {
 void routineGestionWatchdog() {
   if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
     if ( !servoAction) { // servo à l'arrêt
+      //indicateur led 13 pour le mode sleep
       digitalWrite(LED_PIN, HIGH);
-      delay(100);
+      delay(10);
       digitalWrite(LED_PIN, LOW);
       tempsWatchdog--;
       if (tempsWatchdog <= 0) {
@@ -1754,7 +1738,7 @@ void setup() {
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x19); // lecture Pf lumiere du soir (byte)
   delay(10);
-  lumSoir = (val2 << 8) + val1;  // mots 2 byte vers mot int lumMatin
+  lumSoir = (val2 << 8) + val1;  // mots 2 byte vers mot int lumSoir
 
   val1 = i2c_eeprom_read_byte(0x57, 0x20); // lecture pf fin de course haut (byte)
   delay(10);
@@ -1821,15 +1805,12 @@ void loop() {
   regFinDeCourseOuverture(); // reglage fin de course ouverture
   eclairageAfficheur(); // retro eclairage de l'afficheur
 
-  compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   if (TESTSERVO) {
     testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
   }
 
-  // le boitier est fermé et le servo n'est pas en action
-  //  if (!boitierOuvert and  !servoAction) {
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
-  //  }
+
   accusFaible(); // batterie cdes < 4 volt
   ouverturePorte();
   fermeturePorte();
@@ -1837,15 +1818,10 @@ void loop() {
   routineTestFermetureBoitier(); // test fermeture boitier
   routineInterruptionBoitierOuvert(); // routine interruption boitier ouvert
   routineInterruptionBp(); // routine interruption Bp
-  if (interruptBp or boitierOuvert) {
-    digitalWrite(LED_PIN, HIGH);
-  } else  {
-    digitalWrite(LED_PIN, LOW);
-  }
+
   //Serial.println(tempsLum);
   routineInterrruptionAlarme2() ; // routine alarme 2
   routineInterruptionAlarme1(); // routine alarme 1
-
 
   routineGestionWatchdog(); // routine de gestion du watchdog
 
