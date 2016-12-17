@@ -93,7 +93,7 @@ boolean fermeture = false; // descente de la porte
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
-const byte bouclesWatchdog(2); // nombre de boucles du watchdog
+const byte bouclesWatchdog(8); // nombre de boucles du watchdog environ 64s
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean batterieFaible = false; // si batterie < 4,8v = true
 
