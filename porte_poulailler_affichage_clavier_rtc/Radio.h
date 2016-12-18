@@ -10,7 +10,7 @@ class Radio
 {
   public:
 
-    Radio(boolean radio = false , boolean debug = false );// constructeur avec debug, radio
+    Radio(byte taille, boolean radio = false , boolean debug = false );// constructeur avec debug, radio
     ~Radio(); // destructeur
 
     void envoiMessage(char chaine1[]);//routine envoi message radio

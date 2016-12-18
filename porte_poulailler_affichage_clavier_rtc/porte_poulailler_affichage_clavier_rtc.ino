@@ -47,7 +47,7 @@ const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 /*-----virtualWire pour la liaison RF 433Mhz-----*/
 #include <VirtualWire.h>
 #include "Radio.h"
-Radio rad(RADIO); // classe Radio
+Radio rad(VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
 
 /* affichages */
 #define LCDCol 16
@@ -407,7 +407,7 @@ void affiPulsePlusCptRoue() {
       Serial.println(F("Porte ouverte"));
     }
   }
-  if (RADIO) {
+  if (RADIO and tempsWatchdog <= 0) { // éviter l'envoi à l'initialisation
     if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
       char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       strcat(chaine1, "fer");
