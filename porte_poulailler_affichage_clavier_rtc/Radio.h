@@ -10,7 +10,6 @@ class Radio
 {
   public:
 
-   // Radio(boolean radio = false , boolean debug = false );// constructeur avec debug, radio
     Radio(byte taille, boolean radio = false , boolean debug = false );// constructeur avec debug, radio
     ~Radio(); // destructeur
 
