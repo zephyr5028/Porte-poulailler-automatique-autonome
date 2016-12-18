@@ -407,7 +407,7 @@ void affiPulsePlusCptRoue() {
       Serial.println(F("Porte ouverte"));
     }
   }
-  if (RADIO) {
+  if (RADIO and tempsWatchdog <= 0) { // eviter l'envoi à l'initialisation
     if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
       char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       strcat(chaine1, "fer");
