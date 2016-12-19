@@ -28,3 +28,5 @@ class Radio
 
 #endif
 
+
+/* ajouiter la variable boitier ouvert/ferme pour éviter de remplir le tableau sans envoi du message*/

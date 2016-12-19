@@ -322,7 +322,7 @@ void displayTime () {
       Serial.print(timeMinute, DEC);
       Serial.println(F("m"));
     }
-    if (RADIO) {
+    if (RADIO and (!boitierOuvert)) {
       char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       char hour_temp[3];
       char minute_temp[3];
@@ -409,8 +409,8 @@ void affiPulsePlusCptRoue() {
     }
   }
 
-   if (RADIO and tempsWatchdog <= 0) { // eviter l'envoi à l'initialisation
-  //if (RADIO) {
+  if (RADIO and tempsWatchdog <= 0 and (!boitierOuvert)) { // eviter l'envoi à l'initialisation
+    //if (RADIO) {
 
     if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
       char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
@@ -479,7 +479,7 @@ void affiTensionBatCdes() {
     Serial.print(voltage);
     Serial.println(F(" V"));
   }
-  if (RADIO) {
+  if (RADIO and (!boitierOuvert)) {
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     char voltage_temp[6];
     dtostrf(voltage, 1, 2, voltage_temp);
@@ -510,7 +510,7 @@ void affiTensionBatServo() {
     Serial.print(voltage);
     Serial.println(F(" V"));
   }
-  if (RADIO) {
+  if (RADIO and (!boitierOuvert)) {
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     char voltage_temp[6];
     dtostrf(voltage, 1, 2, voltage_temp);
@@ -1076,7 +1076,7 @@ void affiFinDeCourseHaut() {
   if (DEBUG) {
     Serial.print(F("Fin course fermeture = ")); Serial.println(finDeCourseFermeture);
   }
-  if (RADIO) {
+  if (RADIO and (!boitierOuvert)) {
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     char finDeCourseFermeture_temp[5];
     sprintf(finDeCourseFermeture_temp, "%i", finDeCourseFermeture);
@@ -1100,7 +1100,7 @@ void affiFinDeCourseOuverture() {
   if (DEBUG) {
     Serial.print(F("Fin course ouverture = ")); Serial.println(finDeCourseOuverture);
   }
-  if (RADIO) {
+  if (RADIO and (!boitierOuvert)) {
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     char finDeCourseOuverture_temp[5];
     sprintf(finDeCourseOuverture_temp, "%i", finDeCourseOuverture);
@@ -1308,10 +1308,9 @@ void read_temp(boolean type) {
         Serial.print(fahrenheit); Serial.println(F(" F"));// affichage fahrenheit
       }
     }
-    if (RADIO) {
-      // N.B. La constante VW_MAX_MESSAGE_LEN est fournie par la lib VirtualWire
+    if (RADIO and (!boitierOuvert)) {
       char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-      char celsius_temp[6];
+      char celsius_temp[6] = "";
       dtostrf(celsius, 2, 2, celsius_temp);
       strcat(chaine1, celsius_temp);
       strcat(chaine1, "°C");
@@ -1510,7 +1509,7 @@ void lumiere() {
     Serial.print(F("lum : "));
     Serial.println(lumValue);
   }
-  if (RADIO) {
+  if (RADIO and (!boitierOuvert)) {
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     char lumSoir_temp[5];
     sprintf(lumSoir_temp, "%i",  lumSoir);

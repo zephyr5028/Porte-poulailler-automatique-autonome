@@ -13,10 +13,6 @@
 Radio::Radio(byte taille, boolean radio, boolean debug) :  m_taille(taille), m_radio(radio), m_debug(debug)
 {
   m_chaine[m_taille] = "";// initialisation du tableau
-  m_chaine[0] = '\0'; // initialisation du tableau m_chaine
-
-  //strcat(m_chaine, " ");// pour eviter un trou en case une - je n'ai pas trouvé la raison
-
 }
 
 Radio::~Radio()
@@ -34,8 +30,9 @@ void Radio::envoiMessage(char chaine1[]) {
     }
   } else {
     Radio::messageRadio(m_chaine);
-    m_chaine[0] = '\0'; // effacement du tableau
-    strcat(m_chaine, "  ");// pour eviter un trou en case une - je n'ai pas trouvé la raison
+    strcpy(m_chaine, "  ");// effacement du tableau + eviter l'effacement de la case une !!!
+    //*m_chaine=0;// effacement du tableau
+    //m_chaine[0] = '\0'; // effacement du tableau
   }
 }
 
