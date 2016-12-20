@@ -30,7 +30,7 @@ void Radio::envoiMessage(char chaine1[]) {
     }
   } else {
     Radio::messageRadio(m_chaine);
-    strcpy(m_chaine, "  ");// effacement du tableau + eviter l'effacement de la case une !!!
+    strcpy(m_chaine, "   ");// effacement du tableau + eviter l'effacement de la case une !!!
     //*m_chaine=0;// effacement du tableau
     //m_chaine[0] = '\0'; // effacement du tableau
   }
@@ -53,3 +53,28 @@ void Radio::chaineVide() {
     Radio::envoiMessage(chaine1);// on envoie le message
   }
 }
+
+//-----envoi message float avec test de l'ouverture du boitier plus texte-----
+void Radio::envoiFloat(float valeur , boolean boitierOuvert, char texte[]) {
+  if (m_radio and !boitierOuvert) {
+    char chaine1[m_taille - 1] = "";
+    char valeur_temp[6] = "";
+    dtostrf(valeur, 2, 2, valeur_temp);
+    strcat(chaine1, valeur_temp);
+    strcat(chaine1, texte);
+    Radio::envoiMessage(chaine1);// on envoie le message
+  }
+}
+
+//-----envoi message unsigned int avec test de l'ouverture du boitier plus texte-----
+void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char texte[]) {
+  if (m_radio and !boitierOuvert) {
+    char chaine1[m_taille - 1] = "";
+    char valeur_temp[5];
+    sprintf(valeur_temp, "%i", valeur);
+    strcat(chaine1, valeur_temp);
+    strcat(chaine1, texte);
+    Radio::envoiMessage(chaine1);// on envoie le message
+  }
+}
+

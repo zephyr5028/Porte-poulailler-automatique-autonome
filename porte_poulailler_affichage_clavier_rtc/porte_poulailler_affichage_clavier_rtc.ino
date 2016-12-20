@@ -38,6 +38,7 @@
 const boolean DEBUG = false; // positionner debug pour l'utiliser ou pas
 const boolean RADIO = true; // positionner radio pour l'utiliser ou pas
 const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
+const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 
 /*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
 #include <Flash.h>
@@ -48,7 +49,7 @@ const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 #include <VirtualWire.h>
 #include "Radio.h"
 
-Radio rad(VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
+Radio rad(VW_MAX_MESSAGE_LEN, RADIO, true); // classe Radio
 
 /* affichages */
 #define LCDCol 16
@@ -94,7 +95,7 @@ boolean fermeture = false; // descente de la porte
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
-const byte bouclesWatchdog(8); // nombre de boucles du watchdog environ 64s
+const byte bouclesWatchdog(2); // nombre de boucles du watchdog environ 64s
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean batterieFaible = false; // si batterie < 4,8v = true
 
@@ -322,18 +323,22 @@ void displayTime () {
       Serial.print(timeMinute, DEC);
       Serial.println(F("m"));
     }
-    if (RADIO and (!boitierOuvert)) {
-      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-      char hour_temp[3];
-      char minute_temp[3];
-      sprintf(hour_temp, "%i",  timeHour);
-      strcat(chaine1, hour_temp);
-      strcat(chaine1, "h");
-      sprintf(minute_temp, "%i",  timeMinute);
-      strcat(chaine1, minute_temp);
-      strcat(chaine1, "m");
-      rad.envoiMessage(chaine1);// on envoie le message
-    }
+    // rad.envoiDisplayTime(timeHour, timeMinute, boitierOuvert); // envoi message radio heure/minute si le boitier est fermé
+    rad.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure si le boitier est fermé
+    rad.envoiUnsignedInt(timeMinute,  boitierOuvert, "m");// envoi message radio minute si le boitier est fermé
+    /*
+       if (RADIO and (!boitierOuvert)) {
+         char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+         char hour_temp[3];
+         char minute_temp[3];
+         sprintf(hour_temp, "%i",  timeHour);
+         strcat(chaine1, hour_temp);
+         strcat(chaine1, "h");
+         sprintf(minute_temp, "%i",  timeMinute);
+         strcat(chaine1, minute_temp);
+         strcat(chaine1, "m");
+         rad.envoiMessage(chaine1);// on envoie le message
+       }*/
   }
 }
 
@@ -422,11 +427,12 @@ void affiPulsePlusCptRoue() {
       strcat(chaine1, "ouv");
       rad.envoiMessage(chaine1);// on envoie le message
     }
-    char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-    char compteRoueCodeuse_temp[5];
-    sprintf(compteRoueCodeuse_temp, "%i", compteRoueCodeuse);
-    strcat(chaine1, compteRoueCodeuse_temp);
-    rad.envoiMessage(chaine1);// on envoie le message
+    rad.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert); // envoi message radio compteur roue codeuse
+    /*   char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+       char compteRoueCodeuse_temp[5];
+       sprintf(compteRoueCodeuse_temp, "%i", compteRoueCodeuse);
+       strcat(chaine1, compteRoueCodeuse_temp);
+       rad.envoiMessage(chaine1);// on envoie le message*/
   }
 }
 
@@ -479,14 +485,16 @@ void affiTensionBatCdes() {
     Serial.print(voltage);
     Serial.println(F(" V"));
   }
-  if (RADIO and (!boitierOuvert)) {
+  rad.envoiFloat(voltage, boitierOuvert, "V" ); // envoi message radio tension accus
+  //  rad.envoiTension(voltage, boitierOuvert); // envoi message radio tension accus
+  /*if (RADIO and (!boitierOuvert)) {
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     char voltage_temp[6];
     dtostrf(voltage, 1, 2, voltage_temp);
     strcat(chaine1, voltage_temp);
     strcat(chaine1, "V");
     rad.envoiMessage(chaine1);// on envoie le message
-  }
+    }*/
 }
 
 //-------affichage tension batterie servo-moteur
@@ -510,14 +518,17 @@ void affiTensionBatServo() {
     Serial.print(voltage);
     Serial.println(F(" V"));
   }
-  if (RADIO and (!boitierOuvert)) {
+  rad.envoiFloat(voltage, boitierOuvert, "V" ); // envoi message radio tension accus
+  //  rad.envoiTension(voltage, boitierOuvert); // envoi message radio tension accus
+  /*
+    if (RADIO and (!boitierOuvert)) {
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     char voltage_temp[6];
     dtostrf(voltage, 1, 2, voltage_temp);
     strcat(chaine1, voltage_temp);
     strcat(chaine1, "V");
     rad.envoiMessage(chaine1);// on envoie le message
-  }
+    }*/
 }
 
 //-----batterie cdes < 4 volt-----
@@ -1061,8 +1072,8 @@ void reglageTime () {
 }
 
 /* fins de course haut et bas */
-//------affichage fin de course Haut-----
-void affiFinDeCourseHaut() {
+//------affichage fin de course Fermeture-----
+void affiFinDeCourseFermeture() {
   if ( boitierOuvert) { // si le boitier est ouvert
     mydisp.print(F("   Fer : "));
     mydisp.print(finDeCourseFermeture);
@@ -1076,13 +1087,14 @@ void affiFinDeCourseHaut() {
   if (DEBUG) {
     Serial.print(F("Fin course fermeture = ")); Serial.println(finDeCourseFermeture);
   }
-  if (RADIO and (!boitierOuvert)) {
-    char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-    char finDeCourseFermeture_temp[5];
-    sprintf(finDeCourseFermeture_temp, "%i", finDeCourseFermeture);
-    strcat(chaine1, finDeCourseFermeture_temp);
-    rad.envoiMessage(chaine1);// on envoie le message
-  }
+  rad.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert); // envoi message radio fin de course fermeture
+  /* if (RADIO and (!boitierOuvert)) {
+     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+     char finDeCourseFermeture_temp[5];
+     sprintf(finDeCourseFermeture_temp, "%i", finDeCourseFermeture);
+     strcat(chaine1, finDeCourseFermeture_temp);
+     rad.envoiMessage(chaine1);// on envoie le message
+    }*/
 }
 
 //------affichage fin de course Ouverture-------
@@ -1100,13 +1112,15 @@ void affiFinDeCourseOuverture() {
   if (DEBUG) {
     Serial.print(F("Fin course ouverture = ")); Serial.println(finDeCourseOuverture);
   }
-  if (RADIO and (!boitierOuvert)) {
+  rad.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert); // envoi message radio fin de course Ouverture
+  /*
+    if (RADIO and (!boitierOuvert)) {
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     char finDeCourseOuverture_temp[5];
     sprintf(finDeCourseOuverture_temp, "%i", finDeCourseOuverture);
     strcat(chaine1, finDeCourseOuverture_temp);
     rad.envoiMessage(chaine1);// on envoie le message
-  }
+    }*/
 }
 
 //------reglage fin de course Fermeture------
@@ -1148,7 +1162,7 @@ void regFinDeCourseFermeture() {
         i2c_eeprom_write_byte(0x57, 0x21, val2); // écriture de la valeur du reglage de la fin de course haut  high @21 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         mydisp.drawStr(0, 1, "");
-        affiFinDeCourseHaut();
+        affiFinDeCourseFermeture();
         mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
     }
@@ -1287,12 +1301,12 @@ void testServo() {
 
 /* temperature */
 //-----routine lecture température sur ds3231 rtc type celsius=true ,fahrenheit=false------
-void read_temp(boolean type) {
-  int t = RTC.temperature();
-  float celsius = t / 4.0;
+void read_temp(boolean typeTemperature) {
+  int temperature = RTC.temperature();
+  float celsius = temperature / 4.0;
   float fahrenheit = celsius * 9.0 / 5.0 + 32.0;
   if ( boitierOuvert) { // si le boitier est ouvert
-    if (type) {
+    if (typeTemperature) {
       mydisp.print(celsius); // affichage celsius
       mydisp.print(F(" C     "));
     } else {
@@ -1302,20 +1316,25 @@ void read_temp(boolean type) {
   } else {
     if (DEBUG) {
       Serial.print(F("Temp = "));
-      if (type) {
+      if (typeTemperature) {
         Serial.print(celsius); Serial.println(F(" °C"));// affichage celsius
       } else {
         Serial.print(fahrenheit); Serial.println(F(" F"));// affichage fahrenheit
       }
     }
-    if (RADIO and (!boitierOuvert)) {
-      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-      char celsius_temp[6] = "";
-      dtostrf(celsius, 2, 2, celsius_temp);
-      strcat(chaine1, celsius_temp);
-      strcat(chaine1, "°C");
-      rad.envoiMessage(chaine1);// on envoie le message
-    }
+    char temp[2] = "";
+    if (typeTemperature)  strcat(temp, "°C"); else strcat(temp, "F");
+    //  rad.envoiTemperature(celsius, boitierOuvert);// envoi du message radio temperature si boitier fermé
+    rad.envoiFloat(celsius, boitierOuvert, temp);
+    /*
+       if (RADIO and (!boitierOuvert)) {
+         char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+         char celsius_temp[6] = "";
+         dtostrf(celsius, 2, 2, celsius_temp);
+         strcat(chaine1, celsius_temp);
+         strcat(chaine1, "°C");
+         rad.envoiMessage(chaine1);// on envoie le message
+       }*/
   }
 }
 
@@ -1509,17 +1528,19 @@ void lumiere() {
     Serial.print(F("lum : "));
     Serial.println(lumValue);
   }
-  if (RADIO and (!boitierOuvert)) {
-    char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-    char lumSoir_temp[5];
-    sprintf(lumSoir_temp, "%i",  lumSoir);
-    strcat(chaine1, lumSoir_temp);
-    strcat(chaine1, ";");
-    char lumValue_temp[5];
-    sprintf(lumValue_temp, "%i",  lumValue);
-    strcat(chaine1, lumValue_temp);
-    rad.envoiMessage(chaine1);// on envoie le message
-  }
+  rad.envoiUnsignedInt(lumSoir, boitierOuvert); // envoi message radio lumiere du soir
+  rad.envoiUnsignedInt(lumValue, boitierOuvert); // envoi message radio lumiere du soir
+  /* if (RADIO and (!boitierOuvert)) {
+     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+     char lumSoir_temp[5];
+     sprintf(lumSoir_temp, "%i",  lumSoir);
+     strcat(chaine1, lumSoir_temp);
+     strcat(chaine1, ";");
+     char lumValue_temp[5];
+     sprintf(lumValue_temp, "%i",  lumValue);
+     strcat(chaine1, lumValue_temp);
+     rad.envoiMessage(chaine1);// on envoie le message
+    }*/
 }
 
 //-----ouverture/fermeture par test de la lumière----
@@ -1594,7 +1615,7 @@ void deroulementMenu (byte increment) {
         break;
       case 10:  // fin de course Fermeture
         mydisp.drawStr(0, 1, "");
-        affiFinDeCourseHaut(); // fin de course Haut
+        affiFinDeCourseFermeture(); // fin de course Haut
         break;
       case 11:  // fin de course ouverture
         mydisp.drawStr(0, 1, "");
@@ -1669,10 +1690,10 @@ void routineGestionWatchdog() {
         // informations à afficher
         if (RADIO) {
           displayTime();
-          read_temp(true); // read temperature celsius=true
+          read_temp(TEMPERATURE); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
-          affiFinDeCourseHaut();
+          affiFinDeCourseFermeture();
           affiFinDeCourseOuverture();
           affiPulsePlusCptRoue();
           affiChoixOuvFerm();
