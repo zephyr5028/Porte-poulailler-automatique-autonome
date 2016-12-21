@@ -64,7 +64,14 @@ Radio rad(VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
 //ServoTimer2 monServo;
 const byte servoCde = 8; // pin D8 cde du servo
 const byte servoPin = 4; // pin D4 relais du servo
-ServoMoteur monServo(servoCde, servoPin);// use digital pin D8 for commande du servo et D4 relais du servo
+const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
+int pulse = pulseStop; // stop
+const int pulseOuverture = pulseStop - 140; // vitesse montée
+const int pulseFermeture = pulseStop + 140; // vitesse descente
+const int pulseOuvertureReduit = pulseStop - 70; // vitesse montée réduite
+const int pulseFermetureReduit = pulseStop + 70; // vitesse descente réduite
+// use digital pin D8 for commande du servo et D4 relais du servo + pulse (stop, ouverture/fermeture , reduit) + debug si nécessaire
+ServoMoteur monServo(servoCde, servoPin, pulseStop, 140, 70);
 
 /* RTC_DS3231 */
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
@@ -80,12 +87,6 @@ volatile boolean positionRoueCodeuse;
 const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
 
 /* servo */
-const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
-int pulse = pulseStop; // stop
-const int pulseOuverture = pulseStop - 140; // vitesse montée
-const int pulseFermeture = pulseStop + 140; // vitesse descente
-const int pulseOuvertureReduit = pulseStop - 70; // vitesse montée réduite
-const int pulseFermetureReduit = pulseStop + 70; // vitesse descente réduite
 unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
 unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
 boolean servoAction(false) ; // servo à l'arrêt
@@ -1302,6 +1303,7 @@ void compteurRoueCodeuse() {
     -descente
 */
 //------mise sous tension du servo et montee de la porte-------
+/*
 void servoOuverture() {
   if (!batterieFaible and  !servoAction) { // si la batterie n'est pas faible et le servo non en action
     servoAction = true; // servo en action
@@ -1312,7 +1314,7 @@ void servoOuverture() {
     monServo.write(pulse); // modification vitesse servo
     delay(100);
   }
-}
+}*/
 
 //-----mise sous tension du servo et descente de la porte-----
 void  servoFermeture() {
@@ -1398,7 +1400,7 @@ void routineInterruptionBp() {
     if (((millis() - tempoDebounce) > debounce)  and  relacheBpOF == true and !digitalRead(BpOF) ) {
       relacheBpOF = false;
       if (pulse >= pulseStop) {
-        servoOuverture(); // mise sous tension du servo et montee de la porte
+ //    servoAction =  monServo::servoOuverture(batterieFaible, servoAction); // mise sous tension du servo et montee de la porte
       } else {
         servoFermeture(); // mise sous tension du servo et descente de la porte
       }
@@ -1422,7 +1424,7 @@ void  routineInterrruptionAlarme2() {
 //-----routine alarme 1-----
 void  routineInterruptionAlarme1() {
   if ( RTC.alarm(alarm_1) and interruptRTC ) {    // has Alarm1 (ouverture) triggered?  alarme rtc
-    servoOuverture(); // mise sous tension du servo et montee de la porte
+//  servoAction =  monServo::servoOuverture(batterieFaible, servoAction); // mise sous tension du servo et montee de la porte
     interruptRTC = false; // autorisation de la prise en compte de l'IT
   }
 }
@@ -1487,7 +1489,7 @@ void ouvFermLum() {
   }
   if ((sensorValue <= lumMatin) and (ouve == 0) and (compteurWatchdogLumiere >= tempsLum)) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-    servoOuverture(); // mise sous tension du servo et montee de la porte
+//servoAction =  monServo::servoOuverture(batterieFaible, servoAction, ouverture, fermeture); // mise sous tension du servo et montee de la porte
   }
   if ((sensorValue >= lumSoir) and (ferm == 0) and (compteurWatchdogLumiere >= tempsLum)) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
@@ -1715,7 +1717,7 @@ void setup() {
  // monServo.attach(servoCde); // use digital pin D8 for commande du servo
  
   // on démarre à une valeur censée être la moitié de l'excursion totale de l'angle réalisé par le servomoteur
-  monServo.write(pulse);  // value should usually be 750 to 2200 (environ 1500 = stop)
+  //monServo.write(pulse);  // value should usually be 750 to 2200 (environ 1500 = stop)
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
@@ -1739,7 +1741,7 @@ void setup() {
   vw_set_tx_pin(pinEmRadio); // broche d10 emetteur
   vw_setup(600); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
 
-  servoOuverture(); // initialisation des paramétres par la mise sous tension du servo pour la montee de la porte (fonction du sens de rotation du servo)
+// servoAction = monServo::servoOuverture(batterieFaible, servoAction); // initialisation des paramétres par la mise sous tension du servo pour la montee de la porte (fonction du sens de rotation du servo)
 }
 
 /* loop */
