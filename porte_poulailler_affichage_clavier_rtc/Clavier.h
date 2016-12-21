@@ -2,8 +2,10 @@
   prototype de la classe Clavier
 */
 
-#ifndef DEF_CLAVIER
-#define DEF_CLAVIER
+#ifndef Clavier_h
+#define Clavier_h
+
+#include "Arduino.h"
 
 class Clavier
 {
@@ -18,7 +20,7 @@ class Clavier
     byte positionMenu(byte positionMenu, byte toucheClavier); // position du menu pour l'affichage - touches 2 et 3
 
 
-  private:
+  protected:
 
     byte m_oldKey;  // -1
     byte m_MenuManuel; // nombre de lignes du menu

@@ -1,7 +1,7 @@
 /* porte-poulailler : affichage + clavier + rtc */
-//pb avec l'ouverture et la fermeture au bout d'un moment : utilisation du contact fermeture....tjs pas resolu !!!
+// 21 12 2016 ajout de la classe servo - tout le reste fonctionne
 //first commit sur gihub le 01 12 2016
-// 20 septembre 2016
+
 /* 20 septembre 2016 :
     crétion d'une classe Clavier
     inclure le test servoAction dans le comptage de la roue codeuse
@@ -49,7 +49,7 @@ const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 #include <VirtualWire.h>
 #include "Radio.h"
 
-Radio rad(VW_MAX_MESSAGE_LEN, RADIO, true); // classe Radio
+Radio rad(VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
 
 /* affichages */
 #define LCDCol 16
@@ -59,8 +59,12 @@ Radio rad(VW_MAX_MESSAGE_LEN, RADIO, true); // classe Radio
 #define LED_PIN 13
 
 /* servo - montée et descente de la porte */
-#include <ServoTimer2.h> // the servo library
-ServoTimer2 monServo;
+//#include <ServoTimer2.h> // the servo library
+#include "ServoMoteur.h"
+//ServoTimer2 monServo;
+const byte servoCde = 8; // pin D8 cde du servo
+const byte servoPin = 4; // pin D4 relais du servo
+ServoMoteur monServo(servoCde, servoPin);// use digital pin D8 for commande du servo et D4 relais du servo
 
 /* RTC_DS3231 */
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
@@ -76,8 +80,6 @@ volatile boolean positionRoueCodeuse;
 const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
 
 /* servo */
-const byte servoPin = 4; // pin D4 relais du servo
-const byte servoCde = 8; // pin D8 cde du servo
 const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
 int pulse = pulseStop; // stop
 const int pulseOuverture = pulseStop - 140; // vitesse montée
@@ -95,7 +97,7 @@ boolean fermeture = false; // descente de la porte
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
-const byte bouclesWatchdog(2); // nombre de boucles du watchdog environ 64s
+const byte bouclesWatchdog(8); // nombre de boucles du watchdog environ 64s
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean batterieFaible = false; // si batterie < 4,8v = true
 
@@ -1705,10 +1707,13 @@ void setup() {
 
   // roue codeuse
   pinMode(roueCodeuse, INPUT); // make the roueCodeuse's pin 7 an input
+  
   // servo
-  pinMode(servoPin, OUTPUT); // relais servo's pin 4 an OUTPUT
-  digitalWrite(servoPin, LOW); // mise hors tension du relais du servo
-  monServo.attach(servoCde); // use digital pin D8 for commande du servo
+ // pinMode(servoPin, OUTPUT); // relais servo's pin 4 an OUTPUT
+  //digitalWrite(servoPin, LOW); // mise hors tension du relais du servo
+  
+ // monServo.attach(servoCde); // use digital pin D8 for commande du servo
+ 
   // on démarre à une valeur censée être la moitié de l'excursion totale de l'angle réalisé par le servomoteur
   monServo.write(pulse);  // value should usually be 750 to 2200 (environ 1500 = stop)
 

@@ -2,7 +2,6 @@
   définitions de la classe Clavier
 */
 
-#include "Arduino.h"
 #include "Clavier.h"
 
 Clavier::Clavier() : m_oldKey (-1), m_MenuManuel(14), m_NumKeys(6),

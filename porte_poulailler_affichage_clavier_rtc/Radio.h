@@ -3,8 +3,12 @@
   radio 433MHz
 */
 
-#ifndef DEF_RADIO
-#define DEF_RADIO
+#ifndef Radio_h
+#define Radio_h
+
+/*-----virtualWire pour la liaison RF 433Mhz-----*/
+#include <VirtualWire.h>
+#include "Arduino.h"
 
 class Radio
 {
@@ -22,7 +26,7 @@ class Radio
     // envoi du message unsigned int avec test de l'ouverture du boitier
     void envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert = true, char texte[] = "");
 
-  private:
+  protected:
 
     boolean m_debug ; // pour affichage console si nécessaire
     boolean m_radio; // pour envoi radio si necessaire
@@ -33,5 +37,3 @@ class Radio
 
 #endif
 
-
-/* ajouter la variable boitier ouvert/ferme pour éviter de remplir le tableau sans envoi du message*/

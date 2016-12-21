@@ -3,13 +3,9 @@
   radio 433MHz
 */
 
-/*-----virtualWire pour la liaison RF 433Mhz-----*/
-#include <VirtualWire.h>
-#include "Arduino.h"
 #include "Radio.h"
 
 //constructeur avec debug et radio pour affichage si nécessaire
-//Radio::Radio( boolean radio, boolean debug) :  m_radio(radio), m_debug(debug), m_taille(80)
 Radio::Radio(byte taille, boolean radio, boolean debug) :  m_taille(taille), m_radio(radio), m_debug(debug)
 {
   m_chaine[m_taille] = "";// initialisation du tableau
