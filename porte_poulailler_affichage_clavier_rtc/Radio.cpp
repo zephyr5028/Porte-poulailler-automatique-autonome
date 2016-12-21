@@ -24,13 +24,12 @@ void Radio::envoiMessage(char chaine1[]) {
   char chaineComp[] = "Fin";
   if (strcmp(chaineComp, chaine1) != 0) { // test de la dernière chaine
     strcat(m_chaine, chaine1);
-    strcat(m_chaine, ";");
     if (m_debug) {
       Serial.println(m_chaine);
     }
   } else {
     Radio::messageRadio(m_chaine);
-    strcpy(m_chaine, "   ");// effacement du tableau + eviter l'effacement de la case une !!!
+    strcpy(m_chaine, "");// effacement du tableau
     //*m_chaine=0;// effacement du tableau
     //m_chaine[0] = '\0'; // effacement du tableau
   }
