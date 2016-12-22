@@ -25,7 +25,7 @@ void Radio::envoiMessage(char chaine1[]) {
     }
   } else {
     Radio::messageRadio(m_chaine);
-    strcpy(m_chaine, "");// effacement du tableau
+    strcpy(m_chaine, "  ");// effacement du tableau + pb premiers caractères !!! non trouvé...
     //*m_chaine=0;// effacement du tableau
     //m_chaine[0] = '\0'; // effacement du tableau
   }

@@ -61,17 +61,15 @@ Radio rad(VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
 /* servo - montée et descente de la porte */
 //#include <ServoTimer2.h> // the servo library
 #include "ServoMoteur.h"
-//ServoTimer2 monServo;
+
 const byte servoCde = 8; // pin D8 cde du servo
 const byte servoPin = 4; // pin D4 relais du servo
+const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
 const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
-int pulse = pulseStop; // stop
-const int pulseOuverture = pulseStop - 140; // vitesse montée
-const int pulseFermeture = pulseStop + 140; // vitesse descente
-const int pulseOuvertureReduit = pulseStop - 70; // vitesse montée réduite
-const int pulseFermetureReduit = pulseStop + 70; // vitesse descente réduite
-// use digital pin D8 for commande du servo et D4 relais du servo + pulse (stop, ouverture/fermeture , reduit) + debug si nécessaire
-ServoMoteur monServo(servoCde, servoPin, pulseStop, 140, 70);
+
+// use digital pin D8 for commande du servo et D4 relais du servo
+// + pulse (stop, ouverture/fermeture , reduit) + debug si nécessaire
+ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 70, DEBUG);
 
 /* RTC_DS3231 */
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
@@ -84,21 +82,20 @@ const byte roueCodeuse = 7;//digital pin D7 pour entrée roue codeuse
 volatile unsigned int compteRoueCodeuse(200);  // un compteur de position
 volatile boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
 volatile boolean positionRoueCodeuse;
-const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
 
 /* servo */
 unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
 unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
 boolean servoAction(false) ; // servo à l'arrêt
-boolean ouverture = false; // montee de la porte
-boolean fermeture = false; // descente de la porte
+bool ouvFerm(true); // ouverture fermeture, ouverture pour l'initialisation
+bool reduit(false); // vitesse du servo, normal ou reduit(false)
 
 /* watchdog - Optimisation de la consommation */
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
-const byte bouclesWatchdog(8); // nombre de boucles du watchdog environ 64s
+const byte bouclesWatchdog(8); // 8 nombre de boucles du watchdog environ 64s
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean batterieFaible = false; // si batterie < 4,8v = true
 
@@ -106,7 +103,8 @@ boolean batterieFaible = false; // si batterie < 4,8v = true
 byte incrementation = 0; // incrementation verticale
 byte decalage = 0; // decalage à droite pour reglage
 boolean reglage = false; // menu=false ou reglage=true
-int temps = 0; // temps entre deux affichages de l heure
+const int boucleTemps(500); // temps entre deux affichages de l'heure
+int temps(0);
 const int debounce = 350; // debounce latency in ms
 unsigned long tempoDebounce(debounce); // temporisation pour debounce
 boolean relacheBpOF = true; // relache Bp
@@ -382,6 +380,7 @@ void closeTime() {
 
 //------affichage pulse et comptage roue codeuse------
 void affiPulsePlusCptRoue() {
+  int pulse = monServo.get_m_pulse();
   if ( boitierOuvert) { // si le boitier est ouvert
     mydisp.print(F("P: "));
     mydisp.print(pulse);
@@ -404,8 +403,6 @@ void affiPulsePlusCptRoue() {
   }
 
   if (RADIO and tempsWatchdog <= 0 and (!boitierOuvert)) { // eviter l'envoi à l'initialisation
-    //if (RADIO) {
-
     if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
       char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       strcat(chaine1, "fer;");
@@ -416,7 +413,7 @@ void affiPulsePlusCptRoue() {
       strcat(chaine1, "ouv;");
       rad.envoiMessage(chaine1);// on envoie le message
     }
-    rad.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert,";"); // envoi message radio compteur roue codeuse
+    rad.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert, ";"); // envoi message radio compteur roue codeuse
   }
 }
 
@@ -438,8 +435,8 @@ void eclairageAfficheur() {
 }
 
 //---- temporisation pour l'affichage, affichage du menu lorsque temps est >....
-void temporisationAffichage() {
-  if ( temps > 1000) {
+void temporisationAffichage(int boucleTemps) {
+  if (  temps > boucleTemps) {
     deroulementMenu (incrementation); // affichage du menu en fonction de incrementation
     temps = 0;
   } else {
@@ -963,7 +960,7 @@ void choixLumSoir() {
   }
 }
 
-/* reglahe time */
+/* reglage time */
 //-----routine reglage heure , minute , seconde-----
 void reglageTime () {
   if (boitierOuvert) {
@@ -1052,7 +1049,7 @@ void affiFinDeCourseFermeture() {
   if (DEBUG) {
     Serial.print(F("Fin course fermeture = ")); Serial.println(finDeCourseFermeture);
   }
-  rad.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert,";"); // envoi message radio fin de course fermeture
+  rad.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
 }
 
 //------affichage fin de course Ouverture-------
@@ -1070,7 +1067,7 @@ void affiFinDeCourseOuverture() {
   if (DEBUG) {
     Serial.print(F("Fin course ouverture = ")); Serial.println(finDeCourseOuverture);
   }
-  rad.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert,";"); // envoi message radio fin de course Ouverture
+  rad.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
 }
 
 //------reglage fin de course Fermeture------
@@ -1182,71 +1179,72 @@ void regFinDeCourseOuverture() {
 */
 // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
 void testServo() {
-  if (TESTSERVO) {
-    //des données sur la liaison série : (lorsque l'on appuie sur a, q, z, s, e, d )
-    if (Serial.available())    {
-      char commande = Serial.read(); //on lit
-      //on modifie la consigne si c'est un caractère qui nous intéresse
-      if (commande == 'a') {
-        pulse += 1;  //ajout de 1µs au temps HAUT
-        Serial.println(monServo.read());
-        monServo.write(pulse); // modification vitesse servo
-        Serial.println(monServo.read());
+  /*
+    if (TESTSERVO) {
+      //des données sur la liaison série : (lorsque l'on appuie sur a, q, z, s, e, d )
+      if (Serial.available())    {
+        char commande = Serial.read(); //on lit
+        //on modifie la consigne si c'est un caractère qui nous intéresse
+        if (commande == 'a') {
+          pulse += 1;  //ajout de 1µs au temps HAUT
+          Serial.println(monServo.read());
+          monServo.write(pulse); // modification vitesse servo
+          Serial.println(monServo.read());
+        }
+        else if (commande == 'q') {
+          pulse -= 1;  //retrait de 1µs au temps HAUT
+          Serial.println(monServo.read());
+          monServo.write(pulse); // modification vitesse servo
+          Serial.println(monServo.read());
+        }
+        else if (commande == 'z') {
+          pulse += 10;  //ajout de 10µs au temps HAUT
+          Serial.println(monServo.read());
+          monServo.write(pulse); // modification vitesse servo
+          Serial.println(monServo.read());
+        }
+        else if (commande == 's') {
+          pulse -= 10;  //retrait de 10µs au temps HAUT
+          Serial.println(monServo.read());
+          monServo.write(pulse); // modification vitesse servo
+          Serial.println(monServo.read());
+        }
+        else if (commande == 'e') {
+          digitalWrite(servoPin, LOW); // mise hors tension du servo
+        }
+        else if (commande ==  'd') {
+          digitalWrite(servoPin, HIGH); // mise soustension du servo
+        }
+        else if (commande == 'r' ) {
+          //servoMontee(); // mise sous tension du servo et montee de la porte
+          servoAction = true; // servo en action
+          ouverture = true;
+          fermeture = false;
+          digitalWrite(servoPin, HIGH); // mise soustension du servo
+          delay(50);
+          pulse = pulseOuverture;
+          Serial.println(monServo.read());
+          monServo.write(pulse); // modification vitesse servo
+          Serial.println(monServo.read());
+        }
+        else if (commande == 'f') {
+          //servoDescente(); // mise sous tension du servo et descente de la porte
+          servoAction = true; // servo en action
+          fermeture = true;
+          ouverture = false;
+          digitalWrite(servoPin, HIGH); // mise soustension du servo
+          delay(50);
+          pulse = pulseFermeture;
+          Serial.println(monServo.read());
+          monServo.write(pulse); // modification vitesse servo
+          Serial.println(monServo.read());
+        }
+        //et on fait un retour sur la console
+        Serial.print("Etat de l'impulsion du servo = ");
+        Serial.print(pulse);
+        Serial.println(" ms");
       }
-      else if (commande == 'q') {
-        pulse -= 1;  //retrait de 1µs au temps HAUT
-        Serial.println(monServo.read());
-        monServo.write(pulse); // modification vitesse servo
-        Serial.println(monServo.read());
-      }
-      else if (commande == 'z') {
-        pulse += 10;  //ajout de 10µs au temps HAUT
-        Serial.println(monServo.read());
-        monServo.write(pulse); // modification vitesse servo
-        Serial.println(monServo.read());
-      }
-      else if (commande == 's') {
-        pulse -= 10;  //retrait de 10µs au temps HAUT
-        Serial.println(monServo.read());
-        monServo.write(pulse); // modification vitesse servo
-        Serial.println(monServo.read());
-      }
-      else if (commande == 'e') {
-        digitalWrite(servoPin, LOW); // mise hors tension du servo
-      }
-      else if (commande ==  'd') {
-        digitalWrite(servoPin, HIGH); // mise soustension du servo
-      }
-      else if (commande == 'r' ) {
-        //servoMontee(); // mise sous tension du servo et montee de la porte
-        servoAction = true; // servo en action
-        ouverture = true;
-        fermeture = false;
-        digitalWrite(servoPin, HIGH); // mise soustension du servo
-        delay(50);
-        pulse = pulseOuverture;
-        Serial.println(monServo.read());
-        monServo.write(pulse); // modification vitesse servo
-        Serial.println(monServo.read());
-      }
-      else if (commande == 'f') {
-        //servoDescente(); // mise sous tension du servo et descente de la porte
-        servoAction = true; // servo en action
-        fermeture = true;
-        ouverture = false;
-        digitalWrite(servoPin, HIGH); // mise soustension du servo
-        delay(50);
-        pulse = pulseFermeture;
-        Serial.println(monServo.read());
-        monServo.write(pulse); // modification vitesse servo
-        Serial.println(monServo.read());
-      }
-      //et on fait un retour sur la console
-      Serial.print("Etat de l'impulsion du servo = ");
-      Serial.print(pulse);
-      Serial.println(" ms");
-    }
-  }
+    }*/
 }
 
 /* temperature */
@@ -1274,7 +1272,6 @@ void read_temp(boolean typeTemperature) {
     }
     char temp[2] = "";
     if (typeTemperature)  strcat(temp, "°C;"); else strcat(temp, "F;");
-    //  rad.envoiTemperature(celsius, boitierOuvert);// envoi du message radio temperature si boitier fermé
     rad.envoiFloat(celsius, boitierOuvert, temp);
   }
 }
@@ -1289,7 +1286,8 @@ void compteurRoueCodeuse() {
   // Confirmation du changement
   if (cpt != positionRoueCodeuse) {
     positionRoueCodeuse = !positionRoueCodeuse;
-    if (pulse >= pulseStop) {
+    //  if (pulse >= pulseStop) {
+    if (!ouvFerm) {
       compteRoueCodeuse++;
     } else {
       compteRoueCodeuse--;
@@ -1302,72 +1300,44 @@ void compteurRoueCodeuse() {
     -montée
     -descente
 */
-//------mise sous tension du servo et montee de la porte-------
-/*
-void servoOuverture() {
-  if (!batterieFaible and  !servoAction) { // si la batterie n'est pas faible et le servo non en action
-    servoAction = true; // servo en action
-    ouverture = false;
-    fermeture = true;
-    digitalWrite(servoPin, HIGH); // mise soustension du servo
-    pulse = pulseOuverture;
-    monServo.write(pulse); // modification vitesse servo
-    delay(100);
-  }
-}*/
-
-//-----mise sous tension du servo et descente de la porte-----
-void  servoFermeture() {
-  if (!batterieFaible and  !servoAction) { // si la batterie n'est pas faible et le servo non en action
-    servoAction = true; // servo en action
-    fermeture = false;
-    ouverture = true;
-    digitalWrite(servoPin, HIGH); // mise soustension du servo
-    pulse = pulseFermeture;
-    monServo.write(pulse); // modification vitesse servo
-    delay(200);
-  }
-}
-
 //------sequence ouverture de la porte------
 void ouverturePorte() {
-  if ((compteRoueCodeuse <= finDeCourseOuverture + 20) and ouverture == false) {  // 132 + 20
-    pulse = pulseOuvertureReduit;
-    monServo.write(pulse);  // value should usually be 500 to 2500 (environ 1280 = stop)
-  }
-  if ((touche == 5 and relache == true and ouverture == false) or (!digitalRead(securiteHaute) and ouverture == false)) {
-    relache = false;
-    digitalWrite(servoPin, LOW); // mise hors tension du servo led verte éteinte
-    ouverture = true;
-    if (!digitalRead(securiteHaute)) {
-      delay(200); // attente fin l'arrêt complet du servo
-      compteRoueCodeuse = finDeCourseOuverture;
+  if (servoAction) {
+    if ((compteRoueCodeuse <= finDeCourseOuverture + 20) and ouvFerm == true) {  // 132 + 20
+      reduit = 0;// vitesse reduite
+      monServo.servoOuvFermVitesse(servoAction, ouvFerm, reduit);
     }
-    servoAction = false; // servo arret
+    if ((touche == 5 and relache == true and ouvFerm == true)
+        or (!digitalRead(securiteHaute) and ouvFerm == true)) {
+      if (touche == 5 and relache == true and ouvFerm == true)  relache = false;
+      ouvFerm = monServo.servoHorsTension(ouvFerm);
+      compteRoueCodeuse = monServo.testSecuriteHaute(compteRoueCodeuse, finDeCourseOuverture);
+      servoAction = false; // servo arret
+    }
   }
 }
 
 //-----sequence fermeture de la porte-----
 void  fermeturePorte() {
-  if ((compteRoueCodeuse >= finDeCourseFermeture - 20) and fermeture == false) { // 225 - 20
-    pulse = pulseFermetureReduit;
-    monServo.write(pulse);  // value should usually be 500 to 2500 (1280 = stop)
-  }
-  if ((compteRoueCodeuse >= finDeCourseFermeture and fermeture == false ) or (touche == 5 and relache == true and fermeture == false) or (!digitalRead(securiteHaute) and fermeture == false)) {
-    relache = false;
-    digitalWrite(servoPin, LOW); // mise hors tension du servo led verte éteinte
-    fermeture = true;
-    if (!digitalRead(securiteHaute)) {
-      delay(200); // attente fin l'arrêt complet du servo
-      compteRoueCodeuse = finDeCourseOuverture;
+  if (servoAction) {
+    if ((compteRoueCodeuse >= finDeCourseFermeture - 20) and ouvFerm == false) { // 225 - 20
+      reduit = 0;// vitesse reduite
+      monServo.servoOuvFermVitesse(servoAction, ouvFerm, reduit);
     }
-    servoAction = false; // servo arret
+    if ((compteRoueCodeuse >= finDeCourseFermeture and ouvFerm == false )
+        or (touche == 5 and relache == true and ouvFerm == false)
+        or (!digitalRead(securiteHaute) and ouvFerm == false)) {
+      if (touche == 5 and relache == true and ouvFerm == false)   relache = false;
+      ouvFerm = monServo.servoHorsTension(ouvFerm);
+      compteRoueCodeuse = monServo.testSecuriteHaute(compteRoueCodeuse, finDeCourseOuverture);
+      servoAction = false; // servo arret
+    }
   }
 }
 
 /* interruptions
-   -routine interruption D2 INT0
-   -routine interruption D3 INT1
+  -routine interruption D2 INT0
+  -routine interruption D3 INT1
   -routine interruption Bp
   -routine alarme 2
   -routine alarme 1
@@ -1399,10 +1369,16 @@ void routineInterruptionBp() {
     // If the switch changed, due to noise or pressing:
     if (((millis() - tempoDebounce) > debounce)  and  relacheBpOF == true and !digitalRead(BpOF) ) {
       relacheBpOF = false;
-      if (pulse >= pulseStop) {
- //    servoAction =  monServo::servoOuverture(batterieFaible, servoAction); // mise sous tension du servo et montee de la porte
+      if (!ouvFerm) {
+        // mise sous tension du servo pour l'ouverture de la porte
+        ouvFerm = 1; // ouverture
+        reduit = 1;// vitesse normale
+        servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
       } else {
-        servoFermeture(); // mise sous tension du servo et descente de la porte
+        // mise sous tension du servo pour la fermeture de la porte
+        ouvFerm = 0; // fermeture
+        reduit = 1;// vitesse normale
+        servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
       }
       tempoDebounce = millis(); // attente relache du bouton
     }
@@ -1416,7 +1392,10 @@ void routineInterruptionBp() {
 //-----routine alarme 2-----
 void  routineInterrruptionAlarme2() {
   if ( RTC.alarm(alarm_2) and interruptRTC ) {    // has Alarm2 (fermeture) triggered?  alarme rtc
-    servoFermeture(); // mise sous tension du servo et descente de la porte
+    // mise sous tension du servo pour la fermeture de la porte
+    ouvFerm = 0; // fermeture
+    reduit = 1;// vitesse normale
+    servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
     interruptRTC = false; // autorisation de la prise en compte de l'IT
   }
 }
@@ -1424,7 +1403,10 @@ void  routineInterrruptionAlarme2() {
 //-----routine alarme 1-----
 void  routineInterruptionAlarme1() {
   if ( RTC.alarm(alarm_1) and interruptRTC ) {    // has Alarm1 (ouverture) triggered?  alarme rtc
-//  servoAction =  monServo::servoOuverture(batterieFaible, servoAction); // mise sous tension du servo et montee de la porte
+    // mise sous tension du servo pour l'ouverture de la porte
+    ouvFerm = 1; // ouverture
+    reduit = 1;// vitesse normale
+    servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
     interruptRTC = false; // autorisation de la prise en compte de l'IT
   }
 }
@@ -1489,11 +1471,17 @@ void ouvFermLum() {
   }
   if ((sensorValue <= lumMatin) and (ouve == 0) and (compteurWatchdogLumiere >= tempsLum)) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-//servoAction =  monServo::servoOuverture(batterieFaible, servoAction, ouverture, fermeture); // mise sous tension du servo et montee de la porte
+    // mise sous tension du servo pour l'ouverture de la porte
+    ouvFerm = 1; // ouverture
+    reduit = 1;// vitesse normale
+    servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
   }
   if ((sensorValue >= lumSoir) and (ferm == 0) and (compteurWatchdogLumiere >= tempsLum)) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-    servoFermeture(); // mise sous tension du servo et descente de la porte
+    // mise sous tension du servo pour la fermeture de la porte
+    ouvFerm = 0; // fermeture
+    reduit = 1;// vitesse normale
+    servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
   }
 }
 
@@ -1614,9 +1602,7 @@ void routineGestionWatchdog() {
       tempsWatchdog--;
       if (tempsWatchdog <= 0) {
         if (batterieFaible) { // affichage si la batterie est faible
-          // N.B. La constante VW_MAX_MESSAGE_LEN est fournie par la lib VirtualWire
-          char chaine1[VW_MAX_MESSAGE_LEN - 1] = "*** Batterie faible ! ***";
-          rad.messageRadio(chaine1);// on envoie le message
+          rad.messageRadio("*** Batterie faible ! ***");// on envoie le message
         }
         // informations à afficher
         if (RADIO) {
@@ -1709,15 +1695,9 @@ void setup() {
 
   // roue codeuse
   pinMode(roueCodeuse, INPUT); // make the roueCodeuse's pin 7 an input
-  
+
   // servo
- // pinMode(servoPin, OUTPUT); // relais servo's pin 4 an OUTPUT
-  //digitalWrite(servoPin, LOW); // mise hors tension du relais du servo
-  
- // monServo.attach(servoCde); // use digital pin D8 for commande du servo
- 
-  // on démarre à une valeur censée être la moitié de l'excursion totale de l'angle réalisé par le servomoteur
-  //monServo.write(pulse);  // value should usually be 750 to 2200 (environ 1500 = stop)
+  monServo.init(); // initialisation du servo moteur et du relais
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
@@ -1741,7 +1721,8 @@ void setup() {
   vw_set_tx_pin(pinEmRadio); // broche d10 emetteur
   vw_setup(600); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
 
-// servoAction = monServo::servoOuverture(batterieFaible, servoAction); // initialisation des paramétres par la mise sous tension du servo pour la montee de la porte (fonction du sens de rotation du servo)
+  // mise sous tension du servo et ouverture de la porte
+  servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
 }
 
 /* loop */
@@ -1749,7 +1730,7 @@ void loop() {
 
   lectureClavier(); // lecture du clavier
   //affichage du menu lorsque temps est > ....
-  temporisationAffichage() ; // temporisation pour l'affichage
+  temporisationAffichage(boucleTemps) ; // temporisation pour l'affichage
 
   //reglages
   reglageTime(); // reglages de l'heure, minute, seconde si touche fleche droite
@@ -1777,7 +1758,6 @@ void loop() {
   routineInterruptionBoitierOuvert(); // routine interruption boitier ouvert
   routineInterruptionBp(); // routine interruption Bp
 
-  //Serial.println(tempsLum);
   routineInterrruptionAlarme2() ; // routine alarme 2
   routineInterruptionAlarme1(); // routine alarme 1
 
