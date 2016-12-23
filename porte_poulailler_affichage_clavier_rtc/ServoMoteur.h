@@ -21,13 +21,16 @@ class ServoMoteur : public ServoTimer2
 
     void init();
     //mise sous tension du servo et ouverture de la porte
-    bool servoOuvFerm(bool batterieFaible, bool servoAction, bool ouvFerm, bool reduit);
-    void servoOuvFermVitesse( bool servoAction, bool ouvFerm, bool reduit);    //modificaton de la vitesse
-    bool servoHorsTension(bool ouvFerm); // mise hors tension relais du servo
-    //test de la broche securite haute
-    unsigned int testSecuriteHaute(unsigned int compteRoueCodeuse, unsigned int finCourseOuverture);
+    void servoOuvFerm(bool batterieFaible, bool reduit);
+    void servoVitesse( bool reduit);    //modificaton de la vitesse
+    // mise hors tension relais du servo et test de la sécurité haute
+    unsigned int servoHorsTension(unsigned int compteRoueCodeuse, unsigned int finCourseOuverture);
     int get_m_pulse(); // accesseur - getter
     int set_m_pulse(int pulse); // mutateur - setter
+    bool get_m_ouvFerm(); // accesseur - getter
+    bool set_m_ouvFerm(bool ouvFerm); // mutateur - setter
+    bool get_m_servoAction(); // accesseur - getter
+    bool set_m_servoAction(bool servoAction); // mutateur - setter
 
 
   protected:
@@ -40,6 +43,8 @@ class ServoMoteur : public ServoTimer2
     const int m_pulseOuvFerm; // vitesse ouverture -140, fermeture 140
     const int m_pulseReduit; // vitesse ouverture réduite -70 , fermeture réduite 70
     int m_pulse;// vitesse du servo à un instant donné
+    bool m_ouvFerm;// ouverture / fermeture - true ouverture
+    bool m_servoAction; // servo en action - false servo à l'arrêt
 
 };
 

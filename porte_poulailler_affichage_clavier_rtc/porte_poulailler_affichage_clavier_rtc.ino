@@ -79,15 +79,13 @@ byte alarm_2 = 2; //alarme 2
 /* roue codeuse */
 // digital pin D7 has a détecteur roue codeuse
 const byte roueCodeuse = 7;//digital pin D7 pour entrée roue codeuse
-volatile unsigned int compteRoueCodeuse(200);  // un compteur de position
+volatile unsigned int compteRoueCodeuse(150);  // un compteur de position
 volatile boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
 volatile boolean positionRoueCodeuse;
 
 /* servo */
 unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
 unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
-boolean servoAction(false) ; // servo à l'arrêt
-bool ouvFerm(true); // ouverture fermeture, ouverture pour l'initialisation
 bool reduit(false); // vitesse du servo, normal ou reduit(false)
 
 /* watchdog - Optimisation de la consommation */
@@ -95,7 +93,11 @@ bool reduit(false); // vitesse du servo, normal ou reduit(false)
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
+
+/****************************/
 const byte bouclesWatchdog(8); // 8 nombre de boucles du watchdog environ 64s
+/****************************/
+
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean batterieFaible = false; // si batterie < 4,8v = true
 
@@ -103,7 +105,7 @@ boolean batterieFaible = false; // si batterie < 4,8v = true
 byte incrementation = 0; // incrementation verticale
 byte decalage = 0; // decalage à droite pour reglage
 boolean reglage = false; // menu=false ou reglage=true
-const int boucleTemps(500); // temps entre deux affichages de l'heure
+const int boucleTemps(200); // 500 temps entre deux affichages de l'heure
 int temps(0);
 const int debounce = 350; // debounce latency in ms
 unsigned long tempoDebounce(debounce); // temporisation pour debounce
@@ -1287,7 +1289,7 @@ void compteurRoueCodeuse() {
   if (cpt != positionRoueCodeuse) {
     positionRoueCodeuse = !positionRoueCodeuse;
     //  if (pulse >= pulseStop) {
-    if (!ouvFerm) {
+    if (!monServo.get_m_ouvFerm()) {
       compteRoueCodeuse++;
     } else {
       compteRoueCodeuse--;
@@ -1302,35 +1304,29 @@ void compteurRoueCodeuse() {
 */
 //------sequence ouverture de la porte------
 void ouverturePorte() {
-  if (servoAction) {
-    if ((compteRoueCodeuse <= finDeCourseOuverture + 20) and ouvFerm == true) {  // 132 + 20
+  if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
+    if (compteRoueCodeuse <= finDeCourseOuverture + 20) {  // 1 + 20
       reduit = 0;// vitesse reduite
-      monServo.servoOuvFermVitesse(servoAction, ouvFerm, reduit);
+      monServo.servoVitesse( reduit);
     }
-    if ((touche == 5 and relache == true and ouvFerm == true)
-        or (!digitalRead(securiteHaute) and ouvFerm == true)) {
-      if (touche == 5 and relache == true and ouvFerm == true)  relache = false;
-      ouvFerm = monServo.servoHorsTension(ouvFerm);
-      compteRoueCodeuse = monServo.testSecuriteHaute(compteRoueCodeuse, finDeCourseOuverture);
-      servoAction = false; // servo arret
+    if (!digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
+    //  if (touche == 4  and ouvFerm == false and relache == true)  relache = false;
+    compteRoueCodeuse = monServo.servoHorsTension(compteRoueCodeuse, finDeCourseOuverture);
     }
   }
 }
 
 //-----sequence fermeture de la porte-----
 void  fermeturePorte() {
-  if (servoAction) {
-    if ((compteRoueCodeuse >= finDeCourseFermeture - 20) and ouvFerm == false) { // 225 - 20
+  if (monServo.get_m_servoAction() and !monServo.get_m_ouvFerm()) {
+    if (compteRoueCodeuse >= finDeCourseFermeture - 30) { // 195 - 30
       reduit = 0;// vitesse reduite
-      monServo.servoOuvFermVitesse(servoAction, ouvFerm, reduit);
+      monServo.servoVitesse( reduit);
     }
-    if ((compteRoueCodeuse >= finDeCourseFermeture and ouvFerm == false )
-        or (touche == 5 and relache == true and ouvFerm == false)
-        or (!digitalRead(securiteHaute) and ouvFerm == false)) {
-      if (touche == 5 and relache == true and ouvFerm == false)   relache = false;
-      ouvFerm = monServo.servoHorsTension(ouvFerm);
-      compteRoueCodeuse = monServo.testSecuriteHaute(compteRoueCodeuse, finDeCourseOuverture);
-      servoAction = false; // servo arret
+    if ((compteRoueCodeuse >= finDeCourseFermeture)
+        or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
+      //  if (touche == 4 and ouvFerm == false and relache == true)   relache = false; 
+      compteRoueCodeuse = monServo.servoHorsTension(compteRoueCodeuse, finDeCourseOuverture);
     }
   }
 }
@@ -1369,17 +1365,9 @@ void routineInterruptionBp() {
     // If the switch changed, due to noise or pressing:
     if (((millis() - tempoDebounce) > debounce)  and  relacheBpOF == true and !digitalRead(BpOF) ) {
       relacheBpOF = false;
-      if (!ouvFerm) {
-        // mise sous tension du servo pour l'ouverture de la porte
-        ouvFerm = 1; // ouverture
-        reduit = 1;// vitesse normale
-        servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
-      } else {
-        // mise sous tension du servo pour la fermeture de la porte
-        ouvFerm = 0; // fermeture
-        reduit = 1;// vitesse normale
-        servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
-      }
+      if (monServo.get_m_ouvFerm())  monServo.set_m_ouvFerm(false); else  monServo.set_m_ouvFerm(true);
+      reduit = 1;// vitesse normale
+      monServo.servoOuvFerm(batterieFaible, reduit);
       tempoDebounce = millis(); // attente relache du bouton
     }
     if (((millis() - tempoDebounce) > debounce)  and  relacheBpOF == false and digitalRead(BpOF) ) {
@@ -1393,9 +1381,10 @@ void routineInterruptionBp() {
 void  routineInterrruptionAlarme2() {
   if ( RTC.alarm(alarm_2) and interruptRTC ) {    // has Alarm2 (fermeture) triggered?  alarme rtc
     // mise sous tension du servo pour la fermeture de la porte
-    ouvFerm = 0; // fermeture
+    monServo.set_m_ouvFerm(false); // fermeture
+    // ouvFerm = 0; // fermeture
     reduit = 1;// vitesse normale
-    servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
+    monServo.servoOuvFerm(batterieFaible, reduit);
     interruptRTC = false; // autorisation de la prise en compte de l'IT
   }
 }
@@ -1404,9 +1393,10 @@ void  routineInterrruptionAlarme2() {
 void  routineInterruptionAlarme1() {
   if ( RTC.alarm(alarm_1) and interruptRTC ) {    // has Alarm1 (ouverture) triggered?  alarme rtc
     // mise sous tension du servo pour l'ouverture de la porte
-    ouvFerm = 1; // ouverture
+    monServo.set_m_ouvFerm(true); // ouverture
+    // ouvFerm = 1; // ouverture
     reduit = 1;// vitesse normale
-    servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
+    monServo.servoOuvFerm(batterieFaible, reduit);
     interruptRTC = false; // autorisation de la prise en compte de l'IT
   }
 }
@@ -1472,16 +1462,18 @@ void ouvFermLum() {
   if ((sensorValue <= lumMatin) and (ouve == 0) and (compteurWatchdogLumiere >= tempsLum)) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
     // mise sous tension du servo pour l'ouverture de la porte
-    ouvFerm = 1; // ouverture
+    monServo.set_m_ouvFerm(true); // ouverture
+    // ouvFerm = 1; // ouverture
     reduit = 1;// vitesse normale
-    servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
+    monServo.servoOuvFerm(batterieFaible, reduit);
   }
   if ((sensorValue >= lumSoir) and (ferm == 0) and (compteurWatchdogLumiere >= tempsLum)) {
     compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
     // mise sous tension du servo pour la fermeture de la porte
-    ouvFerm = 0; // fermeture
+    monServo.set_m_ouvFerm(false); // fermeture
+    //  ouvFerm = 0; // fermeture
     reduit = 1;// vitesse normale
-    servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
+    monServo.servoOuvFerm(batterieFaible, reduit);
   }
 }
 
@@ -1594,7 +1586,7 @@ void enterSleep(void) {
 //-----routine de gestion du watchdog-----
 void routineGestionWatchdog() {
   if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
-    if ( !servoAction) { // servo à l'arrêt
+    if ( !monServo.get_m_servoAction()) { // servo à l'arrêt
       //indicateur led 13 pour le mode sleep
       digitalWrite(LED_PIN, HIGH);
       delay(10);
@@ -1722,7 +1714,7 @@ void setup() {
   vw_setup(600); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
 
   // mise sous tension du servo et ouverture de la porte
-  servoAction = monServo.servoOuvFerm(batterieFaible, servoAction, ouvFerm, reduit);
+  monServo.servoOuvFerm(batterieFaible, reduit);
 }
 
 /* loop */
