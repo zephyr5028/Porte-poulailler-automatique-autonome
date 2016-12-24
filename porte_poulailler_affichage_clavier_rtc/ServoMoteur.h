@@ -25,6 +25,8 @@ class ServoMoteur : public ServoTimer2
     void servoVitesse( bool reduit);    //modificaton de la vitesse
     // mise hors tension relais du servo et test de la sécurité haute
     unsigned int servoHorsTension(unsigned int compteRoueCodeuse, unsigned int finCourseOuverture);
+    void relaisSousTension(); //relais sous tension
+    void relaisHorsTension();//relais hors tension
     int get_m_pulse(); // accesseur - getter
     int set_m_pulse(int pulse); // mutateur - setter
     bool get_m_ouvFerm(); // accesseur - getter

@@ -40,7 +40,7 @@ void ServoMoteur::servoOuvFerm(boolean batterieFaible, bool reduit)
       Serial.print("  ");
       Serial.println(reduit);
     }
-    digitalWrite(m_pinRelais, HIGH); // mise sous tension du servo
+    ServoMoteur::relaisSousTension(); // relais sous tension
     // modification vitesse ouverture : 1500 - (140 ou 70)  / fermeture : 1500 + (140 ou 70)
     if (reduit) m_pulse = m_pulseOuvFerm; else m_pulse = m_pulseReduit;
     if (m_ouvFerm) ServoTimer2:: write(m_pulse = m_pulseStop - m_pulse); else ServoTimer2:: write(m_pulse = m_pulseStop + m_pulse);
@@ -62,9 +62,8 @@ void ServoMoteur::servoVitesse( bool reduit)
 
 //-----mise hors tension relais du servo-----
 unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsigned int finDeCourseOuverture) {
-  digitalWrite(m_pinRelais, LOW);
-  if (m_ouvFerm) !m_ouvFerm; else m_ouvFerm;
-   if (!digitalRead(m_pinSecuriteHaute)) {
+  ServoMoteur::relaisHorsTension(); // relais hors tension
+  if (!digitalRead(m_pinSecuriteHaute)) {
     delay(200); // attente fin de l'arrêt complet du servo
     m_servoAction = false; // servo arrêt
     return finDeCourseOuverture;
@@ -72,6 +71,17 @@ unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsi
     m_servoAction = false; // servo arrêt
     return compteRoueCodeuse;
   }
+}
+
+//-----relais hors tension-----
+void ServoMoteur::relaisHorsTension () {
+  digitalWrite(m_pinRelais, LOW);
+  if (m_ouvFerm) !m_ouvFerm; else m_ouvFerm;
+}
+
+//-----relais sous tension-----
+void ServoMoteur::relaisSousTension() {
+  digitalWrite(m_pinRelais, HIGH);
 }
 
 //-----accesseur - getter-----
