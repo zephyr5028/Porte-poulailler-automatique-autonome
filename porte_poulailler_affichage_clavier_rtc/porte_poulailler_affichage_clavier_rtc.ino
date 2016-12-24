@@ -48,8 +48,9 @@ const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 /*-----virtualWire pour la liaison RF 433Mhz-----*/
 #include <VirtualWire.h>
 #include "Radio.h"
-
-Radio rad(VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
+const byte pinEmRadio = 10; // pin D10 emetteur radio
+const int vitesseTransmission(600);//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
+Radio rad(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
 
 /* affichages */
 #define LCDCol 16
@@ -59,14 +60,12 @@ Radio rad(VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
 #define LED_PIN 13
 
 /* servo - montée et descente de la porte */
-//#include <ServoTimer2.h> // the servo library
 #include "ServoMoteur.h"
-
 const byte servoCde = 8; // pin D8 cde du servo
 const byte servoPin = 4; // pin D4 relais du servo
 const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
 const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
-
+bool reduit(false); // vitesse du servo, normal ou reduit(false)
 // use digital pin D8 for commande du servo et D4 relais du servo
 // + pulse (stop, ouverture/fermeture , reduit) + debug si nécessaire
 ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 70, DEBUG);
@@ -80,24 +79,19 @@ byte alarm_2 = 2; //alarme 2
 // digital pin D7 has a détecteur roue codeuse
 const byte roueCodeuse = 7;//digital pin D7 pour entrée roue codeuse
 volatile unsigned int compteRoueCodeuse(150);  // un compteur de position
-volatile boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
-volatile boolean positionRoueCodeuse;
-
-/* servo */
 unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
 unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
-bool reduit(false); // vitesse du servo, normal ou reduit(false)
+volatile boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
+volatile boolean positionRoueCodeuse;
 
 /* watchdog - Optimisation de la consommation */
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
-
 /****************************/
-const byte bouclesWatchdog(8); // 8 nombre de boucles du watchdog environ 64s
+const byte bouclesWatchdog(2); // 8 nombre de boucles du watchdog environ 64s
 /****************************/
-
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean batterieFaible = false; // si batterie < 4,8v = true
 
@@ -115,12 +109,6 @@ byte interOuvBoitier = 6; //pin D6 interrupteur ouverture boitier
 boolean retroEclairage = true; // etat retro eclairage
 boolean  boitierOuvert = true; // le boitier est ouvert
 
-/* Clavier */
-byte oldkey = -1;
-boolean relache = false; // relache de la touche
-byte touche(-1); // valeur de la touche appuyee
-const byte sensorClavier = 1; //pin A1 pour le clavier
-
 /* progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
 const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin de course  . Fin de course  . Volt bat Cdes  . Volt bat servo . Commande Manuel.";
@@ -134,9 +122,6 @@ unsigned int lumMatin = 300; // valeur de la lumière du matin
 unsigned int lumSoir = 900; // valeur de la lumiere du soir
 const byte tempsLum = 2 ; // boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 unsigned int  compteurWatchdogLumiere = 0; // compteur watchdog lumiere
-
-/* emetteur 433Mhz */
-const byte pinEmRadio = 10; // pin D10 emetteur radio
 
 /* interruptions */
 volatile boolean interruptBp = false; // etat interruption entree 9
@@ -160,8 +145,12 @@ const byte menuTensionBatServo = 13; // tension batterie servo
 const byte menuManuel = 14; // nombre de lignes du  menu
 const byte colonnes = 16; // colonnes de l'afficheur
 
-/* lecture Clavier */
+/* Clavier */
 #include "Clavier.h"
+byte oldkey(-1);
+boolean relache(false); // relache de la touche
+byte touche(-1); // valeur de la touche appuyee
+const byte sensorClavier(1); //pin A1 pour le clavier
 Clavier clav(menuManuel); // class Clavier avec le nombre de lignes du menu
 
 /* I2C */
@@ -1682,9 +1671,6 @@ void setup() {
   // roue codeuse
   pinMode(roueCodeuse, INPUT); // make the roueCodeuse's pin 7 an input
 
-  // servo
-  monServo.init(); // initialisation du servo moteur et du relais
-
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
 
@@ -1704,9 +1690,12 @@ void setup() {
 
   setup_watchdog(9); // maxi de 8 secondes
 
-  vw_set_tx_pin(pinEmRadio); // broche d10 emetteur
-  vw_setup(600); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
-
+  //initialisation radio
+  rad.init();
+  
+  // initialisation servo
+  monServo.init(); // initialisation du servo moteur et du relais
+  
   if (!TESTSERVO) {
     // mise sous tension du servo et ouverture de la porte
     monServo.servoOuvFerm(batterieFaible, reduit);

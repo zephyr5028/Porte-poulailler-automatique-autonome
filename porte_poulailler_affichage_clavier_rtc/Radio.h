@@ -15,9 +15,10 @@ class Radio
   public:
 
     // constructeur avec la taille du tableau, debug, radio et le type de temperature
-    Radio(byte taille, boolean radio = false , boolean debug = false );
+    Radio(byte pinEmRadio, int vitesseTransmission, byte taille, boolean radio =false, boolean debug =false);
     ~Radio(); // destructeur
 
+    void init();// initialisation
     void envoiMessage(char chaine1[]);//routine envoi message radio
     void messageRadio(char chaine1[]);  // message Radio
     void chaineVide();//chaine radio fin de ligne avant transmission
@@ -28,6 +29,8 @@ class Radio
 
   protected:
 
+    byte m_pinEmRadio; // pin D10 emetteur radio
+    int m_vitesseTransmission;// vitese de la transmission radio
     boolean m_debug ; // pour affichage console si nécessaire
     boolean m_radio; // pour envoi radio si necessaire
     int const m_taille; // taille du tableau

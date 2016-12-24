@@ -17,6 +17,7 @@ ServoMoteur::~ServoMoteur()
 {
 }
 
+//-----initialisation-----
 void ServoMoteur::init () {
   pinMode(m_pinRelais, OUTPUT); // relais servo's pin  an OUTPUT
   digitalWrite(m_pinRelais, LOW); // mise hors tension du relais du servo
