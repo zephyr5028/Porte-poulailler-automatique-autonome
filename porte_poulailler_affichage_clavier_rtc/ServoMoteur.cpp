@@ -114,3 +114,4 @@ bool ServoMoteur::get_m_servoAction() {
 bool ServoMoteur::set_m_servoAction(bool servoAction) {
   m_servoAction = servoAction;
 }
+

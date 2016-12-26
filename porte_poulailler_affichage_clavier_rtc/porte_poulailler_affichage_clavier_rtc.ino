@@ -45,8 +45,6 @@ const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 #include <avr/pgmspace.h> // non nécessaire maintenant
 
 /* radio 43MHz */
-/*-----virtualWire pour la liaison RF 433Mhz-----*/
-#include <VirtualWire.h>
 #include "Radio.h"
 const byte pinEmRadio = 10; // pin D10 emetteur radio
 const int vitesseTransmission(600);//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
@@ -61,14 +59,24 @@ Radio rad(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, RADIO, DEBUG); //
 
 /* servo - montée et descente de la porte */
 #include "ServoMoteur.h"
-const byte servoCde = 8; // pin D8 cde du servo
-const byte servoPin = 4; // pin D4 relais du servo
-const byte securiteHaute = 12; // pin 12 pour la securite d'ouverture de porte
-const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
+const byte servoCde (8); // pin D8 cde du servo
+const byte servoPin (4); // pin D4 relais du servo
+const byte securiteHaute(12); // pin 12 pour la securite d'ouverture de porte
+const int pulseStop (1500); // value should usually be 750 to 2200 (1500 = stop)
 bool reduit(false); // vitesse du servo, normal ou reduit(false)
 // use digital pin D8 for commande du servo et D4 relais du servo
 // + pulse (stop, ouverture/fermeture , reduit) + debug si nécessaire
 ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 70, DEBUG);
+
+/*Accus*/
+#include "Accus.h"
+const byte accusPinCde(2); //analog pin A2 : tension batterie commandes
+const byte accusPinServo(3); //analog pin A3 : tension batterie servo moteur
+const float tensionMiniAccus(4.8); //valeur minimum de l'accu 4.8v
+const float rapportConvertion(7.5);// rapport de convertion CAD float
+boolean batterieFaible = false; // si batterie < 4,8v = true
+Accus accusCde (accusPinCde, tensionMiniAccus, rapportConvertion, DEBUG); // objet accus commande mini 4.8v, convertion 7.5
+Accus accusServo (accusPinServo); // objet accus servo moteur mini 4.8v, convertion 7.5
 
 /* RTC_DS3231 */
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
@@ -93,7 +101,6 @@ volatile int f_wdt = 1; // flag watchdog
 const byte bouclesWatchdog(2); // 8 nombre de boucles du watchdog environ 64s
 /****************************/
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
-boolean batterieFaible = false; // si batterie < 4,8v = true
 
 /* Affichage */
 byte incrementation = 0; // incrementation verticale
@@ -147,10 +154,10 @@ const byte colonnes = 16; // colonnes de l'afficheur
 
 /* Clavier */
 #include "Clavier.h"
-byte oldkey(-1);
+const byte oldkey(-1);
+const byte sensorClavier(1); //pin A1 pour le clavier
 boolean relache(false); // relache de la touche
 byte touche(-1); // valeur de la touche appuyee
-const byte sensorClavier(1); //pin A1 pour le clavier
 Clavier clav(menuManuel); // class Clavier avec le nombre de lignes du menu
 
 /* I2C */
@@ -438,9 +445,8 @@ void temporisationAffichage(int boucleTemps) {
 /* batteries */
 //-------affichage tension batterie commandes
 void affiTensionBatCdes() {
-  int valBatCdes = analogRead(A2); // read the input on analog pin A2 : tension batterie commandes
-  // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 6V)
-  float voltage = valBatCdes * (7.50 / 1023.0);
+  int valBatCdes = accusCde.tensionAccusCAD(); // tension batterie CAD
+  float voltage = accusCde.tensionAccus(valBatCdes);// read the input on analog pin A2 : tension batterie commandes
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
     mydisp.print(F(" "));
@@ -462,9 +468,8 @@ void affiTensionBatCdes() {
 
 //-------affichage tension batterie servo-moteur
 void affiTensionBatServo() {
-  int valBatServo = analogRead(A3); //read the input on analog pin A3 : tension batterie servo moteur
-  // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 6V)
-  float voltage = valBatServo * (7.50 / 1023.0);
+  int valBatServo = accusServo.tensionAccusCAD(); // tension batterie CAD
+  float voltage = accusServo.tensionAccus(valBatServo);// read the input on analog pin A3 : tension batterie servo moteur
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
     mydisp.print(F(" "));
@@ -482,16 +487,6 @@ void affiTensionBatServo() {
     Serial.println(F(" V"));
   }
   rad.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus
-}
-
-//-----batterie cdes < 4 volt-----
-void accusFaible() {
-  int valBatCdes = analogRead(A2); // read the input on analog pin A2 : tension batterie commandes
-  if (valBatCdes < 654) { // si la batterie est faible < 4,8v (654)
-    batterieFaible = true;
-  } else {
-    batterieFaible = false;
-  }
 }
 
 /* choix pour l'ouverture et la fermeture :
@@ -1692,10 +1687,10 @@ void setup() {
 
   //initialisation radio
   rad.init();
-  
+
   // initialisation servo
   monServo.init(); // initialisation du servo moteur et du relais
-  
+
   if (!TESTSERVO) {
     // mise sous tension du servo et ouverture de la porte
     monServo.servoOuvFerm(batterieFaible, reduit);
@@ -1727,7 +1722,8 @@ void loop() {
 
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
-  accusFaible(); // batterie cdes < 4 volt
+  batterieFaible = accusCde.accusFaible(); // test de la batterie commande < 4.8v
+
   ouverturePorte();
   fermeturePorte();
 

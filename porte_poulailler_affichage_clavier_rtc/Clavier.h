@@ -22,11 +22,12 @@ class Clavier
 
   protected:
 
-    byte m_oldKey;  // -1
+    const byte m_oldKey;  // -1
     byte m_MenuManuel; // nombre de lignes du menu
-    byte m_NumKeys;  // nombre de touches +1
+    const byte m_NumKeys;  // nombre de touches +1
     int m_AdcKeyVal[5]; // Analogique digital Keyboard Module
 
 };
 
 #endif
+
