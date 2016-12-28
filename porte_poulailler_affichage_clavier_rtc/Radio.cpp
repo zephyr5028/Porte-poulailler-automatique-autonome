@@ -6,7 +6,7 @@
 #include "Radio.h"
 
 //constructeur avec debug et radio pour affichage si nécessaire
-Radio::Radio(byte pinEmRadio, int vitesseTransmission, byte taille, boolean radio, boolean debug) :  m_pinEmRadio(pinEmRadio),
+Radio::Radio(byte pinEmRadio, int vitesseTransmission, byte taille, const boolean radio, const boolean debug) :  m_pinEmRadio(pinEmRadio),
 m_vitesseTransmission(vitesseTransmission), m_taille(taille), m_radio(radio), m_debug(debug)
 {
   m_chaine[m_taille] = "";// initialisation du tableau

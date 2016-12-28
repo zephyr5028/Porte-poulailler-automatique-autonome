@@ -31,8 +31,8 @@ class Radio
 
     byte m_pinEmRadio; // pin D10 emetteur radio
     int m_vitesseTransmission;// vitese de la transmission radio
-    boolean m_debug ; // pour affichage console si nécessaire
-    boolean m_radio; // pour envoi radio si necessaire
+    const boolean m_debug ; // pour affichage console si nécessaire
+    const boolean m_radio; // pour envoi radio si necessaire
     int const m_taille; // taille du tableau
     char m_chaine[]; // tableau de la chaine avant envoi
 

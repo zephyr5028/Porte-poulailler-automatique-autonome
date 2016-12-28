@@ -7,7 +7,7 @@
 
 //constructeur avec debug si nécessaire
 ServoMoteur::ServoMoteur( byte pinCde, byte pinRelais, const byte pinSecuriteHaute, const int pulseStop, const int pulseOuvFerm ,
-                          const int pulseReduit, boolean debug) :  m_pinCde(pinCde), m_pinRelais(pinRelais),
+                          const int pulseReduit, const boolean debug) :  m_pinCde(pinCde), m_pinRelais(pinRelais),
   m_pulseStop(pulseStop),  m_pulseOuvFerm(pulseOuvFerm), m_pinSecuriteHaute(pinSecuriteHaute),
   m_pulseReduit(pulseReduit), m_debug(debug), m_pulse(pulseStop), m_ouvFerm(true), m_servoAction(false)
 {
@@ -91,7 +91,7 @@ int ServoMoteur::get_m_pulse() {
 }
 
 //-----mutateur - setter-----
-int ServoMoteur::set_m_pulse(int pulse) {
+void ServoMoteur::set_m_pulse(int pulse) {
   m_pulse = pulse;
 }
 
@@ -101,7 +101,7 @@ bool ServoMoteur::get_m_ouvFerm() {
 }
 
 //-----mutateur - setter-----
-bool ServoMoteur::set_m_ouvFerm(bool ouvFerm) {
+void ServoMoteur::set_m_ouvFerm(bool ouvFerm) {
   m_ouvFerm = ouvFerm;
 }
 
@@ -111,7 +111,7 @@ bool ServoMoteur::get_m_servoAction() {
 }
 
 //-----mutateur - setter-----
-bool ServoMoteur::set_m_servoAction(bool servoAction) {
+void ServoMoteur::set_m_servoAction(bool servoAction) {
   m_servoAction = servoAction;
 }
 

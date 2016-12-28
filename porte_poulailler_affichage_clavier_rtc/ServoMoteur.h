@@ -28,16 +28,16 @@ class ServoMoteur : public ServoTimer2
     void relaisSousTension(); //relais sous tension
     void relaisHorsTension();//relais hors tension
     int get_m_pulse(); // accesseur - getter
-    int set_m_pulse(int pulse); // mutateur - setter
+    void set_m_pulse(int pulse); // mutateur - setter
     bool get_m_ouvFerm(); // accesseur - getter
-    bool set_m_ouvFerm(bool ouvFerm); // mutateur - setter
+    void set_m_ouvFerm(bool ouvFerm); // mutateur - setter
     bool get_m_servoAction(); // accesseur - getter
-    bool set_m_servoAction(bool servoAction); // mutateur - setter
+    void set_m_servoAction(bool servoAction); // mutateur - setter
 
 
   protected:
 
-    boolean m_debug ; // pour affichage console si nécessaire
+    const boolean m_debug ; // pour affichage console si nécessaire
     const  byte m_pinCde; // numero de la broche reliée à la commande du servo moteur
     const byte m_pinRelais; // numero de la broche reliée à la commande du relais pour le servo moteur
     const byte m_pinSecuriteHaute; // pin pour la securite d'ouverture de porte

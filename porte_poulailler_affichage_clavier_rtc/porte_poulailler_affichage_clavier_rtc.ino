@@ -1,37 +1,33 @@
 /* porte-poulailler : affichage + clavier + rtc */
-// 21 12 2016 ajout de la classe servo - tout le reste fonctionne
-//first commit sur gihub le 01 12 2016
 
-/* 20 septembre 2016 :
-    crétion d'une classe Clavier
-    inclure le test servoAction dans le comptage de la roue codeuse
-*/
-/* 19 septembre 2016 :
+/*
+  28 12 2016 classe Lumiere - ok
+  26 12 2016 classe Accus - ok
+  21 12 2016 ajout de la classe servo - ok
+  01 12 2016first commit sur gihub
+  20 09 2016 classe clavier
+
+  19 septembre 2016 :
     - suppression du blocage au demarrage (si = 200)
-*/
-/* date 18 septembre 2016 :
+  18 septembre 2016 :
     En cas de probleme avec le sens de rotation du servo :
      - variable globale : sens
      - arret fin de course ( contact) quelque soit le sens
      - diminution de la vitesse reduite dans la descente de la trappe (inertie)
-     Utilisation de fichiers *.h pour la compréhension du programme
-*/
-/* date : 17 septembre 2016 :
+  17 septembre 2016 :
     - problème avec servotimer2  :
-    le pulse en ms ne fonctionne pas donc le servo est tjs dans le même sens (hs).
-    Les valeurs du pulse étaient mauvaise.
-    Il faut :
-    90° : 1500ms
-    o° : 1000ms
-    180° : 2000ms
-*/
-/* date : 10 septembre 2016 :
-    - affichage compteur roue codeuse envoi radio (ligne 1138)
-    - delay d'attente de la remontée du servo augmentée : 300 (ligne 1252)
-*/
-/*
+       Le pulse en ms ne fonctionne pas donc le servo est tjs dans le même sens (hs).
+       Les valeurs du pulse étaient mauvaise.
+       Il faut :
+               90° : 1500ms
+                0° : 1000ms
+              180° : 2000ms
+  10 septembre 2016 :
+    - affichage compteur roue codeuse envoi radio
+    - delay d'attente de la remontée du servo augmentée : 300
+  Important :
   with ServoTimer2 et VirtualWire
-  il faut aussi commenter typedef dans la bibliothèque servotimer2
+  il faut commenter typedef dans la bibliothèque servotimer2
 */
 
 /*-----debug-----*/
@@ -48,7 +44,7 @@ const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 #include "Radio.h"
 const byte pinEmRadio = 10; // pin D10 emetteur radio
 const int vitesseTransmission(600);//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
-Radio rad(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
+Radio radio(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
 
 /* affichages */
 #define LCDCol 16
@@ -64,8 +60,7 @@ const byte servoPin (4); // pin D4 relais du servo
 const byte securiteHaute(12); // pin 12 pour la securite d'ouverture de porte
 const int pulseStop (1500); // value should usually be 750 to 2200 (1500 = stop)
 bool reduit(false); // vitesse du servo, normal ou reduit(false)
-// use digital pin D8 for commande du servo et D4 relais du servo
-// + pulse (stop, ouverture/fermeture , reduit) + debug si nécessaire
+// pulse stop, ouverture/fermeture , reduit et debug si nécessaire
 ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 70, DEBUG);
 
 /*Accus*/
@@ -97,6 +92,7 @@ volatile boolean positionRoueCodeuse;
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
+
 /****************************/
 const byte bouclesWatchdog(2); // 8 nombre de boucles du watchdog environ 64s
 /****************************/
@@ -122,13 +118,12 @@ const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure O
 const char affichageRadio[] PROGMEM = "Batterie faible !!!!.Temp = .Time : .Lum : .Fin course F = .Fin course O = .Ten Cdes = . Ten Servo = .Porte ouv !.Porte ferm !.";
 
 /* lumiere */
-byte ouve = 1; // ouverture 1 donc heure
-byte ferm = 0; // fermeture 0 donc lumière
-int sensorValue; // valeur de la lumiere
-unsigned int lumMatin = 300; // valeur de la lumière du matin
-unsigned int lumSoir = 900; // valeur de la lumiere du soir
-const byte tempsLum = 2 ; // boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
-unsigned int  compteurWatchdogLumiere = 0; // compteur watchdog lumiere
+#include "Lumiere.h"
+const byte lumierePin(0); //analog pin A0 : luminosite
+unsigned int lumMatin(300); // valeur de la lumière du matin
+unsigned int lumSoir(900); // valeur de la lumiere du soir
+const float convertion(5);// rapport de convertion CAD float
+Lumiere lum(lumierePin, lumMatin, lumSoir, convertion, DEBUG); // objet lumiere
 
 /* interruptions */
 volatile boolean interruptBp = false; // etat interruption entree 9
@@ -190,11 +185,9 @@ DigoleSerialDisp mydisp(8, 9, 10); // SPI:Pin 8:data, 9:clock, 10:SS, you can as
 #endif
 
 /* RTC_DS3231 */
-
 #include <DS3232RTC.h>    //http://github.com/JChristensen/DS3232RTC
 #include <Time.h>         //http://www.arduino.cc/playground/Code/Time  
 #define DS3231_I2C_ADDRESS 0x68
-
 tmElements_t tm; // declaration de tm pour la lecture des informations date et heure
 
 //-----routine decToBcd : Convert normal decimal numbers to binary coded decimal-----
@@ -322,8 +315,8 @@ void displayTime () {
       Serial.print(timeMinute, DEC);
       Serial.println(F("m"));
     }
-    rad.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure si le boitier est fermé
-    rad.envoiUnsignedInt(timeMinute,  boitierOuvert, "m;");// envoi message radio minute si le boitier est fermé
+    radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure si le boitier est fermé
+    radio.envoiUnsignedInt(timeMinute,  boitierOuvert, "m;");// envoi message radio minute si le boitier est fermé
   }
 }
 
@@ -399,19 +392,18 @@ void affiPulsePlusCptRoue() {
       Serial.println(F("Porte ouverte"));
     }
   }
-
   if (RADIO and tempsWatchdog <= 0 and (!boitierOuvert)) { // eviter l'envoi à l'initialisation
     if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
       char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       strcat(chaine1, "fer;");
-      rad.envoiMessage(chaine1);// on envoie le message
+      radio.envoiMessage(chaine1);// on envoie le message
     }
     if ( compteRoueCodeuse > (finDeCourseOuverture - 5) and compteRoueCodeuse < (finDeCourseOuverture + 5)) {
       char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
       strcat(chaine1, "ouv;");
-      rad.envoiMessage(chaine1);// on envoie le message
+      radio.envoiMessage(chaine1);// on envoie le message
     }
-    rad.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert, ";"); // envoi message radio compteur roue codeuse
+    radio.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert, ";"); // envoi message radio compteur roue codeuse
   }
 }
 
@@ -463,7 +455,7 @@ void affiTensionBatCdes() {
     Serial.print(voltage);
     Serial.println(F(" V"));
   }
-  rad.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus}*/
+  radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus}*/
 }
 
 //-------affichage tension batterie servo-moteur
@@ -486,7 +478,7 @@ void affiTensionBatServo() {
     Serial.print(voltage);
     Serial.println(F(" V"));
   }
-  rad.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus
+  radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus
 }
 
 /* choix pour l'ouverture et la fermeture :
@@ -497,14 +489,14 @@ void affiTensionBatServo() {
 void affiChoixOuvFerm() {
   if ( boitierOuvert) { // si le boitier est ouvert
     mydisp.print(F(" Ouv:"));
-    if (ouve == 1) {
+    if (lum.get_m_ouverture()) {
       mydisp.print(F("Hre"));
     } else {
       mydisp.print(F("Lum"));
     }
     mydisp.print(F(" "));
     mydisp.print(F("Fer:"));
-    if (ferm == 0) {
+    if (!lum.get_m_fermeture()) {
       mydisp.print(F("Lum"));
     } else {
       mydisp.print(F("Hre"));
@@ -513,13 +505,13 @@ void affiChoixOuvFerm() {
   }
   if (DEBUG) {
     Serial.print(F("Ouv : "));
-    if (ouve == 1) {
+    if (lum.get_m_ouverture()) {
       Serial.print(F("Hre"));
     } else {
       Serial.print(F("Lum "));
     }
     Serial.print(F("   Fer : "));
-    if (ferm == 0) {
+    if (!lum.get_m_fermeture()) {
       Serial.println(F("Lum "));
     } else {
       Serial.println(F("Hre"));
@@ -545,27 +537,27 @@ void choixOuvFerm () {
     if ((touche == 2 or touche == 3) and incrementation == menuChoix and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 7) {
-        if (ouve == 1) {
-          ouve = 0; // ouverture 0 donc lumière
+        if (lum.get_m_ouverture()) {
+          lum.set_m_ouverture(0); // ouverture 0 donc lumière
           RTC.alarmInterrupt(alarm_1, false);     //disable Alarm1
         } else {
-          ouve = 1; // ouverture 1 donc heure
+          lum.set_m_ouverture(1); // ouverture 1 donc heure
           RTC.alarmInterrupt(alarm_1, true); // activation alarme 1 ouverture
         }
-        i2c_eeprom_write_byte(0x57, 0x14, ouve); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
+        i2c_eeprom_write_byte(0x57, 0x14, lum.get_m_ouverture()); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
         mydisp.drawStr(0, 1, "");
         affiChoixOuvFerm();
         mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
       if (decalage == 14) {
-        if (ferm == 0) {
-          ferm = 1; // fermeture 1 donc heure
+        if (!lum.get_m_fermeture()) {
+          lum.set_m_fermeture(1); // fermeture 1 donc heure
           RTC.alarmInterrupt(alarm_2, true);// activation alarme 2 fermeture
         } else {
-          ferm = 0; // fermeture 0 donc lumière
+          lum.set_m_fermeture(0); // fermeture 0 donc lumiere
           RTC.alarmInterrupt(alarm_2, false);     //disable Alarm2
         }
-        i2c_eeprom_write_byte(0x57, 0x15, ferm); // écriture du type de fermeture @15 de l'eeprom de la carte rtc (i2c @ 0x57)
+        i2c_eeprom_write_byte(0x57, 0x15, lum.get_m_fermeture()); // écriture du type de fermeture @15 de l'eeprom de la carte rtc (i2c @ 0x57)
         mydisp.drawStr(0, 1, "");
         affiChoixOuvFerm();
         mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
@@ -828,6 +820,7 @@ void reglageDate () {
 //------affichage de la lumiere du matin------
 void affiLumMatin() {
   if (boitierOuvert) {
+    unsigned int lumMatin = lum.get_m_lumMatin();
     mydisp.print(F("   Lum: "));
     mydisp.print(lumMatin);
     if (lumMatin == 0) {
@@ -857,20 +850,8 @@ void choixLumMatin() {
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereMatin and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 8) {
-        if (touche == 2 ) {
-          if (lumMatin < 1020) {
-            lumMatin = lumMatin + 10; //incrementation de la lumiere du matin
-          } else {
-            lumMatin = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (lumMatin > 0) {
-            lumMatin = lumMatin - 10; //decrementation de la lumiere du matin
-          } else {
-            lumMatin = 1020;
-          }
-        }
+        bool matin(1);
+        unsigned int lumMatin = lum.reglageLumiere(matin, touche);// reglage de la lumiere du matin
         byte val1 = lumMatin & 0xFF; // ou    byte val1= lowByte(sensorValue);// pf
         byte val2 = (lumMatin >> 8) & 0xFF; // ou  //byte val1= highByte(sensorValue); // Pf
         i2c_eeprom_write_byte(0x57, 0x16, val1); // écriture de la valeur du reglage de la lumiere du matin low @16  de l'eeprom de la carte rtc (i2c @ 0x57)
@@ -889,6 +870,7 @@ void choixLumMatin() {
 //------affichage de la lumiere du soir-------
 void affiLumSoir() {
   if (boitierOuvert) {
+    unsigned int lumSoir = lum.get_m_lumSoir();
     mydisp.print(F("   Lum: "));
     mydisp.print(lumSoir);
     if (lumSoir == 0) {
@@ -918,20 +900,8 @@ void choixLumSoir() {
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereSoir and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 8) {
-        if (touche == 2 ) {
-          if (lumSoir < 1020) {
-            lumSoir = lumSoir + 10; //incrementation de la lumiere du soir
-          } else {
-            lumSoir = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (lumSoir > 0) {
-            lumSoir = lumSoir - 10; //decrementation de la lumiere du soir
-          } else {
-            lumSoir = 1020;
-          }
-        }
+        bool soir(0);
+        unsigned int lumSoir =lum.reglageLumiere(soir, touche);// reglage de la lumiere du soir
         byte val1 = lumSoir & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (lumSoir >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
         i2c_eeprom_write_byte(0x57, 0x18, val1); // écriture de la valeur du reglage de la lumiere du soir low @18  de l'eeprom de la carte rtc (i2c @ 0x57)
@@ -1035,7 +1005,7 @@ void affiFinDeCourseFermeture() {
   if (DEBUG) {
     Serial.print(F("Fin course fermeture = ")); Serial.println(finDeCourseFermeture);
   }
-  rad.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
+  radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
 }
 
 //------affichage fin de course Ouverture-------
@@ -1053,7 +1023,7 @@ void affiFinDeCourseOuverture() {
   if (DEBUG) {
     Serial.print(F("Fin course ouverture = ")); Serial.println(finDeCourseOuverture);
   }
-  rad.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
+  radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
 }
 
 //------reglage fin de course Fermeture------
@@ -1252,7 +1222,7 @@ void read_temp(boolean typeTemperature) {
     }
     char temp[2] = "";
     if (typeTemperature)  strcat(temp, "°C;"); else strcat(temp, "F;");
-    rad.envoiFloat(celsius, boitierOuvert, temp);
+    radio.envoiFloat(celsius, boitierOuvert, temp);
   }
 }
 
@@ -1405,9 +1375,8 @@ void  routineTestFermetureBoitier() {
 */
 //-----routine lecture et affichage de la lumière-----
 void lumiere() {
-  int lumValue = analogRead(A0); // read the input on analog pin 0
-  // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V)
-  float voltage = lumValue * (5.0 / 1023.0);
+  int lumValue = lum.luminositeCAD(); // luminosite CAD sur pin A0
+  float voltage = lum.tensionLuminosite(lumValue);// convertion CAD  vers tension luminosite
   if ( boitierOuvert) { // si le boitier est ouvert
     // print out the value you read:
     mydisp.print(F(" "));
@@ -1420,38 +1389,30 @@ void lumiere() {
     Serial.print(F("lum : "));
     Serial.println(lumValue);
   }
-  rad.envoiUnsignedInt(lumSoir, boitierOuvert, ";"); // envoi message radio lumiere du soir
-  rad.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
+  radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
+  radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
 }
 
 //-----ouverture/fermeture par test de la lumière----
 void ouvFermLum() {
   byte  valHeure = bcdToDec(RTC.readRTC(0x02) & 0x3f); // lecture de l'heure
-  sensorValue = analogRead(A0); // read the input on analog pin 0 : lumière
-  if (sensorValue > lumMatin and sensorValue < lumSoir) {
-    compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-  }
-  if ((ouve == 1 and valHeure < 17) or (ferm == 1 and valHeure > 17)) { // pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 si utilisation de l'heure
-    compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-  }
-  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and (ouve == 0)) or (( compteRoueCodeuse >= (finDeCourseFermeture - 2)) and (ferm == 0))) {
-    compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-  }
-  if ((sensorValue <= lumMatin) and (ouve == 0) and (compteurWatchdogLumiere >= tempsLum)) {
-    compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-    // mise sous tension du servo pour l'ouverture de la porte
-    monServo.set_m_ouvFerm(true); // ouverture
-    // ouvFerm = 1; // ouverture
-    reduit = 1;// vitesse normale
-    monServo.servoOuvFerm(batterieFaible, reduit);
-  }
-  if ((sensorValue >= lumSoir) and (ferm == 0) and (compteurWatchdogLumiere >= tempsLum)) {
-    compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-    // mise sous tension du servo pour la fermeture de la porte
-    monServo.set_m_ouvFerm(false); // fermeture
-    //  ouvFerm = 0; // fermeture
-    reduit = 1;// vitesse normale
-    monServo.servoOuvFerm(batterieFaible, reduit);
+  lum.testLuminosite(); // test de la luminosite pour mise à jour du compteur watchdog lumiere
+  //fenetre de non declenchement pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 et mise à jour du compteur watchdog lumiere
+  lum.fenetreNonDeclenchement(valHeure) ;
+  //non eclenchement en fonction de la position du servo et mise à jour du compteur watchdog lumiere
+  lum.nonDeclenchementPositionServo (compteRoueCodeuse, finDeCourseFermeture, finDeCourseOuverture);
+  byte declenchementLuminosite = lum.declenchementServoLuminosite(); // test de laluninosite et declenchement du servo
+  switch (declenchementLuminosite) {
+    case 1: // mise sous tension du servo pour l'ouverture de la porte
+      monServo.set_m_ouvFerm(true); // ouverture
+      reduit = 1;// vitesse normale
+      monServo.servoOuvFerm(batterieFaible, reduit);
+      break;
+    case 2: // mise sous tension du servo pour la fermeture de la porte
+      monServo.set_m_ouvFerm(false); // fermeture
+      reduit = 1;// vitesse normale
+      monServo.servoOuvFerm(batterieFaible, reduit);
+      break;
   }
 }
 
@@ -1572,7 +1533,7 @@ void routineGestionWatchdog() {
       tempsWatchdog--;
       if (tempsWatchdog <= 0) {
         if (batterieFaible) { // affichage si la batterie est faible
-          rad.messageRadio("*** Batterie faible ! ***");// on envoie le message
+          radio.messageRadio("*** Batterie faible ! ***");// on envoie le message
         }
         // informations à afficher
         if (RADIO) {
@@ -1585,10 +1546,10 @@ void routineGestionWatchdog() {
           affiPulsePlusCptRoue();
           affiChoixOuvFerm();
           lumiere();
-          rad.chaineVide();
+          radio.chaineVide();
         }
         if (DEBUG) {
-          Serial.print(F("compt watchdog lum : x * 8s  = ")); Serial.println(compteurWatchdogLumiere);
+          Serial.print(F("compt watchdog lum : x * 8s  = ")); Serial.println(lum.get_m_compteurWatchdogLumiere());
           Serial.print(F("Bat faible : "));
           if (batterieFaible) {
             Serial.println(F("oui"));
@@ -1600,7 +1561,7 @@ void routineGestionWatchdog() {
           delay(100);
         }
         tempsWatchdog = bouclesWatchdog ; // initialisation du nombre de boucles
-        compteurWatchdogLumiere++; //incrementation du compteur watchdog lumiere pour ne pas prendre en compte une ombre
+        lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
       f_wdt = 0;
       enterSleep(); //Revenir en mode veille
@@ -1634,22 +1595,22 @@ void setup() {
   incrementation = menuManuel; // pour affichage menu
   deroulementMenu (incrementation); // affichage du menu
 
-  ouve = i2c_eeprom_read_byte(0x57, 0x14); // lecture du type d'ouverture @14  de l'eeprom de la carte rtc (i2c @ 0x57)
+  lum.set_m_ouverture( i2c_eeprom_read_byte(0x57, 0x14));// lecture du type d'ouverture @14  de l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
-  ferm = i2c_eeprom_read_byte(0x57, 0x15); // lecture du type de fermeture @15   de l'eeprom de la carte rtc (i2c @ 0x57)
+  lum.set_m_fermeture( i2c_eeprom_read_byte(0x57, 0x15)); // lecture du type de fermeture @15   de l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
 
   byte val1 = i2c_eeprom_read_byte(0x57, 0x16); // lecture pf lumière du matin (byte)
   delay(10);
   byte val2 = i2c_eeprom_read_byte(0x57, 0x17); // lecture Pf lumiere du matin (byte)
   delay(10);
-  lumMatin = (val2 << 8) + val1;  // mots 2 byte vers mot int lumMatin
+  lum.set_m_lumMatin((val2 << 8) + val1);// mots 2 byte vers mot int lumMatin
 
   val1 = i2c_eeprom_read_byte(0x57, 0x18); // lecture pf lumière du soir (byte)
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x19); // lecture Pf lumiere du soir (byte)
   delay(10);
-  lumSoir = (val2 << 8) + val1;  // mots 2 byte vers mot int lumSoir
+  lum.set_m_lumSoir((val2 << 8) + val1);// mots 2 byte vers mot int lumSoir
 
   val1 = i2c_eeprom_read_byte(0x57, 0x20); // lecture pf fin de course haut (byte)
   delay(10);
@@ -1684,16 +1645,13 @@ void setup() {
   //power_timer2_disable();
 
   setup_watchdog(9); // maxi de 8 secondes
+  
+  radio.init();//initialisation radio
 
-  //initialisation radio
-  rad.init();
-
-  // initialisation servo
   monServo.init(); // initialisation du servo moteur et du relais
 
   if (!TESTSERVO) {
-    // mise sous tension du servo et ouverture de la porte
-    monServo.servoOuvFerm(batterieFaible, reduit);
+    monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
   }
 }
 
@@ -1735,6 +1693,5 @@ void loop() {
   routineInterruptionAlarme1(); // routine alarme 1
 
   routineGestionWatchdog(); // routine de gestion du watchdog
-
 }
 

@@ -24,7 +24,7 @@ class Accus
 
 
   protected:
-    boolean m_debug ; // pour affichage console si nécessaire
+    const boolean m_debug ; // pour affichage console si nécessaire
     const byte m_accusPin; //analog pin - tension batterie
     // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 6V)
     const float m_rapportConvertion; // 7.5 pour convertion

@@ -6,7 +6,7 @@
 #include "Accus.h"
 
 //constructeur avec debug
-Accus::Accus(  const byte accusPin, const float tensionMiniAccus, const float rapportConvertion, boolean debug) :
+Accus::Accus(  const byte accusPin, const float tensionMiniAccus, const float rapportConvertion, const boolean debug) :
   m_accusPin(accusPin), m_tensionMiniAccus(tensionMiniAccus), m_rapportConvertion(rapportConvertion), m_debug(debug), m_maxCAD(1023)
 {
 }
