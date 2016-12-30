@@ -8,7 +8,7 @@
 //constructeur avec debug
 Codeur::Codeur( const byte roueCodeusePin, unsigned int finDeCourseFermeture, unsigned int finDeCourseOuverture, unsigned int compteRoueCodeuse, const boolean debug) :
   m_roueCodeusePin(roueCodeusePin), m_finDeCourseFermeture(finDeCourseFermeture), m_finDeCourseOuverture(finDeCourseOuverture),
-  m_compteRoueCodeuse(compteRoueCodeuse), m_debug(debug), m_finDeCourseMax(500)
+  m_compteRoueCodeuse(compteRoueCodeuse), m_debug(debug), m_finDeCourseMax(500), m_interruptRoueCodeuse(false)
 {
 }
 
@@ -16,12 +16,22 @@ Codeur::~Codeur()
 {
 }
 
+//initialisation-----
+void Codeur::init () {
+  pinMode(m_roueCodeusePin, INPUT); // make the roueCodeuse's pin 7 an input
+  m_positionRoueCodeuse = digitalRead(m_roueCodeusePin);
+}
 
 //-----test du compteur roue codeuse pour affichage ouvert ou ferme-----
 byte Codeur::testCompteurRoueCodeuse (byte tolerance) {
   byte resultat;
-  if ( m_compteRoueCodeuse > (m_finDeCourseFermeture - 5) and m_compteRoueCodeuse < (m_finDeCourseFermeture + 5)) resultat = 1; else resultat = 0; // creneau porte fermée
-  if ( m_compteRoueCodeuse > (m_finDeCourseOuverture - 5) and m_compteRoueCodeuse < (m_finDeCourseOuverture + 5)) resultat = 2; else resultat = 0;  // creneau porte ouverte
+  if ( m_compteRoueCodeuse > (m_finDeCourseFermeture - 5) and m_compteRoueCodeuse < (m_finDeCourseFermeture + 5)) {
+    resultat = 1; // creneau porte fermée
+  } else  if ( m_compteRoueCodeuse > (m_finDeCourseOuverture - 5) and m_compteRoueCodeuse < (m_finDeCourseOuverture + 5)) {
+    resultat = 2;// creneau porte ouverte
+  } else {
+    resultat = 0;  
+  }
   return resultat;
 }
 
@@ -47,6 +57,24 @@ unsigned int  Codeur::reglageFinDeCourse (bool ouvFerm, byte touche) {
     return finDeCourse;
   }
   if ( ouvFerm) return m_finDeCourseOuverture; else return m_finDeCourseFermeture;
+}
+
+//-----compteur roue codeuse-----
+void Codeur::compteurRoueCodeuse(bool ouvFerm) {
+  // debounce
+  m_interruptRoueCodeuse = true; //activation de l'anti-rebond
+  bool pos = digitalRead(m_roueCodeusePin);
+  // Confirmation du changement
+  if (pos != m_positionRoueCodeuse) {
+    m_positionRoueCodeuse = !m_positionRoueCodeuse;
+    //  if (pulse >= pulseStop) {
+    if (!ouvFerm) {
+      m_compteRoueCodeuse++;
+    } else {
+      m_compteRoueCodeuse--;
+    }
+    m_interruptRoueCodeuse = false; //libération de l'anti-rebond
+  }
 }
 
 //-----accesseur - getter-----

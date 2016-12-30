@@ -1,6 +1,7 @@
 /* porte-poulailler : affichage + clavier + rtc */
 
 /*
+ * 29 12 2016 classe Codeur (optique)
   28 12 2016 classe Lumiere - ok
   26 12 2016 classe Accus - ok
   21 12 2016 ajout de la classe servo - ok
@@ -40,7 +41,7 @@ const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 #include <Flash.h>
 #include <avr/pgmspace.h> // non nécessaire maintenant
 
-/* radio 43MHz */
+/* radio 433MHz */
 #include "Radio.h"
 const byte pinEmRadio = 10; // pin D10 emetteur radio
 const int vitesseTransmission(600);//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
@@ -80,13 +81,10 @@ byte alarm_2 = 2; //alarme 2
 
 /* roue codeuse */
 #include "Codeur.h"
-// digital pin D7 has a détecteur roue codeuse
 const byte roueCodeuse(7);//digital pin D7 pour entrée roue codeuse
-volatile unsigned int compteRoueCodeuse(150);  // un compteur de position
-unsigned int finDeCourseFermeture(250); // initialisation de la valeur de la fin de course fermeture
-unsigned int finDeCourseOuverture(150); // initialisation de la valeur de la fin de course ouverture
-volatile boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
-volatile boolean positionRoueCodeuse; // gestion de l'anti-rebonds
+const unsigned int compteRoueCodeuse(150);  // un compteur de position
+const unsigned int finDeCourseFermeture(250); // initialisation de la valeur de la fin de course fermeture
+const unsigned int finDeCourseOuverture(150); // initialisation de la valeur de la fin de course ouverture
 Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRoueCodeuse, DEBUG); // objet codeur optique
 
 /* watchdog - Optimisation de la consommation */
@@ -96,7 +94,7 @@ Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRo
 volatile int f_wdt = 1; // flag watchdog
 
 /****************************/
-const byte bouclesWatchdog(2); // 8 nombre de boucles du watchdog environ 64s
+const byte bouclesWatchdog(8); // 8 nombre de boucles du watchdog environ 64s
 /****************************/
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 
@@ -122,9 +120,9 @@ const char affichageRadio[] PROGMEM = "Batterie faible !!!!.Temp = .Time : .Lum 
 /* lumiere */
 #include "Lumiere.h"
 const byte lumierePin(0); //analog pin A0 : luminosite
-unsigned int lumMatin(300); // valeur de la lumière du matin
-unsigned int lumSoir(900); // valeur de la lumiere du soir
 const float convertion(5);// rapport de convertion CAD float
+const unsigned int lumMatin(300); // valeur de la lumière du matin
+const unsigned int lumSoir(900); // valeur de la lumiere du soir
 Lumiere lum(lumierePin, lumMatin, lumSoir, convertion, DEBUG); // objet lumiere
 
 /* interruptions */
@@ -316,9 +314,10 @@ void displayTime () {
       Serial.print(F("h "));
       Serial.print(timeMinute, DEC);
       Serial.println(F("m"));
+    } else if (RADIO) {
+      radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure si le boitier est fermé
+      radio.envoiUnsignedInt(timeMinute,  boitierOuvert, "m;");// envoi message radio minute si le boitier est fermé
     }
-    radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure si le boitier est fermé
-    radio.envoiUnsignedInt(timeMinute,  boitierOuvert, "m;");// envoi message radio minute si le boitier est fermé
   }
 }
 
@@ -401,41 +400,20 @@ void affiPulsePlusCptRoue() {
         Serial.println(F("Porte    "));
         break;
     }
-
-    /*   if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
-         Serial.println(F("Porte fermee"));
-       }
-       if ( compteRoueCodeuse > (finDeCourseOuverture - 5) and compteRoueCodeuse < (finDeCourseOuverture + 5)) {
-         Serial.println(F("Porte ouverte"));
-       }*/
   }
   if (RADIO and tempsWatchdog <= 0 and (!boitierOuvert)) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     switch (test) {
       case 1: // mise sous tension du servo pour l'ouverture de la porte
-        //  char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
         strcat(chaine1, "fer;");
-        // radio.envoiMessage(chaine1);// on envoie le message
         break;
       case 2: // mise sous tension du servo pour la fermeture de la porte
-        //  char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
         strcat(chaine1, "ouv;");
-        // radio.envoiMessage(chaine1);// on envoie le message
         break;
       default:
         strcat(chaine1, "   ;");
         break;
     }
-    /*    if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
-          char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-          strcat(chaine1, "fer;");
-          radio.envoiMessage(chaine1);// on envoie le message
-        }
-        if ( compteRoueCodeuse > (finDeCourseOuverture - 5) and compteRoueCodeuse < (finDeCourseOuverture + 5)) {
-          char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-          strcat(chaine1, "ouv;");
-          radio.envoiMessage(chaine1);// on envoie le message
-        }*/
     radio.envoiMessage(chaine1);// on envoie le message
     radio.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert, ";"); // envoi message radio compteur roue codeuse
   }
@@ -489,7 +467,9 @@ void affiTensionBatCdes() {
     Serial.print(voltage);
     Serial.println(F(" V"));
   }
-  radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus}*/
+  if (RADIO) {
+    radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus}*/
+  }
 }
 
 //-------affichage tension batterie servo-moteur
@@ -512,7 +492,9 @@ void affiTensionBatServo() {
     Serial.print(voltage);
     Serial.println(F(" V"));
   }
-  radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus
+  if (RADIO) {
+    radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus
+  }
 }
 
 /* choix pour l'ouverture et la fermeture :
@@ -900,7 +882,7 @@ void choixLumMatin() {
   }
 }
 
-/* reglage de la lumier du soir  */
+/* reglage de la lumiere du soir  */
 //------affichage de la lumiere du soir-------
 void affiLumSoir() {
   if (boitierOuvert) {
@@ -1026,8 +1008,8 @@ void reglageTime () {
 /* fins de course ouverture et fermeture */
 //------affichage fin de course Fermeture-----
 void affiFinDeCourseFermeture() {
+  unsigned int finDeCourseFermeture = codOpt.get_m_finDeCourseFermeture();
   if ( boitierOuvert) { // si le boitier est ouvert
-    unsigned int finDeCourseFermeture = codOpt.get_m_finDeCourseFermeture();
     mydisp.print(F("   Fer : "));
     mydisp.print(finDeCourseFermeture);
     if (finDeCourseFermeture < 10) {
@@ -1040,13 +1022,15 @@ void affiFinDeCourseFermeture() {
   if (DEBUG) {
     Serial.print(F("Fin course fermeture = ")); Serial.println(finDeCourseFermeture);
   }
-  radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
+  if (RADIO) {
+    radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
+  }
 }
 
 //------affichage fin de course Ouverture-------
 void affiFinDeCourseOuverture() {
+  unsigned int finDeCourseOuverture = codOpt.get_m_finDeCourseOuverture();
   if ( boitierOuvert) { // si le boitier est ouvert
-     unsigned int finDeCourseOuverture = codOpt.get_m_finDeCourseOuverture();
     mydisp.print(F("   Ouv : "));
     mydisp.print(finDeCourseOuverture);
     if (finDeCourseOuverture < 10) {
@@ -1059,7 +1043,9 @@ void affiFinDeCourseOuverture() {
   if (DEBUG) {
     Serial.print(F("Fin course ouverture = ")); Serial.println(finDeCourseOuverture);
   }
-  radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
+  if (RADIO) {
+    radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
+  }
 }
 
 //------reglage fin de course Fermeture------
@@ -1080,22 +1066,8 @@ void regFinDeCourseFermeture() {
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 9) {
-        bool fermeture(1);
+        bool fermeture(0);
         unsigned int finDeCourse = codOpt.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
-    /*    if (touche == 2 ) {
-          if (finDeCourseFermeture < 500) {
-            finDeCourseFermeture++; //incrementation de la fin de course haut
-          } else {
-            finDeCourseFermeture = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (finDeCourseFermeture > 0) {
-            finDeCourseFermeture--; //decrementation de la fin de course haut
-          } else {
-            finDeCourseFermeture = 500;
-          }
-        }*/
         byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
         i2c_eeprom_write_byte(0x57, 0x20, val1); // écriture de la valeur du reglage de la fin de course haut low @20  de l'eeprom de la carte rtc (i2c @ 0x57)
@@ -1128,22 +1100,8 @@ void regFinDeCourseOuverture() {
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 9) {
-        bool ouverture(0);
-         unsigned int finDeCourse = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
-    /*    if (touche == 2 ) {
-          if (finDeCourseOuverture < 500) {
-            finDeCourseOuverture++; //incrementation de la fin de course bas
-          } else {
-            finDeCourseOuverture = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (finDeCourseOuverture > 0) {
-            finDeCourseOuverture--; //decrementation de la fin de course bas
-          } else {
-            finDeCourseOuverture = 500;
-          }
-        }*/
+        bool ouverture(1);
+        unsigned int finDeCourse = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
         byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
         i2c_eeprom_write_byte(0x57, 0x22, val1); // écriture de la valeur du reglage de la fin de course bas low @22  de l'eeprom de la carte rtc (i2c @ 0x57)
@@ -1260,29 +1218,11 @@ void read_temp(boolean typeTemperature) {
         Serial.print(fahrenheit); Serial.println(F(" F"));// affichage fahrenheit
       }
     }
-    char temp[2] = "";
-    if (typeTemperature)  strcat(temp, "°C;"); else strcat(temp, "F;");
-    radio.envoiFloat(celsius, boitierOuvert, temp);
-  }
-}
-
-/* roue codeuse */
-//-----compteur roue codeuse-----
-void compteurRoueCodeuse() {
-  // debounce
-  // if (interruptRoueCodeuse) delay (2);  // attendre
-  interruptRoueCodeuse = true; //activation de l'anti-rebond
-  bool cpt = digitalRead(roueCodeuse);
-  // Confirmation du changement
-  if (cpt != positionRoueCodeuse) {
-    positionRoueCodeuse = !positionRoueCodeuse;
-    //  if (pulse >= pulseStop) {
-    if (!monServo.get_m_ouvFerm()) {
-      compteRoueCodeuse++;
-    } else {
-      compteRoueCodeuse--;
+    if (RADIO) {
+      char temp[2] = "";
+      if (typeTemperature)  strcat(temp, "°C;"); else strcat(temp, "F;");
+      radio.envoiFloat(celsius, boitierOuvert, temp);
     }
-    interruptRoueCodeuse = false; //libération de l'anti-rebond
   }
 }
 
@@ -1292,6 +1232,8 @@ void compteurRoueCodeuse() {
 */
 //------sequence ouverture de la porte------
 void ouverturePorte() {
+  unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
+  unsigned int finDeCourseOuverture = codOpt.get_m_finDeCourseOuverture();
   if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
     if (compteRoueCodeuse <= finDeCourseOuverture + 20) {  // 1 + 20
       reduit = 0;// vitesse reduite
@@ -1299,13 +1241,15 @@ void ouverturePorte() {
     }
     if (!digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
       //  if (touche == 4  and ouvFerm == false and relache == true)  relache = false;
-      compteRoueCodeuse = monServo.servoHorsTension(compteRoueCodeuse, finDeCourseOuverture);
+      codOpt.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, finDeCourseOuverture));
     }
   }
 }
 
 //-----sequence fermeture de la porte-----
 void  fermeturePorte() {
+  unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
+  unsigned int finDeCourseFermeture = codOpt.get_m_finDeCourseFermeture();
   if (monServo.get_m_servoAction() and !monServo.get_m_ouvFerm()) {
     if (compteRoueCodeuse >= finDeCourseFermeture - 30) { // 195 - 30
       reduit = 0;// vitesse reduite
@@ -1314,7 +1258,7 @@ void  fermeturePorte() {
     if ((compteRoueCodeuse >= finDeCourseFermeture)
         or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
       //  if (touche == 4 and ouvFerm == false and relache == true)   relache = false;
-      compteRoueCodeuse = monServo.servoHorsTension(compteRoueCodeuse, finDeCourseOuverture);
+      codOpt.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, codOpt.get_m_finDeCourseOuverture()));
     }
   }
 }
@@ -1330,7 +1274,7 @@ void  fermeturePorte() {
 */
 //-----routine interruption D2 INT0------
 void myInterruptINT0() {
-  compteurRoueCodeuse();
+  codOpt.compteurRoueCodeuse(monServo.get_m_ouvFerm());
 }
 
 //-----routine interruption D3 INT1-----
@@ -1429,8 +1373,10 @@ void lumiere() {
     Serial.print(F("lum : "));
     Serial.println(lumValue);
   }
-  radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
-  radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
+  if (RADIO) {
+    radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
+    radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
+  }
 }
 
 //-----ouverture/fermeture par test de la lumière----
@@ -1440,7 +1386,8 @@ void ouvFermLum() {
   //fenetre de non declenchement pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 et mise à jour du compteur watchdog lumiere
   lum.fenetreNonDeclenchement(valHeure) ;
   //non eclenchement en fonction de la position du servo et mise à jour du compteur watchdog lumiere
-  lum.nonDeclenchementPositionServo (compteRoueCodeuse, finDeCourseFermeture, finDeCourseOuverture);
+  // lum.nonDeclenchementPositionServo (compteRoueCodeuse, finDeCourseFermeture, finDeCourseOuverture);
+  lum.nonDeclenchementPositionServo (codOpt.get_m_compteRoueCodeuse(), codOpt.get_m_finDeCourseFermeture(), codOpt.get_m_finDeCourseOuverture());
   byte declenchementLuminosite = lum.declenchementServoLuminosite(); // test de laluninosite et declenchement du servo
   switch (declenchementLuminosite) {
     case 1: // mise sous tension du servo pour l'ouverture de la porte
@@ -1656,16 +1603,13 @@ void setup() {
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x21); // lecture Pf fin de course haut (byte)
   delay(10);
-  finDeCourseFermeture = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseFermeture
+  codOpt.set_m_finDeCourseFermeture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseFermeture
 
   val1 = i2c_eeprom_read_byte(0x57, 0x22); // lecture pf fin de course bas (byte)
   delay(10);
   val2 = i2c_eeprom_read_byte(0x57, 0x23); // lecture Pf fin de course bas (byte)
   delay(10);
-  finDeCourseOuverture = (val2 << 8) + val1;  // mots 2 byte vers mot int finDeCourseOuverture
-
-  // roue codeuse
-  pinMode(roueCodeuse, INPUT); // make the roueCodeuse's pin 7 an input
+  codOpt.set_m_finDeCourseOuverture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseOuverture
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
@@ -1689,6 +1633,8 @@ void setup() {
   radio.init();//initialisation radio
 
   monServo.init(); // initialisation du servo moteur et du relais
+
+  codOpt.init();// initialisation de la position de la roue codeuse
 
   if (!TESTSERVO) {
     monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
