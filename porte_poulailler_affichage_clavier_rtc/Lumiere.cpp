@@ -6,7 +6,7 @@
 #include "Lumiere.h"
 
 //constructeur avec debug
-Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned lumSoir, const float rapportConvertion, const boolean debug) :
+Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const float rapportConvertion, const boolean debug) :
   m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir),
   m_rapportConvertion(rapportConvertion), m_debug(debug), m_ouverture(1), m_fermeture(0),
   m_lumiereMax(1020), m_incrementation(10), m_maxCAD(1023), m_compteurWatchdogLumiere(0),
@@ -18,7 +18,7 @@ Lumiere::~Lumiere()
 {
 }
 
-//-----reglage de la lumiere du matin-----
+//-----reglage de la lumiere du matin ou du soir-----
 unsigned int  Lumiere::reglageLumiere (bool matinSoir, byte touche) {
   if (touche == 2 or touche == 3) {
     unsigned int lumiere;

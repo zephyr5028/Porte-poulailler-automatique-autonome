@@ -79,13 +79,15 @@ byte alarm_1 = 1; // alarme 1
 byte alarm_2 = 2; //alarme 2
 
 /* roue codeuse */
+#include "Codeur.h"
 // digital pin D7 has a détecteur roue codeuse
-const byte roueCodeuse = 7;//digital pin D7 pour entrée roue codeuse
+const byte roueCodeuse(7);//digital pin D7 pour entrée roue codeuse
 volatile unsigned int compteRoueCodeuse(150);  // un compteur de position
-unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
-unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
+unsigned int finDeCourseFermeture(250); // initialisation de la valeur de la fin de course fermeture
+unsigned int finDeCourseOuverture(150); // initialisation de la valeur de la fin de course ouverture
 volatile boolean interruptRoueCodeuse;    // gestion de l'anti-rebonds
-volatile boolean positionRoueCodeuse;
+volatile boolean positionRoueCodeuse; // gestion de l'anti-rebonds
+Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRoueCodeuse, DEBUG); // objet codeur optique
 
 /* watchdog - Optimisation de la consommation */
 #include <avr/power.h>
@@ -372,6 +374,9 @@ void closeTime() {
 //------affichage pulse et comptage roue codeuse------
 void affiPulsePlusCptRoue() {
   int pulse = monServo.get_m_pulse();
+  byte test(0);
+  test = codOpt.testCompteurRoueCodeuse (5); // tolerance de 5
+  unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
   if ( boitierOuvert) { // si le boitier est ouvert
     mydisp.print(F("P: "));
     mydisp.print(pulse);
@@ -385,24 +390,53 @@ void affiPulsePlusCptRoue() {
     Serial.println(pulse);
     Serial.print(F("Cpt roue codeuse = "));
     Serial.println(compteRoueCodeuse);
-    if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
-      Serial.println(F("Porte fermee"));
+    switch (test) {
+      case 1: // mise sous tension du servo pour l'ouverture de la porte
+        Serial.println(F("Porte fermee"));
+        break;
+      case 2: // mise sous tension du servo pour la fermeture de la porte
+        Serial.println(F("Porte ouverte"));
+        break;
+      default:
+        Serial.println(F("Porte    "));
+        break;
     }
-    if ( compteRoueCodeuse > (finDeCourseOuverture - 5) and compteRoueCodeuse < (finDeCourseOuverture + 5)) {
-      Serial.println(F("Porte ouverte"));
-    }
+
+    /*   if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
+         Serial.println(F("Porte fermee"));
+       }
+       if ( compteRoueCodeuse > (finDeCourseOuverture - 5) and compteRoueCodeuse < (finDeCourseOuverture + 5)) {
+         Serial.println(F("Porte ouverte"));
+       }*/
   }
   if (RADIO and tempsWatchdog <= 0 and (!boitierOuvert)) { // eviter l'envoi à l'initialisation
-    if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
-      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-      strcat(chaine1, "fer;");
-      radio.envoiMessage(chaine1);// on envoie le message
+    char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+    switch (test) {
+      case 1: // mise sous tension du servo pour l'ouverture de la porte
+        //  char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+        strcat(chaine1, "fer;");
+        // radio.envoiMessage(chaine1);// on envoie le message
+        break;
+      case 2: // mise sous tension du servo pour la fermeture de la porte
+        //  char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+        strcat(chaine1, "ouv;");
+        // radio.envoiMessage(chaine1);// on envoie le message
+        break;
+      default:
+        strcat(chaine1, "   ;");
+        break;
     }
-    if ( compteRoueCodeuse > (finDeCourseOuverture - 5) and compteRoueCodeuse < (finDeCourseOuverture + 5)) {
-      char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
-      strcat(chaine1, "ouv;");
-      radio.envoiMessage(chaine1);// on envoie le message
-    }
+    /*    if ( compteRoueCodeuse > (finDeCourseFermeture - 5) and compteRoueCodeuse < (finDeCourseFermeture + 5)) {
+          char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+          strcat(chaine1, "fer;");
+          radio.envoiMessage(chaine1);// on envoie le message
+        }
+        if ( compteRoueCodeuse > (finDeCourseOuverture - 5) and compteRoueCodeuse < (finDeCourseOuverture + 5)) {
+          char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
+          strcat(chaine1, "ouv;");
+          radio.envoiMessage(chaine1);// on envoie le message
+        }*/
+    radio.envoiMessage(chaine1);// on envoie le message
     radio.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert, ";"); // envoi message radio compteur roue codeuse
   }
 }
@@ -901,7 +935,7 @@ void choixLumSoir() {
       relache = false;
       if (decalage == 8) {
         bool soir(0);
-        unsigned int lumSoir =lum.reglageLumiere(soir, touche);// reglage de la lumiere du soir
+        unsigned int lumSoir = lum.reglageLumiere(soir, touche); // reglage de la lumiere du soir
         byte val1 = lumSoir & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (lumSoir >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
         i2c_eeprom_write_byte(0x57, 0x18, val1); // écriture de la valeur du reglage de la lumiere du soir low @18  de l'eeprom de la carte rtc (i2c @ 0x57)
@@ -989,10 +1023,11 @@ void reglageTime () {
   }
 }
 
-/* fins de course haut et bas */
+/* fins de course ouverture et fermeture */
 //------affichage fin de course Fermeture-----
 void affiFinDeCourseFermeture() {
   if ( boitierOuvert) { // si le boitier est ouvert
+    unsigned int finDeCourseFermeture = codOpt.get_m_finDeCourseFermeture();
     mydisp.print(F("   Fer : "));
     mydisp.print(finDeCourseFermeture);
     if (finDeCourseFermeture < 10) {
@@ -1011,6 +1046,7 @@ void affiFinDeCourseFermeture() {
 //------affichage fin de course Ouverture-------
 void affiFinDeCourseOuverture() {
   if ( boitierOuvert) { // si le boitier est ouvert
+     unsigned int finDeCourseOuverture = codOpt.get_m_finDeCourseOuverture();
     mydisp.print(F("   Ouv : "));
     mydisp.print(finDeCourseOuverture);
     if (finDeCourseOuverture < 10) {
@@ -1044,7 +1080,9 @@ void regFinDeCourseFermeture() {
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 9) {
-        if (touche == 2 ) {
+        bool fermeture(1);
+        unsigned int finDeCourse = codOpt.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
+    /*    if (touche == 2 ) {
           if (finDeCourseFermeture < 500) {
             finDeCourseFermeture++; //incrementation de la fin de course haut
           } else {
@@ -1057,9 +1095,9 @@ void regFinDeCourseFermeture() {
           } else {
             finDeCourseFermeture = 500;
           }
-        }
-        byte val1 = finDeCourseFermeture & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
-        byte val2 = (finDeCourseFermeture >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
+        }*/
+        byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
+        byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
         i2c_eeprom_write_byte(0x57, 0x20, val1); // écriture de la valeur du reglage de la fin de course haut low @20  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         i2c_eeprom_write_byte(0x57, 0x21, val2); // écriture de la valeur du reglage de la fin de course haut  high @21 de l'eeprom de la carte rtc (i2c @ 0x57)
@@ -1090,7 +1128,9 @@ void regFinDeCourseOuverture() {
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 9) {
-        if (touche == 2 ) {
+        bool ouverture(0);
+         unsigned int finDeCourse = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
+    /*    if (touche == 2 ) {
           if (finDeCourseOuverture < 500) {
             finDeCourseOuverture++; //incrementation de la fin de course bas
           } else {
@@ -1103,9 +1143,9 @@ void regFinDeCourseOuverture() {
           } else {
             finDeCourseOuverture = 500;
           }
-        }
-        byte val1 = finDeCourseOuverture & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
-        byte val2 = (finDeCourseOuverture >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
+        }*/
+        byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
+        byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
         i2c_eeprom_write_byte(0x57, 0x22, val1); // écriture de la valeur du reglage de la fin de course bas low @22  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         i2c_eeprom_write_byte(0x57, 0x23, val2); // écriture de la valeur du reglage de la fin de course bas  high @23 de l'eeprom de la carte rtc (i2c @ 0x57)
@@ -1645,7 +1685,7 @@ void setup() {
   //power_timer2_disable();
 
   setup_watchdog(9); // maxi de 8 secondes
-  
+
   radio.init();//initialisation radio
 
   monServo.init(); // initialisation du servo moteur et du relais
@@ -1681,6 +1721,7 @@ void loop() {
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
   batterieFaible = accusCde.accusFaible(); // test de la batterie commande < 4.8v
+  // if (batterieFaible)  bouclesWatchdog *= 2; // doublement du temps watchdog si batterie faible
 
   ouverturePorte();
   fermeturePorte();

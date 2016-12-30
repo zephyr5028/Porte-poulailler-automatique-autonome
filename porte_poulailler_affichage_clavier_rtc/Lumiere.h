@@ -14,7 +14,7 @@ class Lumiere
   public:
 
     // constructeur avec debug
-    Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned lumSoir,  const float rapportConvertion = 5, boolean debug = false );
+    Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir,  const float rapportConvertion = 5, boolean debug = false );
     ~Lumiere(); // destructeur
 
     unsigned int  reglageLumiere (bool matinSoir, byte touche);// reglage de la lumiere du matin ou du soir
