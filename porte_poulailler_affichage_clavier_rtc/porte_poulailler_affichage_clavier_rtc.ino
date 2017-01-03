@@ -1,7 +1,7 @@
 /* porte-poulailler : affichage + clavier + rtc */
 
 /*
- * 29 12 2016 classe Codeur (optique)
+   29 12 2016 classe Codeur (optique)
   28 12 2016 classe Lumiere - ok
   26 12 2016 classe Accus - ok
   21 12 2016 ajout de la classe servo - ok
@@ -1513,12 +1513,12 @@ void enterSleep(void) {
 void routineGestionWatchdog() {
   if ((f_wdt == 1 ) and (!boitierOuvert)) { // si le boitier est ferme et watchdog=1
     if ( !monServo.get_m_servoAction()) { // servo à l'arrêt
-      //indicateur led 13 pour le mode sleep
-      digitalWrite(LED_PIN, HIGH);
-      delay(10);
-      digitalWrite(LED_PIN, LOW);
       tempsWatchdog--;
       if (tempsWatchdog <= 0) {
+        //indicateur led 13 pour le mode sleep
+        digitalWrite(LED_PIN, HIGH);
+        delay(10);
+        digitalWrite(LED_PIN, LOW);
         if (batterieFaible) { // affichage si la batterie est faible
           radio.messageRadio("*** Batterie faible ! ***");// on envoie le message
         }
