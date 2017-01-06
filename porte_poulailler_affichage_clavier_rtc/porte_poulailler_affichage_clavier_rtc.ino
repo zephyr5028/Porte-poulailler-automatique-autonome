@@ -239,11 +239,12 @@ void displayDate() {
     char semaine[4] = "";
     byte j = ((tm.Wday - 1) * 3);
     for (byte i = j; i < j + 3; i++) {
-      char dayWeek = pgm_read_byte(listeDayWeek + i);
-      semaine[i - j] = dayWeek;
+      //    char dayWeek = pgm_read_byte(listeDayWeek + i);
+      //    semaine[i - j] = dayWeek;
+      semaine[i - j] = pgm_read_byte(listeDayWeek + i);
     }
     //Serial.println(semaine);
-    mydisp.affichageDate(semaine, tm.Day, tm.Month, tm.Year);
+    mydisp.affichageDateHeure(semaine, tm.Day, tm.Month, tm.Year);
   }
   /*
      byte j = ((tm.Wday - 1) * 3);
@@ -275,6 +276,8 @@ void displayDate() {
 void displayTime () {
   if ( boitierOuvert) { // si le boitier est ouvert
     RTC.read(tm); // lecture date et heure
+     mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second);
+     /*
     if (tm.Hour < 10) {
       mydisp.print(F("0"));  // si < 10
     }
@@ -291,6 +294,7 @@ void displayTime () {
     mydisp.print(tm.Second, DEC); // print seconde
     mydisp.print(F("s  "));
     mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
+    */
   }
   if (DEBUG or RADIO) {
     byte timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure

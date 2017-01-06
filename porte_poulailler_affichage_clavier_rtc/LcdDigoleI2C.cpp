@@ -2,17 +2,15 @@
   définitions de la classe LCD Digole I2C
   afficheur lcd 2*16 caractères  avec liaison serie i2c digoleSerial
 */
-/*
-  #include <string.h>
-  using namespace std;
-*/
+
 #include "LcdDigoleI2C.h"
+using namespace std;
 
 //constructeur avec debug
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 LcdDigoleI2C::LcdDigoleI2C ( TwoWire*, char , byte taille, const boolean debug) : DigoleSerialDisp (&Wire, '\x27'), m_taille(taille), m_debug(debug)
 {
-  m_chaineLigne[m_taille] = "";// initialisation du tableau
+
 }
 
 LcdDigoleI2C::~LcdDigoleI2C()
@@ -35,7 +33,7 @@ void LcdDigoleI2C::init () {
 }
 
 //----affichage une ligne-----
-void LcdDigoleI2C::affichageUneLigne(char chaine[]) {
+void LcdDigoleI2C::affichageUneLigne(String chaine) {
   setPrintPos(0, 1);//curseur position 0 ligne 1
   print("                 "); //display space, use to clear the demo line
   for (byte i = 0; i <= 15; i++)  {  //move string to right
@@ -53,125 +51,60 @@ void LcdDigoleI2C::resetpos(void)
   setPrintPos(0, 1);
 }
 
-//----remplissage de la ligne----
-void LcdDigoleI2C::remplissageLigne(char chaine1[]) {
-  strcat(m_chaineLigne, chaine1);
-}
-
-//----affichage-----
-void LcdDigoleI2C::affichage() {
-  setPrintPos(0, 1);//curseur position 0 ligne 1
-  print("                 "); //display space, use to clear the demo line
-  for (byte i = 0; i <= 15; i++)  {  //move string to right
-    setPrintPos(i, 1); // ligne 1
-    print(m_chaineLigne[i]);
-  }
-  drawStr(0, 1, ""); // curseur position 0 ligne 1
-  // strcpy(m_chaineLigne, "");// effacement du tableau
-}
-
 //-----affichage de la date-----
-void LcdDigoleI2C::affichageDate(char jourSemaine[], byte jour, byte mois, byte annee) {
+void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute, byte anneeSeconde) {
   // affichage du jour de la semaine
-  char m_chaine[16] = "";
-  strcat(m_chaine, " ");
-  strcat(m_chaine, jourSemaine);
-  strcat(m_chaine, " ");
-
-  if (jour < 10) {
-    strcat(m_chaine, "0"); // si < 10
+  String chaineLigne = "";
+  if (jourSemaine == "H") {
+    chaineLigne += "   ";
+    chaineLigne.concat(transformation( "h ", jourHeure));// print heure
+    chaineLigne.concat(transformation( "m ", moisMinute));;// print minutes
+    chaineLigne.concat(transformation( "s ", anneeSeconde));// print secondes
+    /*
+      if (tm.Hour < 10) {
+      mydisp.print(F("0"));  // si < 10
+      }
+      mydisp.print(tm.Hour, DEC); // print heure
+      mydisp.print(F("h "));
+      if (tm.Minute < 10) {
+      mydisp.print(F("0"));  // si < 10
+      }
+      mydisp.print(tm.Minute, DEC); // print minute
+      mydisp.print(F("m "));
+      if (tm.Second < 10) {
+      mydisp.print(F("0"));  // si < 10
+      }
+      mydisp.print(tm.Second, DEC); // print seconde
+      mydisp.print(F("s  "));
+      mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
+    */
+  } else {
+    chaineLigne += " ";
+    chaineLigne += jourSemaine;
+    chaineLigne.concat(transformation( " ", jourHeure));// print jour
+    chaineLigne.concat(transformation( " ", moisMinute));;// print mois
+    chaineLigne.concat(transformation( " 20", anneeSeconde));// print année depuis 1970
   }
-  char valeur_temp[5];
-  sprintf(valeur_temp, "%u", jour);
-  strcat(m_chaine, valeur_temp); // print jour
-
-  /*
-    string prenom("Albert");
-     string nom("Einstein");
-
-     string total;    //Une chaîne vide
-     total += prenom; //On ajoute le prénom à la chaîne vide
-     total += " ";    //Puis un espace
-     total += nom;    //Et finalement le nom de famille
-  */
-
-  //    strcat(m_chaine, transformation ("0", jour));
-
-  strcat(m_chaine, " ");
-
-  if (mois < 10) {
-    strcat(m_chaine, "0");  // si < 10
-  }
-  // char valeur_temp[5];
-  sprintf(valeur_temp, "%u", mois); // print mois
-  strcat(m_chaine, valeur_temp);
-
-  strcat(m_chaine, " 20");
-
-  if (annee < 10) {
-    strcat(m_chaine, " "); // si < 10
-  }
-  sprintf(valeur_temp, "%u", annee - 30); // print année depuis 1970
-  strcat(m_chaine, valeur_temp);
-
- // Serial.println(m_chaine);
-  affichageUneLigne(m_chaine);
-  //  strcpy(m_chaineLigne, "");// effacement du tableau
-  /*
-    // char m_chaine[16] = "";
-
-    strcat(m_chaineLigne, " ");
-    strcat(m_chaineLigne, jourSemaine);
-    strcat(m_chaineLigne, " ");
-
-    if (jour < 10) {
-    strcat(m_chaineLigne, "0"); // si < 10
-    }
-    char valeur_temp[5];
-    sprintf(valeur_temp, "%u", jour);
-    strcat(m_chaineLigne, valeur_temp); // print jour
-
-    //   char chaine1[7]="";
-    //  chaine1 = transformation ("0", jour);
-    //  strcat(m_chaine, chaine1);
-    strcat(m_chaineLigne, " ");
-
-    if (mois < 10) {
-    strcat(m_chaineLigne, "0");  // si < 10
-    }
-    //  char valeur_temp[5];
-    sprintf(valeur_temp, "%u", mois); // print mois
-    strcat(m_chaineLigne, valeur_temp);
-
-    strcat(m_chaineLigne, " 20");
-
-    if (annee < 10) {
-    strcat(m_chaineLigne, " "); // si < 10
-    }
-    sprintf(valeur_temp, "%u", annee - 30); // print année depuis 1970
-    strcat(m_chaineLigne, valeur_temp);
-  */
-  // strcat(m_chaineLigne, "abcdefghijklmnop");
-  // Serial.println(m_chaineLigne);
-  // affichage();
+  affichageUneLigne(chaineLigne);// affichage sur lcd
 }
 
 // transformation donnees date et heure
-char transformation (char chaine, byte dateHeure ) {
-  char m_chaine[7] = "";
-  /* if (dateHeure < 10) {
-     strcat(m_chaine, chaine); // si < 10
+String LcdDigoleI2C::transformation (String texte, byte dateHeure ) {
+  String chaine = "";
+  if (texte == "h " or texte == "m " or texte == "s ") {
+    if (dateHeure < 10) {
+      chaine += "0"; // si < 10
     }
-    char valeur_temp[5];
-    sprintf(valeur_temp, "%u", dateHeure);
-    strcat(m_chaine, valeur_temp); // print jour
-  */
-  // return m_chaine;
-  byte length(7);
-  String myArray[length];
-  myArray[0] = String("text");
-  return myArray;
-
+    chaine += dateHeure;
+    chaine += texte;
+  } else {
+    chaine += texte;
+    if (dateHeure < 10) {
+      chaine += "0"; // si < 10
+    }
+    if (texte == " 20")  chaine += dateHeure - 30; else  chaine += dateHeure;//  si -30 : année depuis 1970
+  }
+  return chaine;
 }
 
 

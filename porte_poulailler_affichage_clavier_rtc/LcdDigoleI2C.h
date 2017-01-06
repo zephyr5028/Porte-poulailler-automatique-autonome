@@ -19,7 +19,6 @@
 #define _Digole_Serial_I2C_  // To tell compiler compile the special communication only, 
 #include <DigoleSerial.h> // bibliotheque afficheur serie
 #include <Wire.h>
-
 #include "Arduino.h"
 
 class LcdDigoleI2C  : public DigoleSerialDisp {
@@ -31,20 +30,17 @@ class LcdDigoleI2C  : public DigoleSerialDisp {
     ~LcdDigoleI2C(); // destructeur
 
     void init();// initialisation
-    void affichageUneLigne(char chaine[]); // affichage une ligne
-    void LcdDigoleI2C::resetpos(void);//reset display position and clean the line
-    void LcdDigoleI2C::remplissageLigne(char chaine1[]);//remplissage de la ligne
-    void LcdDigoleI2C::affichage(); //affichage
-    void LcdDigoleI2C::affichageDate(char jourSemaine[], byte jour, byte mois, byte annee);//affichage de la date
-
-    char transformation (char chaine, byte dateHeure); // transformation donnees date et heure
+    void affichageUneLigne(String chaine); // affichage une ligne
+    void resetpos(void);//reset display position and clean the line
+    void affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute, byte anneeSeconde);//affichage de la date et de l'heure
+    String transformation (String chaine, byte dateHeure); // transformation donnees date et heure
 
 
   protected:
 
     const boolean m_debug ; // pour affichage console si nécessaire
     int const m_taille; // taille du tableau
-    char m_chaineLigne[]; // tableau de la chaine avant envoi
+
 
 };
 
