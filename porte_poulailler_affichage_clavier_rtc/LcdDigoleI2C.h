@@ -31,15 +31,20 @@ class LcdDigoleI2C  : public DigoleSerialDisp {
 
     void init();// initialisation
     void affichageUneLigne(String chaine); // affichage une ligne
-    void resetpos(void);//reset display position and clean the line
-    void affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute, byte anneeSeconde);//affichage de la date et de l'heure
+    void resetPos(byte ligne);//reset display position and clean the line
+    void affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute, byte anneeSeconde, byte decalage);//affichage de la date ou de l'heure
     String transformation (String chaine, byte dateHeure); // transformation donnees date et heure
+    void affichageLumFinCourse( unsigned int lum, byte decalage, byte ligne); //affichage lumiere et fin de course
+    void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte decalage, byte ligne); //affichage tensions
+    void affichageChoix( bool ouverture, bool fermeture, byte decalage, byte ligne);//affichage choix ouverture fermeture
 
 
   protected:
 
     const boolean m_debug ; // pour affichage console si nécessaire
     int const m_taille; // taille du tableau
+    byte m_decalage; // position du curseur
+    byte m_ligne; // position de la ligne
 
 
 };

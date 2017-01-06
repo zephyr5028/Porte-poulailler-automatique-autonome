@@ -115,7 +115,7 @@ boolean  boitierOuvert = true; // le boitier est ouvert
 
 /* progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
-const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin de course  . Fin de course  . Volt bat Cdes  . Volt bat servo . Commande Manuel.";
+const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin course fer . Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
 const char affichageRadio[] PROGMEM = "Batterie faible !!!!.Temp = .Time : .Lum : .Fin course F = .Fin course O = .Ten Cdes = . Ten Servo = .Porte ouv !.Porte ferm !.";
 
 /* lumiere */
@@ -244,7 +244,7 @@ void displayDate() {
       semaine[i - j] = pgm_read_byte(listeDayWeek + i);
     }
     //Serial.println(semaine);
-    mydisp.affichageDateHeure(semaine, tm.Day, tm.Month, tm.Year);
+    mydisp.affichageDateHeure(semaine, tm.Day, tm.Month, tm.Year, decalage);
   }
   /*
      byte j = ((tm.Wday - 1) * 3);
@@ -276,24 +276,24 @@ void displayDate() {
 void displayTime () {
   if ( boitierOuvert) { // si le boitier est ouvert
     RTC.read(tm); // lecture date et heure
-     mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second);
-     /*
-    if (tm.Hour < 10) {
+    mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second, decalage);
+    /*
+      if (tm.Hour < 10) {
       mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(tm.Hour, DEC); // print heure
-    mydisp.print(F("h "));
-    if (tm.Minute < 10) {
+      }
+      mydisp.print(tm.Hour, DEC); // print heure
+      mydisp.print(F("h "));
+      if (tm.Minute < 10) {
       mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(tm.Minute, DEC); // print minute
-    mydisp.print(F("m "));
-    if (tm.Second < 10) {
+      }
+      mydisp.print(tm.Minute, DEC); // print minute
+      mydisp.print(F("m "));
+      if (tm.Second < 10) {
       mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(tm.Second, DEC); // print seconde
-    mydisp.print(F("s  "));
-    mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
+      }
+      mydisp.print(tm.Second, DEC); // print seconde
+      mydisp.print(F("s  "));
+      mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
     */
   }
   if (DEBUG or RADIO) {
@@ -315,27 +315,30 @@ void displayTime () {
 //----routine door open time-----
 void openTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
-    byte val;
+    byte val, val1, val2;
     val = bcdToDec(RTC.readRTC(0x09) & 0x3f); // alarme 1 hours
-    mydisp.drawStr(0, 1, "   ");
-    if (val < 10) {
+    val1 = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
+    val2 = bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
+    mydisp.affichageDateHeure("H", val, val1, val2, decalage);
+    /*
+      mydisp.drawStr(0, 1, "   ");
+      if (val < 10) {
       mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(val, DEC);
-    mydisp.print(F("h "));
-    val = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
-    if (val < 10) {
+      }
+      mydisp.print(val, DEC);
+      mydisp.print(F("h "));
+      if (val1 < 10) {
       mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(val, DEC);
-    mydisp.print(F("m "));
-    val = bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
-    if (val < 10) {
+      }
+      mydisp.print(val2, DEC);
+      mydisp.print(F("m "));
+      if (val2 < 10) {
       mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(val, DEC);
-    mydisp.print(F("s   "));
-    mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
+      }
+      mydisp.print(val2, DEC);
+      mydisp.print(F("s   "));
+      mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
+    */
   }
 }
 
@@ -343,21 +346,24 @@ void openTime() {
 void closeTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
     //Set Alarm2
-    byte val;
+    byte val, val1, val2(61);
     val = bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
-    mydisp.drawStr(0, 1, "   ");
-    if (val < 10) {
+    val1 = bcdToDec(RTC.readRTC(0x0B)); //alarme 2 minutes
+    mydisp.affichageDateHeure("H", val, val1, val2, decalage);
+    /*
+      mydisp.drawStr(0, 1, "   ");
+      if (val < 10) {
       mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(val, DEC);
-    mydisp.print(F("h "));
-    val = bcdToDec(RTC.readRTC(0x0B)); //alarme 2 minutes
-    if (val < 10) {
+      }
+      mydisp.print(val, DEC);
+      mydisp.print(F("h "));
+      if (val1 < 10) {
       mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(val, DEC);
-    mydisp.print(F("m      "));
-    mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
+      }
+      mydisp.print(val1, DEC);
+      mydisp.print(F("m      "));
+      mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
+    */
   }
 }
 
@@ -444,12 +450,16 @@ void affiTensionBatCdes() {
   float voltage = accusCde.tensionAccus(valBatCdes);// read the input on analog pin A2 : tension batterie commandes
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
-    mydisp.print(F(" "));
-    mydisp.print(valBatCdes);
-    mydisp.print(F(" = "));
-    mydisp.print(voltage);
-    mydisp.print(F("V    "));
-    mydisp.drawStr(0, 0, "");
+    byte ligne(0);
+    mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
+    /*
+      mydisp.print(F(" "));
+      mydisp.print(valBatCdes);
+      mydisp.print(F(" = "));
+      mydisp.print(voltage);
+      mydisp.print(F("V    "));
+      mydisp.drawStr(0, 0, "");
+    */
   }
   if (DEBUG) {
     Serial.print(F("Ten bat cdes = "));
@@ -469,12 +479,16 @@ void affiTensionBatServo() {
   float voltage = accusServo.tensionAccus(valBatServo);// read the input on analog pin A3 : tension batterie servo moteur
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
-    mydisp.print(F(" "));
-    mydisp.print(valBatServo); //print tension batterie servo moteur
-    mydisp.print(F(" = "));
-    mydisp.print(voltage);
-    mydisp.print(F("V    "));
-    mydisp.drawStr(0, 0, "");
+    byte ligne(0);
+    mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
+    /*
+      mydisp.print(F(" "));
+      mydisp.print(valBatServo); //print tension batterie servo moteur
+      mydisp.print(F(" = "));
+      mydisp.print(voltage);
+      mydisp.print(F("V    "));
+      mydisp.drawStr(0, 0, "");
+    */
   }
   if (DEBUG) {
     Serial.print(F("Ten bat servo = "));
@@ -495,6 +509,9 @@ void affiTensionBatServo() {
 //------affichage du choix de l'ouverture et la fermeture------
 void affiChoixOuvFerm() {
   if ( boitierOuvert) { // si le boitier est ouvert
+    byte ligne(1);
+    mydisp.affichageChoix(lum.get_m_ouverture(), lum.get_m_fermeture(), decalage, ligne);
+    /* 
     mydisp.print(F(" Ouv:"));
     if (lum.get_m_ouverture()) {
       mydisp.print(F("Hre"));
@@ -509,6 +526,7 @@ void affiChoixOuvFerm() {
       mydisp.print(F("Hre"));
     }
     mydisp.drawStr(decalage, 1, "");
+    */
   }
   if (DEBUG) {
     Serial.print(F("Ouv : "));
@@ -828,14 +846,18 @@ void reglageDate () {
 void affiLumMatin() {
   if (boitierOuvert) {
     unsigned int lumMatin = lum.get_m_lumMatin();
-    mydisp.print(F("   Lum: "));
-    mydisp.print(lumMatin);
-    if (lumMatin == 0) {
+    byte ligne(1);
+    mydisp.affichageLumFinCourse(lumMatin, decalage, ligne);
+    /*
+      mydisp.print(F("   Lum: "));
+      mydisp.print(lumMatin);
+      if (lumMatin == 0) {
       mydisp.print(F("       "));
-    } else {
+      } else {
       mydisp.print(F("      "));
-    }
-    mydisp.drawStr(decalage, 1, "");
+      }
+      mydisp.drawStr(decalage, 1, "");
+    */
   }
 }
 
@@ -878,14 +900,18 @@ void choixLumMatin() {
 void affiLumSoir() {
   if (boitierOuvert) {
     unsigned int lumSoir = lum.get_m_lumSoir();
-    mydisp.print(F("   Lum: "));
-    mydisp.print(lumSoir);
-    if (lumSoir == 0) {
+    byte ligne(1);
+    mydisp.affichageLumFinCourse(lumSoir, decalage, ligne);
+    /*
+      mydisp.print(F("   Lum: "));
+      mydisp.print(lumSoir);
+      if (lumSoir == 0) {
       mydisp.print(F("       "));
-    } else {
+      } else {
       mydisp.print(F("      "));
-    }
-    mydisp.drawStr(decalage, 1, "");
+      }
+      mydisp.drawStr(decalage, 1, "");
+    */
   }
 }
 
@@ -1001,14 +1027,19 @@ void reglageTime () {
 void affiFinDeCourseFermeture() {
   unsigned int finDeCourseFermeture = codOpt.get_m_finDeCourseFermeture();
   if ( boitierOuvert) { // si le boitier est ouvert
-    mydisp.print(F("   Fer : "));
-    mydisp.print(finDeCourseFermeture);
-    if (finDeCourseFermeture < 10) {
+    byte ligne(1);
+    mydisp.affichageLumFinCourse(finDeCourseFermeture, decalage, ligne);
+    /*
+      mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
+      mydisp.print(F("   Fer : "));
+      mydisp.print(finDeCourseFermeture);
+      if (finDeCourseFermeture < 10) {
       mydisp.print(F("      "));
-    } else {
+      } else {
       mydisp.print(F("     "));
-    }
-    mydisp.drawStr(decalage, 1, "");
+      }
+      mydisp.drawStr(decalage, 1, "");
+    */
   }
   if (DEBUG) {
     Serial.print(F("Fin course fermeture = ")); Serial.println(finDeCourseFermeture);
@@ -1022,14 +1053,18 @@ void affiFinDeCourseFermeture() {
 void affiFinDeCourseOuverture() {
   unsigned int finDeCourseOuverture = codOpt.get_m_finDeCourseOuverture();
   if ( boitierOuvert) { // si le boitier est ouvert
-    mydisp.print(F("   Ouv : "));
-    mydisp.print(finDeCourseOuverture);
-    if (finDeCourseOuverture < 10) {
+    byte ligne(1);
+    mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
+    /*
+      mydisp.print(F("   Ouv : "));
+      mydisp.print(finDeCourseOuverture);
+      if (finDeCourseOuverture < 10) {
       mydisp.print(F("      "));
-    } else {
+      } else {
       mydisp.print(F("     "));
-    }
-    mydisp.drawStr(decalage, 1, "");
+      }
+      mydisp.drawStr(decalage, 1, "");
+    */
   }
   if (DEBUG) {
     Serial.print(F("Fin course ouverture = ")); Serial.println(finDeCourseOuverture);
@@ -1193,13 +1228,21 @@ void read_temp(boolean typeTemperature) {
   float celsius = temperature / 4.0;
   float fahrenheit = celsius * 9.0 / 5.0 + 32.0;
   if ( boitierOuvert) { // si le boitier est ouvert
+    byte ligne(0);
     if (typeTemperature) {
+      mydisp.affichageVoltage(celsius, "C", decalage, ligne);
+    } else {
+      mydisp.affichageVoltage(fahrenheit, "C", decalage, ligne);
+    }
+    /*
+      if (typeTemperature) {
       mydisp.print(celsius); // affichage celsius
       mydisp.print(F(" C     "));
-    } else {
+      } else {
       mydisp.print(fahrenheit); // affichage fahrenheit
       mydisp.print(F(" F     "));
-    }
+
+      }*/
   } else {
     if (DEBUG) {
       Serial.print(F("Temp = "));
@@ -1351,14 +1394,18 @@ void  routineTestFermetureBoitier() {
 //-----routine lecture et affichage de la lumière-----
 void lumiere() {
   int lumValue = lum.luminositeCAD(); // luminosite CAD sur pin A0
-  float voltage = lum.tensionLuminosite(lumValue);// convertion CAD  vers tension luminosite
+  // float voltage = lum.tensionLuminosite(lumValue);// convertion CAD  vers tension luminosite
   if ( boitierOuvert) { // si le boitier est ouvert
-    // print out the value you read:
-    mydisp.print(F(" "));
-    mydisp.print(lumValue);
-    mydisp.print(F(" = "));
-    mydisp.print(voltage);
-    mydisp.print(F("V    "));
+    byte ligne(0);
+    mydisp.affichageLumFinCourse(lumValue, decalage, ligne);
+    /*
+      // print out the value you read:
+      mydisp.print(F(" "));
+      mydisp.print(lumValue);
+      mydisp.print(F(" = "));
+      mydisp.print(voltage);
+      mydisp.print(F("V    "));
+    */
   }
   if (DEBUG) {
     Serial.print(F("lum : "));
