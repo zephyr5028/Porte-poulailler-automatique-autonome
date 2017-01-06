@@ -104,12 +104,13 @@ byte decalage = 0; // decalage à droite pour reglage
 boolean reglage = false; // menu=false ou reglage=true
 const int boucleTemps(200); // 500 temps entre deux affichages de l'heure
 int temps(0);
+boolean retroEclairage = true; // etat retro eclairage
+
 const int debounce = 350; // debounce latency in ms
 unsigned long tempoDebounce(debounce); // temporisation pour debounce
 boolean relacheBpOF = true; // relache Bp
 byte BpOF = 9; // pin D9 bouton poussoir ouverture / fermeture
 byte interOuvBoitier = 6; //pin D6 interrupteur ouverture boitier
-boolean retroEclairage = true; // etat retro eclairage
 boolean  boitierOuvert = true; // le boitier est ouvert
 
 /* progmem  mémoire flash */
@@ -155,34 +156,10 @@ boolean relache(false); // relache de la touche
 byte touche(-1); // valeur de la touche appuyee
 Clavier clav(menuManuel); // class Clavier avec le nombre de lignes du menu
 
-/* I2C */
-/*----------NOTE----------
-  new version of lib will save you compiled code size for the sample
-  The size for 2 version(@Arduino 1.0.1):
-      UART  I2C    SPI
-  OLD   8998  8988   9132
-  NEW   6966  7566   6354
-  ------------------------*/
-/*------all available are:_Digole_Serial_UART_, _Digole_Serial_I2C_ and _Digole_Serial_SPI_ ------*/
-
-#define _Digole_Serial_I2C_  // To tell compiler compile the special communication only, 
-#include <DigoleSerial.h> // bibliotheque afficheur serie
-
-//------UART setup----
-#if defined(_Digole_Serial_UART_)
-DigoleSerialDisp mydisp(&Serial, 9600); // UART:Arduino UNO: Pin 1(TX)on arduino to RX on module
-#endif
-
-//------I2C setup----
-#if defined(_Digole_Serial_I2C_)
-#include <Wire.h>
-DigoleSerialDisp mydisp(&Wire, '\x27'); // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
-#endif
-
-//------SPI setup----
-#if defined(_Digole_Serial_SPI_)
-DigoleSerialDisp mydisp(8, 9, 10); // SPI:Pin 8:data, 9:clock, 10:SS, you can assign 255 to SS, and hard ground SS pin on module
-#endif
+/* LCD DigoleSerialI2C */
+#include "LcdDigoleI2C.h"
+// I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
+LcdDigoleI2C mydisp(&Wire, '\x27', 16); // classe lcd digole i2c (lcd 2*16 caracteres)
 
 /* RTC_DS3231 */
 #include <DS3232RTC.h>    //http://github.com/JChristensen/DS3232RTC
@@ -259,29 +236,39 @@ void displayDate() {
   if ( boitierOuvert) { // si le boitier est ouvert
     RTC.read(tm); // lecture date et heure
     // affichage du jour de la semaine
+    char semaine[4] = "";
     byte j = ((tm.Wday - 1) * 3);
     for (byte i = j; i < j + 3; i++) {
       char dayWeek = pgm_read_byte(listeDayWeek + i);
-      mydisp.print(dayWeek);
+      semaine[i - j] = dayWeek;
     }
-    mydisp.print(F(" "));
-    if (tm.Day < 10) {
-      mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(tm.Day, DEC); // print jour
-    mydisp.print(F(" "));
-    if (tm.Month < 10) {
-      mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(tm.Month, DEC); // print mois
-    mydisp.print(F(" 20"));
-    if (tm.Year < 10) {
-      mydisp.print(F("0"));  // si < 10
-    }
-    mydisp.print(tm.Year - 30, DEC); // print année depuis 1970
-    mydisp.print(F(" "));
-    mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
+    //Serial.println(semaine);
+    mydisp.affichageDate(semaine, tm.Day, tm.Month, tm.Year);
   }
+  /*
+     byte j = ((tm.Wday - 1) * 3);
+     for (byte i = j; i < j + 3; i++) {
+       char dayWeek = pgm_read_byte(listeDayWeek + i);
+       mydisp.print(dayWeek);
+     }
+     mydisp.print(F(" "));
+     if (tm.Day < 10) {
+       mydisp.print(F("0"));  // si < 10
+     }
+     mydisp.print(tm.Day, DEC); // print jour
+     mydisp.print(F(" "));
+     if (tm.Month < 10) {
+       mydisp.print(F("0"));  // si < 10
+     }
+     mydisp.print(tm.Month, DEC); // print mois
+     mydisp.print(F(" 20"));
+     if (tm.Year < 10) {
+       mydisp.print(F("0"));  // si < 10
+     }
+     mydisp.print(tm.Year - 30, DEC); // print année depuis 1970
+     mydisp.print(F(" "));
+     mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
+  */
 }
 
 //-----routine display Time-----
@@ -1558,14 +1545,11 @@ void routineGestionWatchdog() {
 
 /* setup */
 void setup() {
-  Wire.begin();
+
   Serial.begin(9600);
-  /*----------for text LCD adapter and graphic LCD adapter ------------*/
-  mydisp.begin();
-  mydisp.setPrintPos(0, 0); // position 0 ligne 0 pour débuter le clear screen
-  mydisp.clearScreen(); // CLear screen
-  mydisp.backLightOff(); // retro eclairage off
-  mydisp.enableCursor(); // enable cursor
+
+  mydisp.init(); // initialisation for text LCD adapter
+
   for (uint8_t j = 0; j < 1; j++)  {  //making "Hello" string moving
     for (uint8_t i = 0; i < 9; i++)  {  //move string to right
       mydisp.setPrintPos(i, 0); // ligne 0

@@ -16,7 +16,7 @@ Codeur::~Codeur()
 {
 }
 
-//initialisation-----
+//-----initialisation-----
 void Codeur::init () {
   pinMode(m_roueCodeusePin, INPUT); // make the roueCodeuse's pin 7 an input
   m_positionRoueCodeuse = digitalRead(m_roueCodeusePin);

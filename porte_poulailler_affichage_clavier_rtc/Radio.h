@@ -1,4 +1,4 @@
-/* Radior.h
+/* Radio.h
   prototype de la classe Radio
   radio 433MHz
 */
