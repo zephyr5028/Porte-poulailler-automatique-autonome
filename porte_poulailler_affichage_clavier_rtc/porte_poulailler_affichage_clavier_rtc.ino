@@ -94,12 +94,12 @@ Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRo
 volatile int f_wdt = 1; // flag watchdog
 
 /****************************/
-const byte bouclesWatchdog(8); // 8 nombre de boucles du watchdog environ 64s
+const byte bouclesWatchdog(2); // 8 nombre de boucles du watchdog environ 64s
 /****************************/
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 
 /* Affichage */
-byte incrementation = 0; // incrementation verticale
+
 byte decalage = 0; // decalage à droite pour reglage
 boolean reglage = false; // menu=false ou reglage=true
 const int boucleTemps(200); // 500 temps entre deux affichages de l'heure
@@ -147,6 +147,7 @@ const byte menuTensionBatCdes = 12; // tension batterie commandes
 const byte menuTensionBatServo = 13; // tension batterie servo
 const byte menuManuel = 14; // nombre de lignes du  menu
 const byte colonnes = 16; // colonnes de l'afficheur
+byte incrementation = 0; // incrementation verticale
 
 /* Clavier */
 #include "Clavier.h"
@@ -246,30 +247,6 @@ void displayDate() {
     //Serial.println(semaine);
     mydisp.affichageDateHeure(semaine, tm.Day, tm.Month, tm.Year, decalage);
   }
-  /*
-     byte j = ((tm.Wday - 1) * 3);
-     for (byte i = j; i < j + 3; i++) {
-       char dayWeek = pgm_read_byte(listeDayWeek + i);
-       mydisp.print(dayWeek);
-     }
-     mydisp.print(F(" "));
-     if (tm.Day < 10) {
-       mydisp.print(F("0"));  // si < 10
-     }
-     mydisp.print(tm.Day, DEC); // print jour
-     mydisp.print(F(" "));
-     if (tm.Month < 10) {
-       mydisp.print(F("0"));  // si < 10
-     }
-     mydisp.print(tm.Month, DEC); // print mois
-     mydisp.print(F(" 20"));
-     if (tm.Year < 10) {
-       mydisp.print(F("0"));  // si < 10
-     }
-     mydisp.print(tm.Year - 30, DEC); // print année depuis 1970
-     mydisp.print(F(" "));
-     mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
-  */
 }
 
 //-----routine display Time-----
@@ -277,24 +254,6 @@ void displayTime () {
   if ( boitierOuvert) { // si le boitier est ouvert
     RTC.read(tm); // lecture date et heure
     mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second, decalage);
-    /*
-      if (tm.Hour < 10) {
-      mydisp.print(F("0"));  // si < 10
-      }
-      mydisp.print(tm.Hour, DEC); // print heure
-      mydisp.print(F("h "));
-      if (tm.Minute < 10) {
-      mydisp.print(F("0"));  // si < 10
-      }
-      mydisp.print(tm.Minute, DEC); // print minute
-      mydisp.print(F("m "));
-      if (tm.Second < 10) {
-      mydisp.print(F("0"));  // si < 10
-      }
-      mydisp.print(tm.Second, DEC); // print seconde
-      mydisp.print(F("s  "));
-      mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
-    */
   }
   if (DEBUG or RADIO) {
     byte timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure
@@ -305,9 +264,10 @@ void displayTime () {
       Serial.print(F("h "));
       Serial.print(timeMinute, DEC);
       Serial.println(F("m"));
-    } else if (RADIO) {
-      radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure si le boitier est fermé
-      radio.envoiUnsignedInt(timeMinute,  boitierOuvert, "m;");// envoi message radio minute si le boitier est fermé
+    }
+    if (RADIO) {
+      radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure + etat  boitier
+      radio.envoiUnsignedInt(timeMinute,  boitierOuvert, "m;");// envoi message radio minute  + etat  boitier
     }
   }
 }
@@ -320,25 +280,6 @@ void openTime() {
     val1 = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
     val2 = bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
     mydisp.affichageDateHeure("H", val, val1, val2, decalage);
-    /*
-      mydisp.drawStr(0, 1, "   ");
-      if (val < 10) {
-      mydisp.print(F("0"));  // si < 10
-      }
-      mydisp.print(val, DEC);
-      mydisp.print(F("h "));
-      if (val1 < 10) {
-      mydisp.print(F("0"));  // si < 10
-      }
-      mydisp.print(val2, DEC);
-      mydisp.print(F("m "));
-      if (val2 < 10) {
-      mydisp.print(F("0"));  // si < 10
-      }
-      mydisp.print(val2, DEC);
-      mydisp.print(F("s   "));
-      mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
-    */
   }
 }
 
@@ -350,20 +291,6 @@ void closeTime() {
     val = bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
     val1 = bcdToDec(RTC.readRTC(0x0B)); //alarme 2 minutes
     mydisp.affichageDateHeure("H", val, val1, val2, decalage);
-    /*
-      mydisp.drawStr(0, 1, "   ");
-      if (val < 10) {
-      mydisp.print(F("0"));  // si < 10
-      }
-      mydisp.print(val, DEC);
-      mydisp.print(F("h "));
-      if (val1 < 10) {
-      mydisp.print(F("0"));  // si < 10
-      }
-      mydisp.print(val1, DEC);
-      mydisp.print(F("m      "));
-      mydisp.drawStr(decalage, 1, ""); // curseur position 0 ligne 1
-    */
   }
 }
 
@@ -374,12 +301,8 @@ void affiPulsePlusCptRoue() {
   test = codOpt.testCompteurRoueCodeuse (5); // tolerance de 5
   unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
   if ( boitierOuvert) { // si le boitier est ouvert
-    mydisp.print(F("P: "));
-    mydisp.print(pulse);
-    mydisp.print(F("  R: "));
-    mydisp.print(compteRoueCodeuse);
-    mydisp.print(F(" "));
-    mydisp.drawStr(0, 0, "");
+    byte ligne(0);
+    mydisp.affichageServo(pulse, compteRoueCodeuse, decalage, ligne);
   }
   if (DEBUG) {
     Serial.print(F("Pulse servo = "));
@@ -398,7 +321,7 @@ void affiPulsePlusCptRoue() {
         break;
     }
   }
-  if (RADIO and tempsWatchdog <= 0 and (!boitierOuvert)) { // eviter l'envoi à l'initialisation
+  if (RADIO and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     switch (test) {
       case 1: // mise sous tension du servo pour l'ouverture de la porte
@@ -452,14 +375,6 @@ void affiTensionBatCdes() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
-    /*
-      mydisp.print(F(" "));
-      mydisp.print(valBatCdes);
-      mydisp.print(F(" = "));
-      mydisp.print(voltage);
-      mydisp.print(F("V    "));
-      mydisp.drawStr(0, 0, "");
-    */
   }
   if (DEBUG) {
     Serial.print(F("Ten bat cdes = "));
@@ -481,14 +396,6 @@ void affiTensionBatServo() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
-    /*
-      mydisp.print(F(" "));
-      mydisp.print(valBatServo); //print tension batterie servo moteur
-      mydisp.print(F(" = "));
-      mydisp.print(voltage);
-      mydisp.print(F("V    "));
-      mydisp.drawStr(0, 0, "");
-    */
   }
   if (DEBUG) {
     Serial.print(F("Ten bat servo = "));
@@ -511,22 +418,6 @@ void affiChoixOuvFerm() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageChoix(lum.get_m_ouverture(), lum.get_m_fermeture(), decalage, ligne);
-    /* 
-    mydisp.print(F(" Ouv:"));
-    if (lum.get_m_ouverture()) {
-      mydisp.print(F("Hre"));
-    } else {
-      mydisp.print(F("Lum"));
-    }
-    mydisp.print(F(" "));
-    mydisp.print(F("Fer:"));
-    if (!lum.get_m_fermeture()) {
-      mydisp.print(F("Lum"));
-    } else {
-      mydisp.print(F("Hre"));
-    }
-    mydisp.drawStr(decalage, 1, "");
-    */
   }
   if (DEBUG) {
     Serial.print(F("Ouv : "));
@@ -848,16 +739,6 @@ void affiLumMatin() {
     unsigned int lumMatin = lum.get_m_lumMatin();
     byte ligne(1);
     mydisp.affichageLumFinCourse(lumMatin, decalage, ligne);
-    /*
-      mydisp.print(F("   Lum: "));
-      mydisp.print(lumMatin);
-      if (lumMatin == 0) {
-      mydisp.print(F("       "));
-      } else {
-      mydisp.print(F("      "));
-      }
-      mydisp.drawStr(decalage, 1, "");
-    */
   }
 }
 
@@ -902,16 +783,6 @@ void affiLumSoir() {
     unsigned int lumSoir = lum.get_m_lumSoir();
     byte ligne(1);
     mydisp.affichageLumFinCourse(lumSoir, decalage, ligne);
-    /*
-      mydisp.print(F("   Lum: "));
-      mydisp.print(lumSoir);
-      if (lumSoir == 0) {
-      mydisp.print(F("       "));
-      } else {
-      mydisp.print(F("      "));
-      }
-      mydisp.drawStr(decalage, 1, "");
-    */
   }
 }
 
@@ -1029,17 +900,6 @@ void affiFinDeCourseFermeture() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageLumFinCourse(finDeCourseFermeture, decalage, ligne);
-    /*
-      mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
-      mydisp.print(F("   Fer : "));
-      mydisp.print(finDeCourseFermeture);
-      if (finDeCourseFermeture < 10) {
-      mydisp.print(F("      "));
-      } else {
-      mydisp.print(F("     "));
-      }
-      mydisp.drawStr(decalage, 1, "");
-    */
   }
   if (DEBUG) {
     Serial.print(F("Fin course fermeture = ")); Serial.println(finDeCourseFermeture);
@@ -1055,16 +915,6 @@ void affiFinDeCourseOuverture() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
-    /*
-      mydisp.print(F("   Ouv : "));
-      mydisp.print(finDeCourseOuverture);
-      if (finDeCourseOuverture < 10) {
-      mydisp.print(F("      "));
-      } else {
-      mydisp.print(F("     "));
-      }
-      mydisp.drawStr(decalage, 1, "");
-    */
   }
   if (DEBUG) {
     Serial.print(F("Fin course ouverture = ")); Serial.println(finDeCourseOuverture);
@@ -1234,29 +1084,19 @@ void read_temp(boolean typeTemperature) {
     } else {
       mydisp.affichageVoltage(fahrenheit, "C", decalage, ligne);
     }
-    /*
-      if (typeTemperature) {
-      mydisp.print(celsius); // affichage celsius
-      mydisp.print(F(" C     "));
-      } else {
-      mydisp.print(fahrenheit); // affichage fahrenheit
-      mydisp.print(F(" F     "));
-
-      }*/
-  } else {
-    if (DEBUG) {
-      Serial.print(F("Temp = "));
-      if (typeTemperature) {
-        Serial.print(celsius); Serial.println(F(" °C"));// affichage celsius
-      } else {
-        Serial.print(fahrenheit); Serial.println(F(" F"));// affichage fahrenheit
-      }
+  }
+  if (DEBUG) {
+    Serial.print(F("Temp = "));
+    if (typeTemperature) {
+      Serial.print(celsius); Serial.println(F(" °C"));// affichage celsius
+    } else {
+      Serial.print(fahrenheit); Serial.println(F(" F"));// affichage fahrenheit
     }
-    if (RADIO) {
-      char temp[2] = "";
-      if (typeTemperature)  strcat(temp, "°C;"); else strcat(temp, "F;");
-      radio.envoiFloat(celsius, boitierOuvert, temp);
-    }
+  }
+  if (RADIO) {
+    char temp[3] = "";
+    if (typeTemperature)  strcat(temp, "C;"); else strcat(temp, "F;");
+    radio.envoiFloat(celsius, boitierOuvert, temp);
   }
 }
 
@@ -1398,14 +1238,6 @@ void lumiere() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageLumFinCourse(lumValue, decalage, ligne);
-    /*
-      // print out the value you read:
-      mydisp.print(F(" "));
-      mydisp.print(lumValue);
-      mydisp.print(F(" = "));
-      mydisp.print(voltage);
-      mydisp.print(F("V    "));
-    */
   }
   if (DEBUG) {
     Serial.print(F("lum : "));
@@ -1562,14 +1394,16 @@ void routineGestionWatchdog() {
         }
         // informations à afficher
         if (RADIO) {
-          displayTime();
           read_temp(TEMPERATURE); // read temperature celsius=true
+          radio.chaineVide();
+          displayTime();
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
+          radio.chaineVide();
+          affiPulsePlusCptRoue();
           affiFinDeCourseFermeture();
           affiFinDeCourseOuverture();
-          affiPulsePlusCptRoue();
-          affiChoixOuvFerm();
+          radio.chaineVide();
           lumiere();
           radio.chaineVide();
         }

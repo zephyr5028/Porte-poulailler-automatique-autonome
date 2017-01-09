@@ -128,5 +128,18 @@ void LcdDigoleI2C::affichageChoix( bool ouverture, bool fermeture, byte decalage
   affichageUneLigne(chaineLigne);// affichage sur lcd
 }
 
+//-----affichage pulse et roue codeuse du servo-------
+void LcdDigoleI2C::affichageServo(int pulse, int roueCodeuse, byte decalage, byte ligne)
+{
+  m_ligne = ligne;
+  m_decalage = decalage;
+  String chaineLigne = "";
+  chaineLigne += " P:";
+  chaineLigne += pulse;
+  chaineLigne += "   R:";
+  chaineLigne += roueCodeuse;
+  affichageUneLigne(chaineLigne);// affichage sur lcd
+}
+
 
 

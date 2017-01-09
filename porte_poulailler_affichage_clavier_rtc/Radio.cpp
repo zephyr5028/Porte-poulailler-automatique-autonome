@@ -7,7 +7,7 @@
 
 //constructeur avec debug et radio pour affichage si nécessaire
 Radio::Radio(byte pinEmRadio, int vitesseTransmission, byte taille, const boolean radio, const boolean debug) :  m_pinEmRadio(pinEmRadio),
-m_vitesseTransmission(vitesseTransmission), m_taille(taille), m_radio(radio), m_debug(debug)
+  m_vitesseTransmission(vitesseTransmission), m_taille(taille), m_radio(radio), m_debug(debug)
 {
   m_chaine[m_taille] = "";// initialisation du tableau
 }
@@ -22,7 +22,7 @@ void Radio::init () {
   vw_setup(m_vitesseTransmission); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
 }
 
-//----routine envoi message radio----
+//----routine construction message radio----
 void Radio::envoiMessage(char chaine1[]) {
   char chaineComp[] = "Fin";
   if (strcmp(chaineComp, chaine1) != 0) { // test de la dernière chaine
@@ -31,10 +31,7 @@ void Radio::envoiMessage(char chaine1[]) {
       Serial.println(m_chaine);
     }
   } else {
-    Radio::messageRadio(m_chaine);
-    strcpy(m_chaine, "  ");// effacement du tableau + pb premiers caractères !!! non trouvé...
-    //*m_chaine=0;// effacement du tableau
-    //m_chaine[0] = '\0'; // effacement du tableau
+    messageSansParametre();// envoi du message contenu dans m_chaine[]
   }
 }
 
@@ -45,6 +42,16 @@ void Radio::messageRadio(char chaine1[]) {
   // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
   vw_wait_tx(); // On attend la fin de l'envoi
   delay(10);
+}
+
+//----message Radio sans parametre-----
+void Radio::messageSansParametre() {
+  strcat(m_chaine, "\0");
+  vw_send((uint8_t *)m_chaine, strlen(m_chaine) + 1); // On envoie le message
+  // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
+  vw_wait_tx(); // On attend la fin de l'envoi
+  delay(10);
+  m_chaine[0] = '\0'; // effacement du tableau
 }
 
 //----chaine radio fin de ligne avant transmission-----
@@ -59,12 +66,12 @@ void Radio::chaineVide() {
 //-----envoi message float avec test de l'ouverture du boitier plus texte-----
 void Radio::envoiFloat(float valeur , boolean boitierOuvert, char texte[]) {
   if (m_radio and !boitierOuvert) {
-    char chaine1[m_taille - 1] = "";
-    char valeur_temp[6] = "";
+    char chaine[m_taille - 1] = "";
+    char valeur_temp[8] = "";
     dtostrf(valeur, 2, 2, valeur_temp);
-    strcat(chaine1, valeur_temp);
-    strcat(chaine1, texte);
-    Radio::envoiMessage(chaine1);// on envoie le message
+    strcat(chaine, valeur_temp);
+    strcat(chaine, texte);
+    Radio::envoiMessage(chaine);// on envoie le message
   }
 }
 

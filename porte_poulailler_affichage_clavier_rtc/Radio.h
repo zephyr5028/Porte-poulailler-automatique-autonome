@@ -15,12 +15,13 @@ class Radio
   public:
 
     // constructeur avec la taille du tableau, debug, radio et le type de temperature
-    Radio(byte pinEmRadio, int vitesseTransmission, byte taille, boolean radio =false, boolean debug =false);
+    Radio(byte pinEmRadio, int vitesseTransmission, byte taille, boolean radio = false, boolean debug = false);
     ~Radio(); // destructeur
 
     void init();// initialisation
-    void envoiMessage(char chaine1[]);//routine envoi message radio
+    void envoiMessage(char chaine1[]);//routine construction message radio
     void messageRadio(char chaine1[]);  // message Radio
+    void messageSansParametre();//message Radio sans parametre
     void chaineVide();//chaine radio fin de ligne avant transmission
     //envoi message float avec test de l'ouverture du boitier plus texte
     void envoiFloat(float valeur , boolean boitierOuvert = true, char texte[] = "");

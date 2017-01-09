@@ -37,6 +37,7 @@ class LcdDigoleI2C  : public DigoleSerialDisp {
     void affichageLumFinCourse( unsigned int lum, byte decalage, byte ligne); //affichage lumiere et fin de course
     void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte decalage, byte ligne); //affichage tensions
     void affichageChoix( bool ouverture, bool fermeture, byte decalage, byte ligne);//affichage choix ouverture fermeture
+    void affichageServo(int pulse, int compteRoueCodeuse, byte decalage, byte ligne) ; //affichage pulse et roue codeuse du servo
 
 
   protected:
