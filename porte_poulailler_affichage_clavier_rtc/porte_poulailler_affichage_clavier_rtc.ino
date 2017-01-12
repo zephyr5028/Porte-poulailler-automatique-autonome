@@ -38,8 +38,8 @@ const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 
 /*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
-#include <Flash.h>
-#include <avr/pgmspace.h> // non nécessaire maintenant
+//#include <Flash.h>
+//#include <avr/pgmspace.h> // non nécessaire maintenant
 
 /*** radio 433MHz ***/
 #include "Radio.h"
@@ -90,7 +90,7 @@ Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRo
 volatile int f_wdt = 1; // flag watchdog
 
 /****************************/
-const byte bouclesWatchdog(2); // 8 nombre de boucles du watchdog environ 64s
+const byte bouclesWatchdog(8); // 8 nombre de boucles du watchdog environ 64s
 /****************************/
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 
@@ -256,7 +256,7 @@ void displayTime () {
     byte timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure
     byte timeMinute = bcdToDec(RTC.readRTC(0x01)); // minutes
     if (DEBUG) {
-     
+
     }
     if (RADIO) {
       radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure + etat  boitier
@@ -298,7 +298,7 @@ void affiPulsePlusCptRoue() {
     mydisp.affichageServo(pulse, compteRoueCodeuse, decalage, ligne);
   }
   if (DEBUG) {
-  
+
   }
   if (RADIO and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
@@ -345,7 +345,7 @@ void affiTensionBatCdes() {
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
   }
   if (DEBUG) {
- 
+
   }
   if (RADIO) {
     radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus}*/
@@ -362,7 +362,7 @@ void affiTensionBatServo() {
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
   }
   if (DEBUG) {
-  
+
   }
   if (RADIO) {
     radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus
@@ -848,7 +848,7 @@ void affiFinDeCourseFermeture() {
     mydisp.affichageLumFinCourse(finDeCourseFermeture, decalage, ligne);
   }
   if (DEBUG) {
-  
+
   }
   if (RADIO) {
     radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
@@ -863,7 +863,7 @@ void affiFinDeCourseOuverture() {
     mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
   }
   if (DEBUG) {
-  
+
   }
   if (RADIO) {
     radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
@@ -1032,7 +1032,7 @@ void read_temp(boolean typeTemperature) {
     }
   }
   if (DEBUG) {
- 
+
   }
   if (RADIO) {
     char temp[3] = "";
@@ -1148,6 +1148,7 @@ void routineTestOuvertureBoitier()  {
     mydisp.enableCursor(); //  cursor
     decalage = 0; // pour afficher le curseur
     mydisp.bonjour(); // affichage bonjour
+    delay(100);
     incrementation = menuManuel; // affichage à l'ouverture du boitier
   }
 }
@@ -1175,7 +1176,7 @@ void lumiere() {
     mydisp.affichageLumFinCourse(lumValue, decalage, ligne);
   }
   if (DEBUG) {
-  
+
   }
   if (RADIO) {
     radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
@@ -1211,12 +1212,19 @@ void ouvFermLum() {
 //-----routine affichage menus------
 void deroulementMenu (byte increment) {
   if (boitierOuvert) {
-    byte j = ((increment - 1) * (colonnes + 1)); // tous les 16 caractères
-    mydisp.drawStr(0, 0, ""); // position du curseur en 0,0
-    for (byte i = j; i < j + colonnes; i++) { // boucle pour afficher 16 caractères sur le lcd
+
+    
+  //  mydisp.ligneTitres(affichageMenu, incrementation);// afficahge ligne titres
+    
+      byte j = ((increment - 1) * (colonnes + 1)); // tous les 16 caractères
+      mydisp.drawStr(0, 0, ""); // position du curseur en 0,0
+      for (byte i = j; i < j + colonnes; i++) { // boucle pour afficher 16 caractères sur le lcd
       char temp = pgm_read_byte(affichageMenu + i); // utilisation du texte présent en mèmoire flash
       mydisp.print(temp);
-    }
+      Serial.print(temp);
+      }
+Serial.println(" ");
+      
     switch (increment) { // test de la valeur de incrementation pour affichage des parametres
       case 1: // Date
         mydisp.drawStr(0, 1, " ");

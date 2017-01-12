@@ -19,6 +19,10 @@
 #define _Digole_Serial_I2C_  // To tell compiler compile the special communication only, 
 #include <DigoleSerial.h> // bibliotheque afficheur serie
 #include <Wire.h>
+/*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
+#include <Flash.h>
+#include <avr/pgmspace.h> // non nécessaire maintenant
+
 #include "Arduino.h"
 
 class LcdDigoleI2C  : public DigoleSerialDisp {
@@ -40,12 +44,13 @@ class LcdDigoleI2C  : public DigoleSerialDisp {
     void affichageServo(int pulse, int compteRoueCodeuse, byte decalage, byte ligne) ; //affichage pulse et roue codeuse du servo
     void razLcd(); //remise à zero du lcd
     void bonjour(); //Bonjour
+  //  void ligneTitres(const char &affichageMenu, const byte &incrementation); //affichage ligne titres
 
 
   protected:
 
     const boolean m_debug ; // pour affichage console si nécessaire
-    int const m_taille; // taille du tableau
+    int const m_taille; // taille du tableau - 16 caractères
     byte m_decalage; // position du curseur
     byte m_ligne; // position de la ligne
 

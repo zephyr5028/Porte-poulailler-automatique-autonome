@@ -172,6 +172,13 @@ void LcdDigoleI2C::bonjour() {
     }
   }
 }
-
-
-
+/*
+//-----affichage ligne titres----
+void LcdDigoleI2C::ligneTitres(const char &affichageMenu, const byte &incrementation) {
+  byte j = ((incrementation - 1) * (m_taille + 1)); // tous les 16 caractères
+  drawStr(0, 0, ""); // position du curseur en 0,0
+  for (byte i = j; i < j + m_taille; i++) { // boucle pour afficher 16 caractères sur le lcd
+    char temp = pgm_read_byte(affichageMenu + i); // utilisation du texte présent en mèmoire flash
+    print(temp);
+  }
+}*/
