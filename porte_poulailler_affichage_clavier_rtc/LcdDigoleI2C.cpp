@@ -28,27 +28,40 @@ void LcdDigoleI2C::init () {
   backLightOff(); // retro eclairage off
   enableCursor(); // enable cursor
   setPrintPos(0, 0); // position 0 ligne 0 pour débuter le clear screen
-  delay(100); //delay
+  delay(10); //delay
+}
+
+// -----remise à zero du lcd-----
+void LcdDigoleI2C::razLcd() {
+  clearScreen(); // CLear screen
+  backLightOff(); // retro eclairage
+  disableCursor(); // cursor
+  setPrintPos(0, 0); // position 0 ligne 0 pour débuter le clear screen
+  delay(10); //delay
 }
 
 //----affichage une ligne-----
-void LcdDigoleI2C::affichageUneLigne(String chaine) {
-  // setPrintPos(0, 1);//curseur position 0 ligne 1
-  // print("                 "); //display space, use to clear the demo line
+void LcdDigoleI2C::affichageUneLigne(String &chaine) {
   resetPos(1);// efface la ligne 1
-  for (byte i = 0; i <= 15; i++)  {  //move string to right
-    setPrintPos(i, 1); // ligne 1
-    print(chaine[i]);
+  for (byte i = 0; i < 16; i++)  {  //move string to right
+    DigoleSerialDisp::print(chaine[i]);
   }
+  chaine[0] = '\0'; // effacement du tableau
   drawStr(m_decalage, m_ligne, ""); // curseur position : decalage, ligne 1
 }
 
 //-----reset display position and clean the line-----
 void LcdDigoleI2C::resetPos(byte ligne)
 {
-  setPrintPos(0, ligne);
-  println("                "); //display space, use to clear the demo line
-  setPrintPos(0, ligne);
+  String chaine = "";
+  drawStr(0, ligne, ""); // position du curseur en 0, ligne
+  //chaine += "                "; // chaine vide
+  for (byte i = 0; i < 16; i++)  {  //move string to right
+    chaine  += " "; // chaine vide
+    DigoleSerialDisp::print(chaine[i]);
+  }
+  chaine[0] = '\0'; // effacement du tableau
+  drawStr(0, ligne, ""); // position du curseur en 0, ligne
 }
 
 //-----affichage de la date ou de l'heure-----
@@ -69,6 +82,9 @@ void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte m
     chaineLigne.concat(transformation( " ", jourHeure));// print jour
     chaineLigne.concat(transformation( " ", moisMinute));;// print mois
     chaineLigne.concat(transformation( " 20", anneeSeconde));// print année depuis 1970
+  }
+  if (m_debug) {
+    Serial.println(chaineLigne);
   }
   affichageUneLigne(chaineLigne);// affichage sur lcd
 }
@@ -139,6 +155,22 @@ void LcdDigoleI2C::affichageServo(int pulse, int roueCodeuse, byte decalage, byt
   chaineLigne += "   R:";
   chaineLigne += roueCodeuse;
   affichageUneLigne(chaineLigne);// affichage sur lcd
+}
+
+//-----Bonjour-----
+void LcdDigoleI2C::bonjour() {
+  for (byte j = 0; j < 1; j++)  {  //making "Hello" string moving
+    for (byte i = 0; i < 9; i++)  {  //move string to right
+      setPrintPos(i, 0); // ligne 0
+      DigoleSerialDisp::print(F(" Bonjour"));
+      delay(200); //delay
+    }
+    for (byte i = 0; i < 9; i++) {  //move string to left
+      setPrintPos(8 - i, 0);
+      DigoleSerialDisp::print(F("Bonjour "));
+      delay(200);
+    }
+  }
 }
 
 

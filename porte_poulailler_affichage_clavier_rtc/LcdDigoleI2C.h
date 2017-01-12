@@ -30,7 +30,7 @@ class LcdDigoleI2C  : public DigoleSerialDisp {
     ~LcdDigoleI2C(); // destructeur
 
     void init();// initialisation
-    void affichageUneLigne(String chaine); // affichage une ligne
+    void affichageUneLigne(String &chaine); // affichage une ligne
     void resetPos(byte ligne);//reset display position and clean the line
     void affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute, byte anneeSeconde, byte decalage);//affichage de la date ou de l'heure
     String transformation (String chaine, byte dateHeure); // transformation donnees date et heure
@@ -38,6 +38,8 @@ class LcdDigoleI2C  : public DigoleSerialDisp {
     void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte decalage, byte ligne); //affichage tensions
     void affichageChoix( bool ouverture, bool fermeture, byte decalage, byte ligne);//affichage choix ouverture fermeture
     void affichageServo(int pulse, int compteRoueCodeuse, byte decalage, byte ligne) ; //affichage pulse et roue codeuse du servo
+    void razLcd(); //remise à zero du lcd
+    void bonjour(); //Bonjour
 
 
   protected:

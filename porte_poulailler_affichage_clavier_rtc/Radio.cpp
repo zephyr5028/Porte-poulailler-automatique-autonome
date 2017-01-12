@@ -22,6 +22,15 @@ void Radio::init () {
   vw_setup(m_vitesseTransmission); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
 }
 
+//----message Radio-----
+void Radio::messageRadio(char chaine1[]) {
+  strcat(chaine1, "\0");
+  vw_send((uint8_t *)chaine1, strlen(chaine1) + 1); // On envoie le message
+  // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
+  vw_wait_tx(); // On attend la fin de l'envoi
+  delay(10);
+}
+
 //----routine construction message radio----
 void Radio::envoiMessage(char chaine1[]) {
   char chaineComp[] = "Fin";
@@ -33,15 +42,6 @@ void Radio::envoiMessage(char chaine1[]) {
   } else {
     messageSansParametre();// envoi du message contenu dans m_chaine[]
   }
-}
-
-//----message Radio-----
-void Radio::messageRadio(char chaine1[]) {
-  strcat(chaine1, "\0");
-  vw_send((uint8_t *)chaine1, strlen(chaine1) + 1); // On envoie le message
-  // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
-  vw_wait_tx(); // On attend la fin de l'envoi
-  delay(10);
 }
 
 //----message Radio sans parametre-----

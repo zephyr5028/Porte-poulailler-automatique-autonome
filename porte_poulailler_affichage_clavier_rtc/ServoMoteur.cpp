@@ -32,15 +32,6 @@ void ServoMoteur::init () {
 void ServoMoteur::servoOuvFerm(boolean batterieFaible, bool reduit)
 {
   if (!batterieFaible and  !m_servoAction) { // si la batterie n'est pas faible et le servo non en action
-    if (m_debug) {
-      Serial.print(batterieFaible);
-      Serial.print(" ");
-      Serial.print(m_servoAction);
-      Serial.print("  ");
-      Serial.print(m_ouvFerm);
-      Serial.print("  ");
-      Serial.println(reduit);
-    }
     ServoMoteur::relaisSousTension(); // relais sous tension
     // modification vitesse ouverture : 1500 - (140 ou 70)  / fermeture : 1500 + (140 ou 70)
     if (reduit) m_pulse = m_pulseOuvFerm; else m_pulse = m_pulseReduit;

@@ -31,7 +31,7 @@
   il faut commenter typedef dans la bibliothèque servotimer2
 */
 
-/*-----debug-----*/
+/***-----debug-----***/
 const boolean DEBUG = false; // positionner debug pour l'utiliser ou pas
 const boolean RADIO = true; // positionner radio pour l'utiliser ou pas
 const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
@@ -41,20 +41,16 @@ const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 #include <Flash.h>
 #include <avr/pgmspace.h> // non nécessaire maintenant
 
-/* radio 433MHz */
+/*** radio 433MHz ***/
 #include "Radio.h"
 const byte pinEmRadio = 10; // pin D10 emetteur radio
 const int vitesseTransmission(600);//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
 Radio radio(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
 
-/* affichages */
-#define LCDCol 16
-#define LCDRow 2
-
-/* led broche 13 */
+/*** led broche 13 ***/
 #define LED_PIN 13
 
-/* servo - montée et descente de la porte */
+/*** servo - montée et descente de la porte ***/
 #include "ServoMoteur.h"
 const byte servoCde (8); // pin D8 cde du servo
 const byte servoPin (4); // pin D4 relais du servo
@@ -64,7 +60,7 @@ bool reduit(false); // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
 ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 70, DEBUG);
 
-/*Accus*/
+/*** Accus ***/
 #include "Accus.h"
 const byte accusPinCde(2); //analog pin A2 : tension batterie commandes
 const byte accusPinServo(3); //analog pin A3 : tension batterie servo moteur
@@ -79,7 +75,7 @@ const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
 byte alarm_1 = 1; // alarme 1
 byte alarm_2 = 2; //alarme 2
 
-/* roue codeuse */
+/*** roue codeuse ***/
 #include "Codeur.h"
 const byte roueCodeuse(7);//digital pin D7 pour entrée roue codeuse
 const unsigned int compteRoueCodeuse(150);  // un compteur de position
@@ -98,27 +94,15 @@ const byte bouclesWatchdog(2); // 8 nombre de boucles du watchdog environ 64s
 /****************************/
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 
-/* Affichage */
-
-byte decalage = 0; // decalage à droite pour reglage
 boolean reglage = false; // menu=false ou reglage=true
-const int boucleTemps(200); // 500 temps entre deux affichages de l'heure
-int temps(0);
-boolean retroEclairage = true; // etat retro eclairage
-
-const int debounce = 350; // debounce latency in ms
-unsigned long tempoDebounce(debounce); // temporisation pour debounce
-boolean relacheBpOF = true; // relache Bp
-byte BpOF = 9; // pin D9 bouton poussoir ouverture / fermeture
-byte interOuvBoitier = 6; //pin D6 interrupteur ouverture boitier
-boolean  boitierOuvert = true; // le boitier est ouvert
 
 /* progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
 const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin course fer . Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
-const char affichageRadio[] PROGMEM = "Batterie faible !!!!.Temp = .Time : .Lum : .Fin course F = .Fin course O = .Ten Cdes = . Ten Servo = .Porte ouv !.Porte ferm !.";
+const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
+const char affichageRadio[] PROGMEM = " ";
 
-/* lumiere */
+/*** lumiere ***/
 #include "Lumiere.h"
 const byte lumierePin(0); //analog pin A0 : luminosite
 const float convertion(5);// rapport de convertion CAD float
@@ -127,40 +111,49 @@ const unsigned int lumSoir(900); // valeur de la lumiere du soir
 Lumiere lum(lumierePin, lumMatin, lumSoir, convertion, DEBUG); // objet lumiere
 
 /* interruptions */
-volatile boolean interruptBp = false; // etat interruption entree 9
+volatile boolean interruptBp(false); // etat interruption entree 9
 volatile boolean interruptRTC = false; // etat interruption entree 10
 volatile boolean interruptOuvBoi = false; // etat interruption entree 6
 
+/*** Clavier ***/
 /* menus */
-const byte menuDate = 1;
-const byte menuHeure = 2;
-const byte menuOuverture = 3;
-const byte menuFermeture = 4;
-const byte menuTemperature = 5;
-const byte menuLumiere = 6;
-const byte menuLumiereMatin = 7;
-const byte menuLumiereSoir = 8;
-const byte menuChoix = 9;
-const byte menuFinDeCourseFermeture = 10;
-const byte menuFinDeCourseOuverture = 11;
-const byte menuTensionBatCdes = 12; // tension batterie commandes
-const byte menuTensionBatServo = 13; // tension batterie servo
-const byte menuManuel = 14; // nombre de lignes du  menu
-const byte colonnes = 16; // colonnes de l'afficheur
-byte incrementation = 0; // incrementation verticale
-
-/* Clavier */
 #include "Clavier.h"
+const byte menuDate(1);
+const byte menuHeure(2);
+const byte menuOuverture(3);
+const byte menuFermeture(4);
+const byte menuTemperature(5);
+const byte menuLumiere(6);
+const byte menuLumiereMatin(7);
+const byte menuLumiereSoir(8);
+const byte menuChoix(9);
+const byte menuFinDeCourseFermeture(10);
+const byte menuFinDeCourseOuverture(11);
+const byte menuTensionBatCdes(12); // tension batterie commandes
+const byte menuTensionBatServo(13); // tension batterie servo
+const byte menuManuel(14); // nombre de lignes du  menu
+const byte colonnes(16); // colonnes de l'afficheur
 const byte oldkey(-1);
 const byte sensorClavier(1); //pin A1 pour le clavier
+byte incrementation(0); // incrementation verticale
 boolean relache(false); // relache de la touche
 byte touche(-1); // valeur de la touche appuyee
-Clavier clav(menuManuel); // class Clavier avec le nombre de lignes du menu
+const byte pinBp(9); // pin D9 bouton poussoir ouverture / fermeture
+const byte pinBoitier(6); //pin D6 interrupteur ouverture boitier
+const int debounce(350); // debounce latency in ms
+unsigned long tempoDebounce(0); // temporisation pour debounce
+boolean  boitierOuvert(true); // le boitier est ouvert
+bool relacheBp(true); // relache du Bp
+Clavier clav(menuManuel, pinBp, pinBoitier, debounce, DEBUG); // class Clavier avec le nombre de lignes du menu
 
-/* LCD DigoleSerialI2C */
+/*** LCD DigoleSerialI2C ***/
 #include "LcdDigoleI2C.h"
+byte decalage = 0; // position du curseur
+boolean retroEclairage = true; // etat retro eclairage
+const int boucleTemps(200); // temps entre deux affichages
+int temps(0);
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
-LcdDigoleI2C mydisp(&Wire, '\x27', 16); // classe lcd digole i2c (lcd 2*16 caracteres)
+LcdDigoleI2C mydisp(&Wire, '\x27', colonnes, DEBUG); // classe lcd digole i2c (lcd 2*16 caracteres)
 
 /* RTC_DS3231 */
 #include <DS3232RTC.h>    //http://github.com/JChristensen/DS3232RTC
@@ -206,14 +199,21 @@ byte i2c_eeprom_read_byte( int deviceaddress, unsigned int eeaddress ) {
 void  lectureClavier() {
   if (boitierOuvert) {
     touche = clav.read_key(sensorClavier); // read key sensor = A1
-    if (touche == oldkey ) { // si touche == -1, donc touche relache=true
-      relache = true;
-    }
-    if ((touche == 2 or touche == 3) and relache and !reglage) { // si appui sur les touches 2 ou 3 et la touche relache=true et mode reglage
-      relache = false;
-      incrementation = clav.positionMenu(incrementation, touche); // position du menu pour l'affichage
+    clav.relacheTouche(touche, relache);
+    if (clav.deplacementDansMenu(touche, relache, reglage)) {
+      clav.positionMenu(incrementation, touche); // position du menu pour l'affichage
       deroulementMenu (incrementation); // affichage du menu
     }
+  }
+}
+
+//---- temporisation pour l'affichage, affichage du menu lorsque temps est >....
+void temporisationAffichage(int boucleTemps) {
+  if (  temps > boucleTemps) {
+    deroulementMenu (incrementation); // affichage du menu en fonction de incrementation
+    temps = 0;
+  } else {
+    temps = temps + 1;
   }
 }
 
@@ -240,11 +240,8 @@ void displayDate() {
     char semaine[4] = "";
     byte j = ((tm.Wday - 1) * 3);
     for (byte i = j; i < j + 3; i++) {
-      //    char dayWeek = pgm_read_byte(listeDayWeek + i);
-      //    semaine[i - j] = dayWeek;
       semaine[i - j] = pgm_read_byte(listeDayWeek + i);
     }
-    //Serial.println(semaine);
     mydisp.affichageDateHeure(semaine, tm.Day, tm.Month, tm.Year, decalage);
   }
 }
@@ -259,11 +256,7 @@ void displayTime () {
     byte timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure
     byte timeMinute = bcdToDec(RTC.readRTC(0x01)); // minutes
     if (DEBUG) {
-      Serial.print(F("Time : "));
-      Serial.print(timeHour, DEC);
-      Serial.print(F("h "));
-      Serial.print(timeMinute, DEC);
-      Serial.println(F("m"));
+     
     }
     if (RADIO) {
       radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure + etat  boitier
@@ -305,21 +298,7 @@ void affiPulsePlusCptRoue() {
     mydisp.affichageServo(pulse, compteRoueCodeuse, decalage, ligne);
   }
   if (DEBUG) {
-    Serial.print(F("Pulse servo = "));
-    Serial.println(pulse);
-    Serial.print(F("Cpt roue codeuse = "));
-    Serial.println(compteRoueCodeuse);
-    switch (test) {
-      case 1: // mise sous tension du servo pour l'ouverture de la porte
-        Serial.println(F("Porte fermee"));
-        break;
-      case 2: // mise sous tension du servo pour la fermeture de la porte
-        Serial.println(F("Porte ouverte"));
-        break;
-      default:
-        Serial.println(F("Porte    "));
-        break;
-    }
+  
   }
   if (RADIO and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
@@ -343,8 +322,7 @@ void affiPulsePlusCptRoue() {
 //-----retro eclairage de l'afficheur-----
 void eclairageAfficheur() {
   if (boitierOuvert) {
-    if (touche == 5 and relache == true ) { // retro eclairage si appuis sur la touche 5
-      relache = false;
+    if (clav.testTouche5(touche, relache)) {
       if (retroEclairage)  {
         mydisp.backLightOn(); // retro eclairage on
         retroEclairage = false;
@@ -353,16 +331,6 @@ void eclairageAfficheur() {
         retroEclairage = true;
       }
     }
-  }
-}
-
-//---- temporisation pour l'affichage, affichage du menu lorsque temps est >....
-void temporisationAffichage(int boucleTemps) {
-  if (  temps > boucleTemps) {
-    deroulementMenu (incrementation); // affichage du menu en fonction de incrementation
-    temps = 0;
-  } else {
-    temps = temps + 1;
   }
 }
 
@@ -377,11 +345,7 @@ void affiTensionBatCdes() {
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
   }
   if (DEBUG) {
-    Serial.print(F("Ten bat cdes = "));
-    Serial.print(valBatCdes);
-    Serial.print(F(" = "));
-    Serial.print(voltage);
-    Serial.println(F(" V"));
+ 
   }
   if (RADIO) {
     radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus}*/
@@ -398,11 +362,7 @@ void affiTensionBatServo() {
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
   }
   if (DEBUG) {
-    Serial.print(F("Ten bat servo = "));
-    Serial.print(valBatServo);
-    Serial.print(F(" = "));
-    Serial.print(voltage);
-    Serial.println(F(" V"));
+  
   }
   if (RADIO) {
     radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus
@@ -418,20 +378,6 @@ void affiChoixOuvFerm() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageChoix(lum.get_m_ouverture(), lum.get_m_fermeture(), decalage, ligne);
-  }
-  if (DEBUG) {
-    Serial.print(F("Ouv : "));
-    if (lum.get_m_ouverture()) {
-      Serial.print(F("Hre"));
-    } else {
-      Serial.print(F("Lum "));
-    }
-    Serial.print(F("   Fer : "));
-    if (!lum.get_m_fermeture()) {
-      Serial.println(F("Lum "));
-    } else {
-      Serial.println(F("Hre"));
-    }
   }
 }
 
@@ -902,7 +848,7 @@ void affiFinDeCourseFermeture() {
     mydisp.affichageLumFinCourse(finDeCourseFermeture, decalage, ligne);
   }
   if (DEBUG) {
-    Serial.print(F("Fin course fermeture = ")); Serial.println(finDeCourseFermeture);
+  
   }
   if (RADIO) {
     radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
@@ -917,7 +863,7 @@ void affiFinDeCourseOuverture() {
     mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
   }
   if (DEBUG) {
-    Serial.print(F("Fin course ouverture = ")); Serial.println(finDeCourseOuverture);
+  
   }
   if (RADIO) {
     radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
@@ -1086,12 +1032,7 @@ void read_temp(boolean typeTemperature) {
     }
   }
   if (DEBUG) {
-    Serial.print(F("Temp = "));
-    if (typeTemperature) {
-      Serial.print(celsius); Serial.println(F(" °C"));// affichage celsius
-    } else {
-      Serial.print(fahrenheit); Serial.println(F(" F"));// affichage fahrenheit
-    }
+ 
   }
   if (RADIO) {
     char temp[3] = "";
@@ -1156,30 +1097,20 @@ void myInterruptINT1() {
   if (!digitalRead(rtcINT)) { // entree 10 pour interruption RTC
     interruptRTC = true;
   }
-  if (!digitalRead(BpOF) and !interruptBp) { // entree 9 pour interruption BP
-    interruptBp = true;
-    tempoDebounce = millis();
-  }
-  if (!digitalRead(interOuvBoitier) and !interruptOuvBoi) { // entree 6 pour interruption ouverture boitier
-    interruptOuvBoi = true;
-  }
+  clav.testInterruptionBp (interruptBp, tempoDebounce);
+  clav.testInterruptionBoitier (interruptOuvBoi);
 }
 
 //-----routine interruption Bp-----
 void routineInterruptionBp() {
   if (interruptBp) { // test de l'appui sur bouton bp
-    // If the switch changed, due to noise or pressing:
-    if (((millis() - tempoDebounce) > debounce)  and  relacheBpOF == true and !digitalRead(BpOF) ) {
-      relacheBpOF = false;
+    // If the switch changed, due to noise or pressing
+    if (clav.testToucheBp (tempoDebounce)) {
       if (monServo.get_m_ouvFerm())  monServo.set_m_ouvFerm(false); else  monServo.set_m_ouvFerm(true);
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
-      tempoDebounce = millis(); // attente relache du bouton
     }
-    if (((millis() - tempoDebounce) > debounce)  and  relacheBpOF == false and digitalRead(BpOF) ) {
-      interruptBp = false; // autorisation de la prise en compte de l'IT
-      relacheBpOF = true;
-    }
+    clav.testRelacheBp(interruptBp);
   }
 }
 
@@ -1207,24 +1138,28 @@ void  routineInterruptionAlarme1() {
   }
 }
 
-//-----routine interruption boitier ouvert------
-void  routineInterruptionBoitierOuvert() {
-  if ( interruptOuvBoi) {    //  interruption ouverture boitier
-    if (!digitalRead(interOuvBoitier) ) { // ouverture boitier
-      boitierOuvert = true; // boitier ouvert
-    }
+//-----test ouverture boitier-----
+void routineTestOuvertureBoitier()  {
+  if ( clav.testBoitierOuvert( interruptOuvBoi, boitierOuvert)) {
+    char chaine[9] = "ouverture";
+    radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
+    radio.chaineVide();
+    boitierOuvert = true; // boitier ouvert
+    mydisp.enableCursor(); //  cursor
+    decalage = 0; // pour afficher le curseur
+    mydisp.bonjour(); // affichage bonjour
+    incrementation = menuManuel; // affichage à l'ouverture du boitier
   }
 }
 
 //-----test fermeture boitier-----
 void  routineTestFermetureBoitier() {
-  if (digitalRead(interOuvBoitier)) { //  fermeture boitier
-    if (!retroEclairage)  {
-      mydisp.backLightOff(); // retro eclairage off
-      retroEclairage = true;
-    }
+  if (clav.testBoitierFerme(interruptOuvBoi, boitierOuvert)) {
+    deroulementMenu ( incrementation);// affichage menu
+    mydisp.razLcd(); // extinction et raz du lcd
     boitierOuvert = false; // boitier ferme
     interruptOuvBoi = false; // autorisation de la prise en compte de l'IT
+    retroEclairage = true;
   }
 }
 
@@ -1240,8 +1175,7 @@ void lumiere() {
     mydisp.affichageLumFinCourse(lumValue, decalage, ligne);
   }
   if (DEBUG) {
-    Serial.print(F("lum : "));
-    Serial.println(lumValue);
+  
   }
   if (RADIO) {
     radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
@@ -1390,7 +1324,11 @@ void routineGestionWatchdog() {
         delay(10);
         digitalWrite(LED_PIN, LOW);
         if (batterieFaible) { // affichage si la batterie est faible
-          radio.messageRadio("*** Batterie faible ! ***");// on envoie le message
+          char chaine[26] = "";
+          for (byte i = 0; i < 25 ; i++) {
+            chaine[i] = pgm_read_byte(affichageBatterieFaible + i);
+          }
+          radio.messageRadio(chaine);// on envoie le message
         }
         // informations à afficher
         if (RADIO) {
@@ -1432,22 +1370,11 @@ void routineGestionWatchdog() {
 void setup() {
 
   Serial.begin(9600);
+  pinMode(LED_PIN, OUTPUT); // led broche 13
 
   mydisp.init(); // initialisation for text LCD adapter
+  mydisp.bonjour(); // affichage bonjour au demarrage
 
-  for (uint8_t j = 0; j < 1; j++)  {  //making "Hello" string moving
-    for (uint8_t i = 0; i < 9; i++)  {  //move string to right
-      mydisp.setPrintPos(i, 0); // ligne 0
-      mydisp.print(F(" Bonjour"));
-      delay(200); //delay
-    }
-    for (uint8_t i = 0; i < 9; i++) {  //move string to left
-      mydisp.setPrintPos(8 - i, 0);
-      mydisp.print(F("Bonjour "));
-      delay(200);
-    }
-  }
-  pinMode(LED_PIN, OUTPUT); // led broche 13
   incrementation = menuManuel; // pour affichage menu
   deroulementMenu (incrementation); // affichage du menu
 
@@ -1542,7 +1469,8 @@ void loop() {
   fermeturePorte();
 
   routineTestFermetureBoitier(); // test fermeture boitier
-  routineInterruptionBoitierOuvert(); // routine interruption boitier ouvert
+  routineTestOuvertureBoitier();// test ouvertuer boitier
+
   routineInterruptionBp(); // routine interruption Bp
 
   routineInterrruptionAlarme2() ; // routine alarme 2
