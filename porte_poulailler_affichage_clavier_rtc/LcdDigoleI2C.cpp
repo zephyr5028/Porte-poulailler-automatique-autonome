@@ -35,9 +35,7 @@ void LcdDigoleI2C::init () {
 void LcdDigoleI2C::razLcd() {
   clearScreen(); // CLear screen
   backLightOff(); // retro eclairage
-  disableCursor(); // cursor
-  setPrintPos(0, 0); // position 0 ligne 0 pour débuter le clear screen
-  delay(10); //delay
+  disableCursor();
 }
 
 //----affichage une ligne-----
@@ -46,21 +44,20 @@ void LcdDigoleI2C::affichageUneLigne(String &chaine) {
   for (byte i = 0; i < 16; i++)  {  //move string to right
     DigoleSerialDisp::print(chaine[i]);
   }
-  chaine[0] = '\0'; // effacement du tableau
   drawStr(m_decalage, m_ligne, ""); // curseur position : decalage, ligne 1
 }
 
 //-----reset display position and clean the line-----
 void LcdDigoleI2C::resetPos(byte ligne)
 {
-  String chaine = "";
   drawStr(0, ligne, ""); // position du curseur en 0, ligne
+  String chaine = "";
   //chaine += "                "; // chaine vide
   for (byte i = 0; i < 16; i++)  {  //move string to right
     chaine  += " "; // chaine vide
     DigoleSerialDisp::print(chaine[i]);
+
   }
-  chaine[0] = '\0'; // effacement du tableau
   drawStr(0, ligne, ""); // position du curseur en 0, ligne
 }
 
@@ -172,13 +169,14 @@ void LcdDigoleI2C::bonjour() {
     }
   }
 }
+
 /*
-//-----affichage ligne titres----
-void LcdDigoleI2C::ligneTitres(const char &affichageMenu, const byte &incrementation) {
+  //-----affichage ligne titres----
+  void LcdDigoleI2C::ligneTitres(const char &affichageMenu, const byte &incrementation) {
   byte j = ((incrementation - 1) * (m_taille + 1)); // tous les 16 caractères
   drawStr(0, 0, ""); // position du curseur en 0,0
   for (byte i = j; i < j + m_taille; i++) { // boucle pour afficher 16 caractères sur le lcd
     char temp = pgm_read_byte(affichageMenu + i); // utilisation du texte présent en mèmoire flash
     print(temp);
   }
-}*/
+  }*/

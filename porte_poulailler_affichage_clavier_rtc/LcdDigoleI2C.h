@@ -20,9 +20,8 @@
 #include <DigoleSerial.h> // bibliotheque afficheur serie
 #include <Wire.h>
 /*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
-#include <Flash.h>
-#include <avr/pgmspace.h> // non nécessaire maintenant
-
+//#include <Flash.h>
+//#include <avr/pgmspace.h> // non nécessaire maintenant
 #include "Arduino.h"
 
 class LcdDigoleI2C  : public DigoleSerialDisp {

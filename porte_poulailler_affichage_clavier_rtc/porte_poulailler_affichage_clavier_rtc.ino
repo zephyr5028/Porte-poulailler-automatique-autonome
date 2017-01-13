@@ -38,8 +38,8 @@ const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 
 /*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
-//#include <Flash.h>
-//#include <avr/pgmspace.h> // non nécessaire maintenant
+#include <Flash.h>
+#include <avr/pgmspace.h> // non nécessaire maintenant
 
 /*** radio 433MHz ***/
 #include "Radio.h"
@@ -90,7 +90,8 @@ Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRo
 volatile int f_wdt = 1; // flag watchdog
 
 /****************************/
-const byte bouclesWatchdog(8); // 8 nombre de boucles du watchdog environ 64s
+// nombre de boucles du watchdog environ 64s pour 8 boucles
+const byte bouclesWatchdog(8);
 /****************************/
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 
@@ -135,12 +136,12 @@ const byte menuManuel(14); // nombre de lignes du  menu
 const byte colonnes(16); // colonnes de l'afficheur
 const byte oldkey(-1);
 const byte sensorClavier(1); //pin A1 pour le clavier
-byte incrementation(0); // incrementation verticale
-boolean relache(false); // relache de la touche
-byte touche(-1); // valeur de la touche appuyee
 const byte pinBp(9); // pin D9 bouton poussoir ouverture / fermeture
 const byte pinBoitier(6); //pin D6 interrupteur ouverture boitier
 const int debounce(350); // debounce latency in ms
+byte incrementation(0); // incrementation verticale
+boolean relache(false); // relache de la touche
+byte touche(-1); // valeur de la touche appuyee
 unsigned long tempoDebounce(0); // temporisation pour debounce
 boolean  boitierOuvert(true); // le boitier est ouvert
 bool relacheBp(true); // relache du Bp
@@ -148,9 +149,9 @@ Clavier clav(menuManuel, pinBp, pinBoitier, debounce, DEBUG); // class Clavier a
 
 /*** LCD DigoleSerialI2C ***/
 #include "LcdDigoleI2C.h"
+const int boucleTemps(200); // temps entre deux affichages
 byte decalage = 0; // position du curseur
 boolean retroEclairage = true; // etat retro eclairage
-const int boucleTemps(200); // temps entre deux affichages
 int temps(0);
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 LcdDigoleI2C mydisp(&Wire, '\x27', colonnes, DEBUG); // classe lcd digole i2c (lcd 2*16 caracteres)
@@ -1119,7 +1120,6 @@ void  routineInterrruptionAlarme2() {
   if ( RTC.alarm(alarm_2) and interruptRTC ) {    // has Alarm2 (fermeture) triggered?  alarme rtc
     // mise sous tension du servo pour la fermeture de la porte
     monServo.set_m_ouvFerm(false); // fermeture
-    // ouvFerm = 0; // fermeture
     reduit = 1;// vitesse normale
     monServo.servoOuvFerm(batterieFaible, reduit);
     interruptRTC = false; // autorisation de la prise en compte de l'IT
@@ -1131,7 +1131,6 @@ void  routineInterruptionAlarme1() {
   if ( RTC.alarm(alarm_1) and interruptRTC ) {    // has Alarm1 (ouverture) triggered?  alarme rtc
     // mise sous tension du servo pour l'ouverture de la porte
     monServo.set_m_ouvFerm(true); // ouverture
-    // ouvFerm = 1; // ouverture
     reduit = 1;// vitesse normale
     monServo.servoOuvFerm(batterieFaible, reduit);
     interruptRTC = false; // autorisation de la prise en compte de l'IT
@@ -1145,18 +1144,13 @@ void routineTestOuvertureBoitier()  {
     radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
     radio.chaineVide();
     boitierOuvert = true; // boitier ouvert
-    mydisp.enableCursor(); //  cursor
-    decalage = 0; // pour afficher le curseur
-    mydisp.bonjour(); // affichage bonjour
-    delay(100);
-    incrementation = menuManuel; // affichage à l'ouverture du boitier
+    mydisp.enableCursor();// active le curseur
   }
 }
 
 //-----test fermeture boitier-----
 void  routineTestFermetureBoitier() {
   if (clav.testBoitierFerme(interruptOuvBoi, boitierOuvert)) {
-    deroulementMenu ( incrementation);// affichage menu
     mydisp.razLcd(); // extinction et raz du lcd
     boitierOuvert = false; // boitier ferme
     interruptOuvBoi = false; // autorisation de la prise en compte de l'IT
@@ -1213,18 +1207,14 @@ void ouvFermLum() {
 void deroulementMenu (byte increment) {
   if (boitierOuvert) {
 
-    
-  //  mydisp.ligneTitres(affichageMenu, incrementation);// afficahge ligne titres
-    
-      byte j = ((increment - 1) * (colonnes + 1)); // tous les 16 caractères
-      mydisp.drawStr(0, 0, ""); // position du curseur en 0,0
-      for (byte i = j; i < j + colonnes; i++) { // boucle pour afficher 16 caractères sur le lcd
+    //  mydisp.ligneTitres(affichageMenu, incrementation);// afficahge ligne titres
+    byte j = ((increment - 1) * (colonnes + 1)); // tous les 16 caractères
+    mydisp.drawStr(0, 0, ""); // position du curseur en 0,0
+    for (byte i = j; i < j + colonnes; i++) { // boucle pour afficher 16 caractères sur le lcd
       char temp = pgm_read_byte(affichageMenu + i); // utilisation du texte présent en mèmoire flash
       mydisp.print(temp);
-      Serial.print(temp);
-      }
-Serial.println(" ");
-      
+    }
+
     switch (increment) { // test de la valeur de incrementation pour affichage des parametres
       case 1: // Date
         mydisp.drawStr(0, 1, " ");
@@ -1449,7 +1439,6 @@ void setup() {
 void loop() {
 
   lectureClavier(); // lecture du clavier
-  //affichage du menu lorsque temps est > ....
   temporisationAffichage(boucleTemps) ; // temporisation pour l'affichage
 
   //reglages
