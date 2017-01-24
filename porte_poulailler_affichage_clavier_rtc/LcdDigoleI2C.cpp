@@ -69,8 +69,8 @@ void LcdDigoleI2C::choixRetroEclairage (bool choix) {
 //----affichage une ligne-----
 void LcdDigoleI2C::affichageUneLigne(String chaine) {
   resetPos(1);// efface la ligne 1
-  for (byte i = 0; i < 16; i++)  {  //move string to right
-    DigoleSerialDisp::print(chaine[i]);
+  for (byte i = 0; i < chaine.length(); i++)  {  //move string to right
+    print(chaine[i]);
   }
   drawStr(m_decalage, m_ligne, ""); // curseur position : decalage, ligne 1
 }
@@ -82,7 +82,7 @@ void LcdDigoleI2C::resetPos(byte ligne)
   String chaine = "";
   for (byte i = 0; i < 16; i++)  {  //move string to right
     chaine += " "; // espace
-    DigoleSerialDisp::print(chaine[i]);
+    print(chaine[i]);
   }
   drawStr(0, ligne, ""); // position du curseur en 0, ligne
 }
@@ -186,12 +186,12 @@ void LcdDigoleI2C::bonjour() {
   for (byte j = 0; j < 1; j++)  {  //making "Hello" string moving
     for (byte i = 0; i < 9; i++)  {  //move string to right
       setPrintPos(i, 0); // ligne 0
-      DigoleSerialDisp::print(F(" Bonjour"));// F() pour memoire flash
+      print(F(" Bonjour"));// F() pour memoire flash
       delay(200); //delay
     }
     for (byte i = 0; i < 9; i++) {  //move string to left
       setPrintPos(8 - i, 0);
-      DigoleSerialDisp::print(F("Bonjour "));
+      print(F("Bonjour "));
       delay(200);
     }
   }
@@ -201,6 +201,6 @@ void LcdDigoleI2C::bonjour() {
 void LcdDigoleI2C::cursorPosition(byte decalage, byte ligne, char *texte) {
   m_decalage = decalage;
   m_ligne = ligne;
-  DigoleSerialDisp::drawStr(m_decalage, m_ligne, texte);
+  drawStr(m_decalage, m_ligne, texte);
 }
 

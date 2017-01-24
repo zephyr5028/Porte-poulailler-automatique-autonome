@@ -40,8 +40,8 @@ const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 
 
 /*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
-//#include <Flash.h>
-//#include <avr/pgmspace.h> // non nécessaire maintenant
+#include <Flash.h>
+#include <avr/pgmspace.h> // non nécessaire maintenant
 
 /*** radio 433MHz ***/
 #include "Radio.h"
@@ -72,10 +72,6 @@ boolean batterieFaible = false; // si batterie < 4,8v = true
 Accus accusCde (accusPinCde, tensionMiniAccus, rapportConvertion, DEBUG); // objet accus commande mini 4.8v, convertion 7.5
 Accus accusServo (accusPinServo); // objet accus servo moteur mini 4.8v, convertion 7.5
 
-/* RTC_DS3231 */
-const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
-byte alarm_1 = 1; // alarme 1
-byte alarm_2 = 2; //alarme 2
 
 /*** roue codeuse ***/
 #include "Codeur.h"
@@ -148,15 +144,23 @@ const int boucleTemps(200); // temps entre deux affichages
 byte decalage(0); // position du curseur
 bool LcdCursor(true) ; //curseur du lcd if treu = enable
 int temps(0);
-// I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
+
 #ifdef  LCDDIGOLE
+// I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
 LcdDigoleI2C mydisp(&Wire, '\x27', colonnes, DEBUG); // classe lcd digole i2c (lcd 2*16 caracteres)
 #endif
-#ifdef LCDLIQIDCRYSTAL
 
+#ifdef LCDLIQIDCRYSTAL
+#include "LcdPCF8574.h"
+// Set the LCD address to 0x27 for a 16 chars and 2 line display
+LcdPCF8574  mydisp(0x27, 16, 2);
 #endif
 
+/* RTC_DS3231 */
+const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
+byte alarm_1 = 1; // alarme 1
+byte alarm_2 = 2; //alarme 2
 /* RTC_DS3231 */
 #include <DS3232RTC.h>    //http://github.com/JChristensen/DS3232RTC
 #include <Time.h>         //http://www.arduino.cc/playground/Code/Time  
@@ -883,7 +887,9 @@ void regFinDeCourseOuverture() {
         delay(10);
         i2c_eeprom_write_byte(0x57, 0x23, val2); // écriture de la valeur du reglage de la fin de course bas  high @23 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-        mydisp.drawStr(0, 1, "");
+        
+       // mydisp.drawStr(0, 1, "");
+       
         affiFinDeCourseOuverture();
       }
     }

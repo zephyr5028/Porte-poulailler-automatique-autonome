@@ -21,13 +21,30 @@ class LcdPCF8574  : public LiquidCrystal_I2C
     ~LcdPCF8574(); // destructeur
 
 
+    void init();// initialisation
+    void affichageUneLigne(String chaine); // affichage une ligne
+    void resetPos(byte ligne);//reset display position and clean the line
+    void affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde, byte decalage);//affichage de la date ou de l'heure
+    String transformation (String chaine, byte dateHeure); // transformation donnees date et heure
+    void affichageLumFinCourse( unsigned int lum, byte decalage, byte ligne); //affichage lumiere et fin de course
+    void affichageVoltage( float voltage, String texte, byte decalage, byte ligne); //affichage tensions
+    void affichageChoix( bool ouverture, bool fermeture, byte decalage, byte ligne);//affichage choix ouverture fermeture
+    void affichageServo(int pulse, int compteRoueCodeuse, byte decalage, byte ligne) ; //affichage pulse et roue codeuse du servo
+    void razLcd(); //remise à zero du lcd
+    void bonjour(); //Bonjour
+    void cursorPosition(byte decalage, byte ligne, char *texte); // position du curseur
+    void gestionCurseur (bool curseur);//activation / desactivation du curseur
+    void retroEclairage ();//activation / desactivation du retro eclairage (bascule)
+    void choixRetroEclairage (bool choix);//choix activation / desactivation du retro eclairage
 
   protected:
-
+    
     const boolean m_debug ; // pour affichage console si nécessaire
-    //  const byte m_taille; // taille du tableau - 16 caractères
+    int const m_taille; // taille du tableau - 16 caractères
     byte m_decalage; // position du curseur
-    //  const byte m_nbLigne; // nombre de lignes
+    byte m_ligne; // numero ligne
+    byte m_deplacement; // deplacement du curseur
+    bool m_retroEclairage; // position retro eclairage
 
 };
 #endif
