@@ -23,7 +23,8 @@ void Radio::init () {
 }
 
 //----message Radio-----
-void Radio::messageRadio(char chaine1[]) {
+//void Radio::messageRadio(char chaine1[]) {
+void Radio::messageRadio(char *chaine1) {
   strcat(chaine1, "\0");
   vw_send((uint8_t *)chaine1, strlen(chaine1) + 1); // On envoie le message
   // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
@@ -32,10 +33,19 @@ void Radio::messageRadio(char chaine1[]) {
 }
 
 //----routine construction message radio----
-void Radio::envoiMessage(char chaine1[]) {
+//void Radio::envoiMessage(char chaine1[]) {
+void Radio::envoiMessage(char *chaine1) {
   char chaineComp[] = "Fin";
   if (strcmp(chaineComp, chaine1) != 0) { // test de la dernière chaine
-    strcat(m_chaine, chaine1);
+    //  strcat(m_chaine, chaine1);
+    byte lenChaine1(0);
+    while (chaine1[lenChaine1] != '\0') lenChaine1++;
+    byte  len_m_chaine(0);
+    while (m_chaine[len_m_chaine] != '\0')  len_m_chaine++;
+    for (byte pos = 0; pos < lenChaine1; pos++) {
+      m_chaine[len_m_chaine + pos] = chaine1[pos];
+      m_chaine[len_m_chaine + lenChaine1] = '\0';
+    }
     if (m_debug) {
       Serial.println(m_chaine);
     }
@@ -64,7 +74,8 @@ void Radio::chaineVide() {
 }
 
 //-----envoi message float avec test de l'ouverture du boitier plus texte-----
-void Radio::envoiFloat(float valeur , boolean boitierOuvert, char texte[]) {
+//void Radio::envoiFloat(float valeur , boolean boitierOuvert, char texte[]) {
+void Radio::envoiFloat(float valeur, boolean boitierOuvert, char *texte ) {
   if (m_radio and !boitierOuvert) {
     char chaine[m_taille - 1] = "";
     char valeur_temp[8] = "";
@@ -76,10 +87,11 @@ void Radio::envoiFloat(float valeur , boolean boitierOuvert, char texte[]) {
 }
 
 //-----envoi message unsigned int avec test de l'ouverture du boitier plus texte-----
-void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char texte[]) {
+//void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char texte[]) {
+void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char *texte) {
   if (m_radio and !boitierOuvert) {
     char chaine1[m_taille - 1] = "";
-    char valeur_temp[5];
+    char valeur_temp[5] = "";
     sprintf(valeur_temp, "%i", valeur);
     strcat(chaine1, valeur_temp);
     strcat(chaine1, texte);

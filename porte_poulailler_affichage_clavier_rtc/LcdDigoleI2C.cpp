@@ -8,7 +8,8 @@ using namespace std;
 
 //constructeur avec debug
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
-LcdDigoleI2C::LcdDigoleI2C ( TwoWire*, char , byte taille, const boolean debug) : DigoleSerialDisp (&Wire, '\x27'), m_taille(taille), m_debug(debug), m_decalage(0), m_ligne(0)
+LcdDigoleI2C::LcdDigoleI2C ( TwoWire*, char , byte taille, const boolean debug) : DigoleSerialDisp (&Wire, '\x27'), m_taille(taille), m_debug(debug), m_decalage(0),
+  m_ligne(0), m_deplacement(0), m_retroEclairage(1)
 {
 }
 
@@ -31,15 +32,42 @@ void LcdDigoleI2C::init () {
   delay(10); //delay
 }
 
-// -----remise à zero du lcd-----
+//-----remise à zero du lcd-----
 void LcdDigoleI2C::razLcd() {
   clearScreen(); // CLear screen
   backLightOff(); // retro eclairage
   disableCursor();
 }
 
+//------activation / desactivation du curseur-----
+void LcdDigoleI2C::gestionCurseur (bool curseur) {
+  if (curseur) enableCursor(); else disableCursor();
+}
+
+//-----activation / desactivation du retro eclairage------
+void LcdDigoleI2C::retroEclairage () {
+  if (m_retroEclairage)   {
+    backLightOn();
+    m_retroEclairage = false;
+  } else {
+    backLightOff();
+    m_retroEclairage = true;
+  }
+}
+
+//-----choix activation / desactivation du retro eclairage------
+void LcdDigoleI2C::choixRetroEclairage (bool choix) {
+  if (choix)   {
+    backLightOn();
+    m_retroEclairage = false;
+  } else {
+    backLightOff();
+    m_retroEclairage = true;
+  }
+}
+
 //----affichage une ligne-----
-void LcdDigoleI2C::affichageUneLigne(String &chaine) {
+void LcdDigoleI2C::affichageUneLigne(String chaine) {
   resetPos(1);// efface la ligne 1
   for (byte i = 0; i < 16; i++)  {  //move string to right
     DigoleSerialDisp::print(chaine[i]);
@@ -52,17 +80,15 @@ void LcdDigoleI2C::resetPos(byte ligne)
 {
   drawStr(0, ligne, ""); // position du curseur en 0, ligne
   String chaine = "";
-  //chaine += "                "; // chaine vide
   for (byte i = 0; i < 16; i++)  {  //move string to right
-    chaine  += " "; // chaine vide
+    chaine += " "; // espace
     DigoleSerialDisp::print(chaine[i]);
-
   }
   drawStr(0, ligne, ""); // position du curseur en 0, ligne
 }
 
 //-----affichage de la date ou de l'heure-----
-void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute, byte anneeSeconde, byte decalage) {
+void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde, byte decalage) {
   m_ligne = 1;
   m_decalage = decalage;
   String chaineLigne = "";
@@ -77,8 +103,9 @@ void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte m
     chaineLigne += " ";
     chaineLigne += jourSemaine;
     chaineLigne.concat(transformation( " ", jourHeure));// print jour
-    chaineLigne.concat(transformation( " ", moisMinute));;// print mois
-    chaineLigne.concat(transformation( " 20", anneeSeconde));// print année depuis 1970
+    chaineLigne.concat(transformation( " ", moisMinute));// print mois
+    chaineLigne += " ";
+    chaineLigne += anneeSeconde + 1970; // année depuis 1970
   }
   if (m_debug) {
     Serial.println(chaineLigne);
@@ -100,7 +127,7 @@ String LcdDigoleI2C::transformation (String texte, byte dateHeure ) {
     if (dateHeure < 10) {
       chaine += "0"; // si < 10
     }
-    if (texte == " 20")  chaine += dateHeure - 30; else  chaine += dateHeure;//  si -30 : année depuis 1970
+    chaine += dateHeure;
   }
   return chaine;
 }
@@ -159,7 +186,7 @@ void LcdDigoleI2C::bonjour() {
   for (byte j = 0; j < 1; j++)  {  //making "Hello" string moving
     for (byte i = 0; i < 9; i++)  {  //move string to right
       setPrintPos(i, 0); // ligne 0
-      DigoleSerialDisp::print(F(" Bonjour"));
+      DigoleSerialDisp::print(F(" Bonjour"));// F() pour memoire flash
       delay(200); //delay
     }
     for (byte i = 0; i < 9; i++) {  //move string to left
@@ -170,13 +197,10 @@ void LcdDigoleI2C::bonjour() {
   }
 }
 
-/*
-  //-----affichage ligne titres----
-  void LcdDigoleI2C::ligneTitres(const char &affichageMenu, const byte &incrementation) {
-  byte j = ((incrementation - 1) * (m_taille + 1)); // tous les 16 caractères
-  drawStr(0, 0, ""); // position du curseur en 0,0
-  for (byte i = j; i < j + m_taille; i++) { // boucle pour afficher 16 caractères sur le lcd
-    char temp = pgm_read_byte(affichageMenu + i); // utilisation du texte présent en mèmoire flash
-    print(temp);
-  }
-  }*/
+// -----position du curseur : decalage, ligne, texte-----
+void LcdDigoleI2C::cursorPosition(byte decalage, byte ligne, char *texte) {
+  m_decalage = decalage;
+  m_ligne = ligne;
+  DigoleSerialDisp::drawStr(m_decalage, m_ligne, texte);
+}
+

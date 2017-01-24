@@ -30,16 +30,18 @@
   with ServoTimer2 et VirtualWire
   il faut commenter typedef dans la bibliothèque servotimer2
 */
+#define LCDDIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
+//#define LCDLIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
 
-/***-----debug-----***/
 const boolean DEBUG = false; // positionner debug pour l'utiliser ou pas
 const boolean RADIO = true; // positionner radio pour l'utiliser ou pas
 const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 
+
 /*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
-#include <Flash.h>
-#include <avr/pgmspace.h> // non nécessaire maintenant
+//#include <Flash.h>
+//#include <avr/pgmspace.h> // non nécessaire maintenant
 
 /*** radio 433MHz ***/
 #include "Radio.h"
@@ -90,18 +92,12 @@ Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRo
 volatile int f_wdt = 1; // flag watchdog
 
 /****************************/
-// nombre de boucles du watchdog environ 64s pour 8 boucles
-const byte bouclesWatchdog(8);
+// nombre de boucles du watchdog : environ 64s pour 8 boucles
+const byte bouclesWatchdog(2);
 /****************************/
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 
 boolean reglage = false; // menu=false ou reglage=true
-
-/* progmem  mémoire flash */
-const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
-const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin course fer . Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
-const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
-const char affichageRadio[] PROGMEM = " ";
 
 /*** lumiere ***/
 #include "Lumiere.h"
@@ -148,19 +144,29 @@ bool relacheBp(true); // relache du Bp
 Clavier clav(menuManuel, pinBp, pinBoitier, debounce, DEBUG); // class Clavier avec le nombre de lignes du menu
 
 /*** LCD DigoleSerialI2C ***/
-#include "LcdDigoleI2C.h"
 const int boucleTemps(200); // temps entre deux affichages
-byte decalage = 0; // position du curseur
-boolean retroEclairage = true; // etat retro eclairage
+byte decalage(0); // position du curseur
+bool LcdCursor(true) ; //curseur du lcd if treu = enable
 int temps(0);
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
+#ifdef  LCDDIGOLE
+#include "LcdDigoleI2C.h"
 LcdDigoleI2C mydisp(&Wire, '\x27', colonnes, DEBUG); // classe lcd digole i2c (lcd 2*16 caracteres)
+#endif
+#ifdef LCDLIQIDCRYSTAL
+
+#endif
 
 /* RTC_DS3231 */
 #include <DS3232RTC.h>    //http://github.com/JChristensen/DS3232RTC
 #include <Time.h>         //http://www.arduino.cc/playground/Code/Time  
 #define DS3231_I2C_ADDRESS 0x68
 tmElements_t tm; // declaration de tm pour la lecture des informations date et heure
+
+/* progmem  mémoire flash */
+const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
+const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin course fer . Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
+const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 
 //-----routine decToBcd : Convert normal decimal numbers to binary coded decimal-----
 byte decToBcd(byte val) {
@@ -222,14 +228,11 @@ void temporisationAffichage(int boucleTemps) {
 void ecritureDateTime() {
   RTC.write(tm);
   if (incrementation == menuHeure) {
-    mydisp.drawStr(0, 1, "   ");
     displayTime(); // affichage de l'heure
   }
   if (incrementation == menuDate) {
-    mydisp.drawStr(0, 1, " ");
     displayDate(); // affichage de la date
   }
-  mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
 }
 
 /* affichages */
@@ -254,8 +257,8 @@ void displayTime () {
     mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second, decalage);
   }
   if (DEBUG or RADIO) {
-    byte timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure
-    byte timeMinute = bcdToDec(RTC.readRTC(0x01)); // minutes
+    int timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure
+    int timeMinute = bcdToDec(RTC.readRTC(0x01)); // minutes
     if (DEBUG) {
 
     }
@@ -311,10 +314,10 @@ void affiPulsePlusCptRoue() {
         strcat(chaine1, "ouv;");
         break;
       default:
-        strcat(chaine1, "   ;");
+        strcat(chaine1, " ? ;");
         break;
     }
-    radio.envoiMessage(chaine1);// on envoie le message
+    radio.envoiMessage(chaine1);// on envoie le message ouverture / fermeture
     radio.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert, ";"); // envoi message radio compteur roue codeuse
   }
 }
@@ -324,13 +327,7 @@ void affiPulsePlusCptRoue() {
 void eclairageAfficheur() {
   if (boitierOuvert) {
     if (clav.testTouche5(touche, relache)) {
-      if (retroEclairage)  {
-        mydisp.backLightOn(); // retro eclairage on
-        retroEclairage = false;
-      } else {
-        mydisp.backLightOff(); // retro eclairage off
-        retroEclairage = true;
-      }
+      mydisp.retroEclairage();// retro eclairage 
     }
   }
 }
@@ -349,7 +346,7 @@ void affiTensionBatCdes() {
 
   }
   if (RADIO) {
-    radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus}*/
+    radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
   }
 }
 
@@ -366,7 +363,7 @@ void affiTensionBatServo() {
 
   }
   if (RADIO) {
-    radio.envoiFloat(voltage, boitierOuvert, "V;" ); // envoi message radio tension accus
+    radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
   }
 }
 
@@ -395,7 +392,6 @@ void choixOuvFerm () {
         decalage = 0;
         reglage = false;
       }
-      mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
     }
     if ((touche == 2 or touche == 3) and incrementation == menuChoix and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
@@ -408,9 +404,7 @@ void choixOuvFerm () {
           RTC.alarmInterrupt(alarm_1, true); // activation alarme 1 ouverture
         }
         i2c_eeprom_write_byte(0x57, 0x14, lum.get_m_ouverture()); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
-        mydisp.drawStr(0, 1, "");
         affiChoixOuvFerm();
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
       if (decalage == 14) {
         if (!lum.get_m_fermeture()) {
@@ -421,9 +415,7 @@ void choixOuvFerm () {
           RTC.alarmInterrupt(alarm_2, false);     //disable Alarm2
         }
         i2c_eeprom_write_byte(0x57, 0x15, lum.get_m_fermeture()); // écriture du type de fermeture @15 de l'eeprom de la carte rtc (i2c @ 0x57)
-        mydisp.drawStr(0, 1, "");
         affiChoixOuvFerm();
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
     }
   }
@@ -443,7 +435,6 @@ void reglageHeureFermeture() {
         decalage = 0;
         reglage = false;
       }
-      mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
     }
     if ((touche == 2 or touche == 3) and incrementation == menuFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
@@ -465,9 +456,7 @@ void reglageHeureFermeture() {
           }
         }
         RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0); // écriture de l'heure alarme 2
-        mydisp.drawStr(0, 1, "   ");
         closeTime(); // affichage de l'heure d'ouverture
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
       if (decalage == 8) {
         if (touche == 2) {
@@ -485,9 +474,7 @@ void reglageHeureFermeture() {
           }
         }
         RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0);  // écriture de l'heure alarme 2
-        mydisp.drawStr(0, 1, "   ");
         closeTime(); // affichage de l'heure d'ouverture
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
     }
   }
@@ -507,7 +494,6 @@ void reglageHeureOuverture() {
         decalage = 0;
         reglage = false;
       }
-      mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
     }
     // Set Alarm1
     if ((touche == 2 or touche == 3) and incrementation == menuOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
@@ -531,12 +517,9 @@ void reglageHeureOuverture() {
           }
         }
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
-        mydisp.drawStr(0, 1, "   ");
         openTime(); // affichage de l'heure d'ouverture
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
       if (decalage == 8) {
-        // byte alarm1Minute = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
         if (touche == 2) {
           if (alarm1Minute < 59) {
             alarm1Minute++; // incrementation des minutes
@@ -552,9 +535,7 @@ void reglageHeureOuverture() {
           }
         }
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
-        mydisp.drawStr(0, 1, "   ");
         openTime(); // affichage de l'heure d'ouverture
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
       if (decalage == 12) {
         if (touche == 2 ) {
@@ -572,9 +553,7 @@ void reglageHeureOuverture() {
           }
         }
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
-        mydisp.drawStr(0, 1, "   ");
         openTime(); // affichage de l'heure d'ouverture
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
     }
   }
@@ -594,26 +573,21 @@ void reglageDate () {
         decalage = 0;
         reglage = false;
       }
-      mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
     }
     if ((touche == 2 or touche == 3) and incrementation == menuDate and relache == true and reglage == true) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 3) {
         if (touche == 2) {
           if (tm.Wday < 7) {
-            mydisp.drawStr(decalage - 2, 1, ""); // curseur position decalage-2, ligne 1
             tm.Wday++; // incrementation du jour de la semaine
           } else {
-            mydisp.drawStr(decalage - 2, 1, ""); // curseur position decalage-2, ligne 1
             tm.Wday = 1; // dimanche
           }
         }
         if (touche == 3) {
           if (tm.Wday > 1) {
-            mydisp.drawStr(decalage - 2, 1, ""); // curseur position decalage-2, ligne 1
             tm.Wday--; // decrementation du jour de la semaine
           } else {
-            mydisp.drawStr(decalage - 2, 1, ""); // curseur position decalage-2, ligne 1
             tm.Wday = 7;
           }
         }
@@ -628,7 +602,6 @@ void reglageDate () {
           }
         }
         if (touche == 3 ) {
-          mydisp.drawStr(decalage - 1, 1, ""); // curseur position decalage-2, ligne 1
           if (tm.Day > 1) {
             tm.Day--; // decrementation du jour
           } else {
@@ -656,20 +629,10 @@ void reglageDate () {
       }
       if (decalage == 12 ) {
         if (touche == 2 ) {
-          if (tm.Year < 9) {
-            mydisp.drawStr(decalage + 1, 1, "0"); // curseur position decalage-2, ligne 1
-          } else {
-            mydisp.drawStr(decalage + 1, 1, ""); // curseur position decalage-2, ligne 1
-          }
           tm.Year++; // incrementation de l'année
         }
         if (touche == 3 ) {
-          if (tm.Year < 11) {
-            mydisp.drawStr(decalage + 1, 1, "0"); // curseur position decalage-2, ligne 1
-          } else {
-            mydisp.drawStr(decalage + 1, 1, ""); // curseur position decalage-2, ligne 1
-          }
-          if (tm.Year > 0) {
+          if (tm.Year > 30) {
             tm.Year--; // decrementation de l'année si > 2000
           }
         }
@@ -702,7 +665,6 @@ void choixLumMatin() {
         decalage = 0;
         reglage = false;
       }
-      mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
     }
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereMatin and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
@@ -715,9 +677,7 @@ void choixLumMatin() {
         delay(10);
         i2c_eeprom_write_byte(0x57, 0x17, val2); // écriture de la valeur du reglage de la lumiere du matin high @17 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-        mydisp.drawStr(0, 1, "");
         affiLumMatin();
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
     }
   }
@@ -746,7 +706,6 @@ void choixLumSoir() {
         decalage = 0;
         reglage = false;
       }
-      mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
     }
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereSoir and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
@@ -759,9 +718,7 @@ void choixLumSoir() {
         delay(10);
         i2c_eeprom_write_byte(0x57, 0x19, val2); // écriture de la valeur du reglage de la lumiere du soir high @19 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-        mydisp.drawStr(0, 1, "");
         affiLumSoir();
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
     }
   }
@@ -781,7 +738,6 @@ void reglageTime () {
         decalage = 0;
         reglage = false;
       }
-      mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
     }
     if ((touche == 2 or touche == 3) and incrementation == menuHeure and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
@@ -884,7 +840,6 @@ void regFinDeCourseFermeture() {
         decalage = 0;
         reglage = false;
       }
-      mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
     }
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
@@ -897,9 +852,7 @@ void regFinDeCourseFermeture() {
         delay(10);
         i2c_eeprom_write_byte(0x57, 0x21, val2); // écriture de la valeur du reglage de la fin de course haut  high @21 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-        mydisp.drawStr(0, 1, "");
         affiFinDeCourseFermeture();
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
     }
   }
@@ -918,7 +871,6 @@ void regFinDeCourseOuverture() {
         decalage = 0;
         reglage = false;
       }
-      mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
     }
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
@@ -933,7 +885,6 @@ void regFinDeCourseOuverture() {
         delay(10);
         mydisp.drawStr(0, 1, "");
         affiFinDeCourseOuverture();
-        mydisp.drawStr(decalage, 1, ""); // curseur position : decalage, ligne 1
       }
     }
   }
@@ -1011,9 +962,9 @@ void testServo() {
         Serial.println(monServo.read());
       }
       //et on fait un retour sur la console
-      Serial.print("Etat de l'impulsion du servo = ");
+      Serial.print(F("Etat de l'impulsion du servo = "));
       Serial.print(pulse);
-      Serial.println(" ms");
+      Serial.println(F(" ms"));
     }
   }
 }
@@ -1029,7 +980,7 @@ void read_temp(boolean typeTemperature) {
     if (typeTemperature) {
       mydisp.affichageVoltage(celsius, "C", decalage, ligne);
     } else {
-      mydisp.affichageVoltage(fahrenheit, "C", decalage, ligne);
+      mydisp.affichageVoltage(fahrenheit, "F", decalage, ligne);
     }
   }
   if (DEBUG) {
@@ -1040,6 +991,13 @@ void read_temp(boolean typeTemperature) {
     if (typeTemperature)  strcat(temp, "C;"); else strcat(temp, "F;");
     radio.envoiFloat(celsius, boitierOuvert, temp);
   }
+}
+
+//-----taille d'une chaine de caractères-----
+byte tailleChaine (char * chaine) {
+  byte i(1);
+  while (chaine[i] != '\0') i++;
+  return i;
 }
 
 /* servomoteur :
@@ -1056,7 +1014,6 @@ void ouverturePorte() {
       monServo.servoVitesse( reduit);
     }
     if (!digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
-      //  if (touche == 4  and ouvFerm == false and relache == true)  relache = false;
       codOpt.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, finDeCourseOuverture));
     }
   }
@@ -1071,9 +1028,7 @@ void  fermeturePorte() {
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
-    if ((compteRoueCodeuse >= finDeCourseFermeture)
-        or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
-      //  if (touche == 4 and ouvFerm == false and relache == true)   relache = false;
+    if ((compteRoueCodeuse >= finDeCourseFermeture) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
       codOpt.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, codOpt.get_m_finDeCourseOuverture()));
     }
   }
@@ -1144,7 +1099,7 @@ void routineTestOuvertureBoitier()  {
     radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
     radio.chaineVide();
     boitierOuvert = true; // boitier ouvert
-    mydisp.enableCursor();// active le curseur
+    mydisp.gestionCurseur(1); // activation du curseur
   }
 }
 
@@ -1154,7 +1109,7 @@ void  routineTestFermetureBoitier() {
     mydisp.razLcd(); // extinction et raz du lcd
     boitierOuvert = false; // boitier ferme
     interruptOuvBoi = false; // autorisation de la prise en compte de l'IT
-    retroEclairage = true;
+    mydisp.choixRetroEclairage (0);// extinction retro eclairage 
   }
 }
 
@@ -1164,9 +1119,8 @@ void  routineTestFermetureBoitier() {
 //-----routine lecture et affichage de la lumière-----
 void lumiere() {
   int lumValue = lum.luminositeCAD(); // luminosite CAD sur pin A0
-  // float voltage = lum.tensionLuminosite(lumValue);// convertion CAD  vers tension luminosite
   if ( boitierOuvert) { // si le boitier est ouvert
-    byte ligne(0);
+    byte ligne(0);// première ligne car non reglable
     mydisp.affichageLumFinCourse(lumValue, decalage, ligne);
   }
   if (DEBUG) {
@@ -1185,7 +1139,6 @@ void ouvFermLum() {
   //fenetre de non declenchement pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 et mise à jour du compteur watchdog lumiere
   lum.fenetreNonDeclenchement(valHeure) ;
   //non eclenchement en fonction de la position du servo et mise à jour du compteur watchdog lumiere
-  // lum.nonDeclenchementPositionServo (compteRoueCodeuse, finDeCourseFermeture, finDeCourseOuverture);
   lum.nonDeclenchementPositionServo (codOpt.get_m_compteRoueCodeuse(), codOpt.get_m_finDeCourseFermeture(), codOpt.get_m_finDeCourseOuverture());
   byte declenchementLuminosite = lum.declenchementServoLuminosite(); // test de laluninosite et declenchement du servo
   switch (declenchementLuminosite) {
@@ -1206,70 +1159,55 @@ void ouvFermLum() {
 //-----routine affichage menus------
 void deroulementMenu (byte increment) {
   if (boitierOuvert) {
-
-    //  mydisp.ligneTitres(affichageMenu, incrementation);// afficahge ligne titres
     byte j = ((increment - 1) * (colonnes + 1)); // tous les 16 caractères
-    mydisp.drawStr(0, 0, ""); // position du curseur en 0,0
+    mydisp.cursorPosition(0, 0, ""); // decalage, ligne, texte
     for (byte i = j; i < j + colonnes; i++) { // boucle pour afficher 16 caractères sur le lcd
       char temp = pgm_read_byte(affichageMenu + i); // utilisation du texte présent en mèmoire flash
-      mydisp.print(temp);
+      mydisp.print(temp);// valable pour digoleSerial et liquidCrystal
+
     }
 
     switch (increment) { // test de la valeur de incrementation pour affichage des parametres
       case 1: // Date
-        mydisp.drawStr(0, 1, " ");
         displayDate(); // affichage de la date
         break;
       case 2: // heure
-        mydisp.drawStr(0, 1, "   ");
         displayTime(); // affichage de l'heure
         break;
       case 3: // heure ouverture
-        mydisp.drawStr(0, 1, "   ");
         openTime();  // affichage de l'heure d'ouverture de la porte
         break;
       case 4: // heure fermeture
-        mydisp.drawStr(0, 1, "   ");
         closeTime();  // affichage de l'heure de fermeture de la porte
         break;
       case 5: // temperature
-        mydisp.drawStr(0, 1, "    ");
         read_temp(true); // read temperature celsius=true
         break;
       case 6: //lumiere
-        mydisp.drawStr(0, 1, "");
         lumiere(); // lecture et affichage de la lumiere
         break;
       case 7: // lumiere matin
-        mydisp.drawStr(0, 1, "");
         affiLumMatin(); // affichage de la lumiere du matin
         break;
       case 8: // lumiere soir
-        mydisp.drawStr(0, 1, "");
         affiLumSoir(); // affichage de la lumiere du soir
         break;
       case 9: // choix Ouverture / Fermeture
-        mydisp.drawStr(0, 1, "");
         affiChoixOuvFerm(); // choix
         break;
       case 10:  // fin de course Fermeture
-        mydisp.drawStr(0, 1, "");
         affiFinDeCourseFermeture(); // fin de course Haut
         break;
       case 11:  // fin de course ouverture
-        mydisp.drawStr(0, 1, "");
         affiFinDeCourseOuverture();  // fin de course ouverture
         break;
       case 12:  // tension batterie commandes
-        mydisp.drawStr(0, 1, "");
         affiTensionBatCdes(); //
         break;
       case 13:  // tension batterie servo
-        mydisp.drawStr(0, 1, "");
         affiTensionBatServo(); //
         break;
       case 14:  // commande manuelle
-        mydisp.drawStr(0, 1, "");
         affiPulsePlusCptRoue(); // affichage pulse et comptage roue codeuse
         break;
     }
@@ -1330,28 +1268,26 @@ void routineGestionWatchdog() {
         }
         // informations à afficher
         if (RADIO) {
-          read_temp(TEMPERATURE); // read temperature celsius=true
-          radio.chaineVide();
           displayTime();
+          radio.chaineVide();
+          read_temp(TEMPERATURE); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
-          radio.chaineVide();
           affiPulsePlusCptRoue();
           affiFinDeCourseFermeture();
           affiFinDeCourseOuverture();
-          radio.chaineVide();
           lumiere();
           radio.chaineVide();
         }
         if (DEBUG) {
           Serial.print(F("compt watchdog lum : x * 8s  = ")); Serial.println(lum.get_m_compteurWatchdogLumiere());
-          Serial.print(F("Bat faible : "));
+          Serial.print(F("Batterie faible ! "));
           if (batterieFaible) {
-            Serial.println(F("oui"));
+            Serial.println(F("oui"));// F() pour mise en mèmoire flash
           } else {
             Serial.println(F("non"));
           }
-          Serial.println(F("Sommeil."));
+          Serial.println(F("Sommeil"));
           Serial.println(F("* * * *"));
           delay(100);
         }
@@ -1460,7 +1396,6 @@ void loop() {
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
   batterieFaible = accusCde.accusFaible(); // test de la batterie commande < 4.8v
-  // if (batterieFaible)  bouclesWatchdog *= 2; // doublement du temps watchdog si batterie faible
 
   ouverturePorte();
   fermeturePorte();
