@@ -20,9 +20,9 @@ class ServoMoteur : public ServoTimer2
     ~ServoMoteur(); // destructeur
 
     void init();
-    //mise sous tension du servo et ouverture de la porte
+    //mise sous tension du servo et ouverture fermeture de la porte
     void servoOuvFerm(bool batterieFaible, bool reduit);
-    void servoVitesse( bool reduit);    //modificaton de la vitesse
+    void servoVitesse( bool reduit);    //modificaton de la vitesse si le servo en action
     // mise hors tension relais du servo et test de la sécurité haute
     unsigned int servoHorsTension(unsigned int compteRoueCodeuse, unsigned int finCourseOuverture);
     void relaisSousTension(); //relais sous tension
@@ -36,6 +36,8 @@ class ServoMoteur : public ServoTimer2
 
 
   protected:
+
+    void modificationVitesse( bool reduit); // modification de la vitesse
 
     const boolean m_debug ; // pour affichage console si nécessaire
     const  byte m_pinCde; // numero de la broche reliée à la commande du servo moteur

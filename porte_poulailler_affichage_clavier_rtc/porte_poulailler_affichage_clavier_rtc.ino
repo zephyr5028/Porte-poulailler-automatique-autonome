@@ -30,8 +30,15 @@
   with ServoTimer2 et VirtualWire
   il faut commenter typedef dans la bibliothèque servotimer2
 */
+
+/*********************************************************************************/
+// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
+
 #define LCDDIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
+
 //#define LCDLIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
+
+/**********************************************************************************/
 
 const boolean DEBUG = false; // positionner debug pour l'utiliser ou pas
 const boolean RADIO = true; // positionner radio pour l'utiliser ou pas
@@ -87,12 +94,14 @@ Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRo
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
 
-/****************************/
+/************************************************************/
 // nombre de boucles du watchdog : environ 64s pour 8 boucles
-const byte bouclesWatchdog(2);
-/****************************/
-byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 
+const byte bouclesWatchdog(2);
+
+/************************************************************/
+
+byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean reglage = false; // menu=false ou reglage=true
 
 /*** lumiere ***/
@@ -331,7 +340,7 @@ void affiPulsePlusCptRoue() {
 void eclairageAfficheur() {
   if (boitierOuvert) {
     if (clav.testTouche5(touche, relache)) {
-      mydisp.retroEclairage();// retro eclairage 
+      mydisp.retroEclairage();// retro eclairage
     }
   }
 }
@@ -887,9 +896,9 @@ void regFinDeCourseOuverture() {
         delay(10);
         i2c_eeprom_write_byte(0x57, 0x23, val2); // écriture de la valeur du reglage de la fin de course bas  high @23 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-        
-       // mydisp.drawStr(0, 1, "");
-       
+
+        // mydisp.drawStr(0, 1, "");
+
         affiFinDeCourseOuverture();
       }
     }
@@ -1015,7 +1024,7 @@ void ouverturePorte() {
   unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
   unsigned int finDeCourseOuverture = codOpt.get_m_finDeCourseOuverture();
   if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
-    if (compteRoueCodeuse <= finDeCourseOuverture + 20) {  // 1 + 20
+    if (compteRoueCodeuse <= finDeCourseOuverture + 20) {  // 100 + 20
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
@@ -1115,7 +1124,7 @@ void  routineTestFermetureBoitier() {
     mydisp.razLcd(); // extinction et raz du lcd
     boitierOuvert = false; // boitier ferme
     interruptOuvBoi = false; // autorisation de la prise en compte de l'IT
-    mydisp.choixRetroEclairage (0);// extinction retro eclairage 
+    mydisp.choixRetroEclairage (0);// extinction retro eclairage
   }
 }
 
@@ -1170,9 +1179,7 @@ void deroulementMenu (byte increment) {
     for (byte i = j; i < j + colonnes; i++) { // boucle pour afficher 16 caractères sur le lcd
       char temp = pgm_read_byte(affichageMenu + i); // utilisation du texte présent en mèmoire flash
       mydisp.print(temp);// valable pour digoleSerial et liquidCrystal
-
     }
-
     switch (increment) { // test de la valeur de incrementation pour affichage des parametres
       case 1: // Date
         displayDate(); // affichage de la date
@@ -1273,7 +1280,7 @@ void routineGestionWatchdog() {
           radio.messageRadio(chaine);// on envoie le message
         }
         // informations à afficher
-        if (RADIO) {
+        if (RADIO) {     
           displayTime();
           radio.chaineVide();
           read_temp(TEMPERATURE); // read temperature celsius=true
@@ -1282,7 +1289,7 @@ void routineGestionWatchdog() {
           affiPulsePlusCptRoue();
           affiFinDeCourseFermeture();
           affiFinDeCourseOuverture();
-          lumiere();
+          lumiere();       
           radio.chaineVide();
         }
         if (DEBUG) {

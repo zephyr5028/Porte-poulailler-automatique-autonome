@@ -27,29 +27,38 @@ void ServoMoteur::init () {
 
 }
 
-//------mise sous tension du servo et ouverture de la porte-------
+//------mise sous tension du servo et ouverture fermeture de la porte-------
 // value should usually be 500 to 2500 (1280 = stop)
 void ServoMoteur::servoOuvFerm(boolean batterieFaible, bool reduit)
 {
   if (!batterieFaible and  !m_servoAction) { // si la batterie n'est pas faible et le servo non en action
     ServoMoteur::relaisSousTension(); // relais sous tension
     // modification vitesse ouverture : 1500 - (140 ou 70)  / fermeture : 1500 + (140 ou 70)
-    if (reduit) m_pulse = m_pulseOuvFerm; else m_pulse = m_pulseReduit;
-    if (m_ouvFerm) ServoTimer2:: write(m_pulse = m_pulseStop - m_pulse); else ServoTimer2:: write(m_pulse = m_pulseStop + m_pulse);
+    // if (reduit) m_pulse = m_pulseOuvFerm; else m_pulse = m_pulseReduit;
+    //  if (m_ouvFerm) ServoTimer2:: write(m_pulse = m_pulseStop - m_pulse); else ServoTimer2:: write(m_pulse = m_pulseStop + m_pulse);
+    modificationVitesse(reduit);
     delay(150);
     m_servoAction = true; // servo en action
   }
 }
 
-//------modificaton de la vitesse-------
+//------modificaton de la vitesse si le servo en action-------
 // value should usually be 500 to 2500 (1280 = stop)
 void ServoMoteur::servoVitesse( bool reduit)
 {
   if (m_servoAction ) {
     // modification vitesse ouverture : 1500 - (140 ou 70)  / fermeture : 1500 + (140 ou 70)
-    if (reduit) m_pulse = m_pulseOuvFerm; else m_pulse = m_pulseReduit;
-    if (m_ouvFerm) ServoTimer2::write(m_pulse = m_pulseStop - m_pulse); else  ServoTimer2::write(m_pulse = m_pulseStop + m_pulse);
+    //if (reduit) m_pulse = m_pulseOuvFerm; else m_pulse = m_pulseReduit;
+    //if (m_ouvFerm) ServoTimer2::write(m_pulse = m_pulseStop - m_pulse); else  ServoTimer2::write(m_pulse = m_pulseStop + m_pulse);
+    modificationVitesse(reduit);
   }
+}
+
+//-----modification de la vitesse-----
+void ServoMoteur::modificationVitesse( bool reduit) {
+  // modification vitesse ouverture : 1500 - (140 ou 70)  / fermeture : 1500 + (140 ou 70)
+  if (reduit) m_pulse = m_pulseOuvFerm; else m_pulse = m_pulseReduit;
+  if (m_ouvFerm) ServoTimer2:: write(m_pulse = m_pulseStop - m_pulse); else ServoTimer2:: write(m_pulse = m_pulseStop + m_pulse);
 }
 
 //-----mise hors tension relais du servo-----

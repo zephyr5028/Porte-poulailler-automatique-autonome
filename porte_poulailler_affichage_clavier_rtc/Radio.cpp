@@ -56,12 +56,18 @@ void Radio::envoiMessage(char *chaine1) {
 
 //----message Radio sans parametre-----
 void Radio::messageSansParametre() {
-  strcat(m_chaine, "\0");
-  vw_send((uint8_t *)m_chaine, strlen(m_chaine) + 1); // On envoie le message
+  Serial.println(m_chaine);
+  //strcat(m_chaine, "\0");
+  byte leng = strlen(m_chaine);
+  m_chaine[leng + 1] = '\0';
+  vw_send((uint8_t *)m_chaine, leng + 1); // On envoie le message
   // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
   vw_wait_tx(); // On attend la fin de l'envoi
   delay(10);
-  m_chaine[0] = '\0'; // effacement du tableau
+  for (byte i = 0; i < leng + 1; i++) {
+    m_chaine[i] = {0};
+  }
+  // m_chaine[0] = '\0'; // effacement du tableau
 }
 
 //----chaine radio fin de ligne avant transmission-----
