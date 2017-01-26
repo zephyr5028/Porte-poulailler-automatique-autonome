@@ -183,6 +183,7 @@ const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en m
 const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin course fer . Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 
+
 //-----routine decToBcd : Convert normal decimal numbers to binary coded decimal-----
 byte decToBcd(byte val) {
   return ( (val / 10 * 16) + (val % 10) );
@@ -192,6 +193,7 @@ byte decToBcd(byte val) {
 byte bcdToDec(byte val) {
   return ( (val / 16 * 10) + (val % 16) );
 }
+
 
 /* eeprom at24c32 */
 /*
@@ -274,8 +276,10 @@ void displayTime () {
     mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second, decalage);
   }
   if (DEBUG or RADIO) {
-    int timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure
-    int timeMinute = bcdToDec(RTC.readRTC(0x01)); // minutes
+  //  int timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure
+   // int timeMinute = bcdToDec(RTC.readRTC(0x01)); // minutes
+     int timeHour = rtc.lectureRegistreEtConversion (RTC_HOURS, 0x3f); // heure
+    int timeMinute = rtc.lectureRegistreEtConversion( RTC_MINUTES ) ; // minutes
     if (DEBUG) {
 
     }
@@ -290,9 +294,12 @@ void displayTime () {
 void openTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte val, val1, val2;
-    val = bcdToDec(RTC.readRTC(0x09) & 0x3f); // alarme 1 hours
-    val1 = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
-    val2 = bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
+   // val = bcdToDec(RTC.readRTC(0x09) & 0x3f); // alarme 1 hours
+  //  val1 = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
+  //  val2 = bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
+    val = rtc.lectureRegistreEtConversion (ALM1_HOURS & 0x3f); // alarme 1 hours
+    val1 = rtc.lectureRegistreEtConversion (ALM1_MINUTES); // alarme 1 minutes
+    val2 = rtc.lectureRegistreEtConversion (ALM1_SECONDS & 0x7f); // alarme 1 seconds
     mydisp.affichageDateHeure("H", val, val1, val2, decalage);
   }
 }
@@ -302,8 +309,10 @@ void closeTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
     //Set Alarm2
     byte val, val1, val2(61);
-    val = bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
-    val1 = bcdToDec(RTC.readRTC(0x0B)); //alarme 2 minutes
+  //  val = bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
+ //   val1 = bcdToDec(RTC.readRTC(0x0B)); //alarme 2 minutes
+  val = rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
+    val1 = rtc.lectureRegistreEtConversion(ALM2_MINUTES); //alarme 2 minutes
     mydisp.affichageDateHeure("H", val, val1, val2, decalage);
   }
 }
@@ -455,8 +464,10 @@ void reglageHeureFermeture() {
     }
     if ((touche == 2 or touche == 3) and incrementation == menuFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      byte alarm2Hour =  bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
-      byte alarm2Minute = bcdToDec(RTC.readRTC(0x0B)); // alarme 2 minutes
+      //byte alarm2Hour =  bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
+     // byte alarm2Minute = bcdToDec(RTC.readRTC(0x0B)); // alarme 2 minutes
+       byte alarm2Hour =  rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
+      byte alarm2Minute = rtc.lectureRegistreEtConversion(ALM2_MINUTES); // alarme 2 minutes
       if (decalage == 4) {
         if (touche == 2 ) {
           if (alarm2Hour < 24) {
@@ -515,9 +526,12 @@ void reglageHeureOuverture() {
     // Set Alarm1
     if ((touche == 2 or touche == 3) and incrementation == menuOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      byte alarm1Hour =  bcdToDec(RTC.readRTC(0x09) & 0x3f); // alarme 1 hours
-      byte alarm1Minute = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
-      byte alarm1Second =  bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
+     // byte alarm1Hour =  bcdToDec(RTC.readRTC(0x09) & 0x3f); // alarme 1 hours
+    //  byte alarm1Minute = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
+     // byte alarm1Second =  bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
+      byte alarm1Hour =  rtc.lectureRegistreEtConversion(ALM1_HOURS & 0x3f); // alarme 1 hours
+      byte alarm1Minute = rtc.lectureRegistreEtConversion(ALM1_MINUTES); // alarme 1 minutes
+      byte alarm1Second =  rtc.lectureRegistreEtConversion(ALM1_SECONDS & 0x7f); // alarme 1 seconds
       if (decalage == 4) {
         if (touche == 2 ) {
           if (alarm1Hour < 24) {
@@ -1153,7 +1167,8 @@ void lumiere() {
 
 //-----ouverture/fermeture par test de la lumière----
 void ouvFermLum() {
-  byte  valHeure = bcdToDec(RTC.readRTC(0x02) & 0x3f); // lecture de l'heure
+  //byte  valHeure = bcdToDec(RTC.readRTC(0x02) & 0x3f); // lecture de l'heure
+  byte  valHeure = rtc.lectureRegistreEtConversion(RTC_HOURS & 0x3f); // lecture de l'heure
   lum.testLuminosite(); // test de la luminosite pour mise à jour du compteur watchdog lumiere
   //fenetre de non declenchement pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 et mise à jour du compteur watchdog lumiere
   lum.fenetreNonDeclenchement(valHeure) ;
