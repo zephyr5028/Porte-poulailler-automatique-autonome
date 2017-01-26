@@ -167,14 +167,16 @@ LcdPCF8574  mydisp(0x27, 16, 2);
 #endif
 
 /* RTC_DS3231 */
+#include "HorlogeDS3232.h"
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
 byte alarm_1 = 1; // alarme 1
 byte alarm_2 = 2; //alarme 2
 /* RTC_DS3231 */
-#include <DS3232RTC.h>    //http://github.com/JChristensen/DS3232RTC
-#include <Time.h>         //http://www.arduino.cc/playground/Code/Time  
-#define DS3231_I2C_ADDRESS 0x68
+//#include <DS3232RTC.h>    //http://github.com/JChristensen/DS3232RTC
+//#include <Time.h>         //http://www.arduino.cc/playground/Code/Time  
+//#define DS3231_I2C_ADDRESS 0x68
 tmElements_t tm; // declaration de tm pour la lecture des informations date et heure
+HorlogeDS3232 rtc(DEBUG);
 
 /* progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
@@ -192,6 +194,7 @@ byte bcdToDec(byte val) {
 }
 
 /* eeprom at24c32 */
+/*
 //-----ecriture dans l'eeprom at24c32 de la carte rtc------
 void i2c_eeprom_write_byte( int deviceaddress, unsigned int eeaddress, byte data ) {
   int rdata = data;
@@ -213,6 +216,7 @@ byte i2c_eeprom_read_byte( int deviceaddress, unsigned int eeaddress ) {
   if (Wire.available()) rdata = Wire.read();
   return rdata;
 }
+*/
 
 /* clavier */
 //-----lecture clavier------
@@ -416,7 +420,7 @@ void choixOuvFerm () {
           lum.set_m_ouverture(1); // ouverture 1 donc heure
           RTC.alarmInterrupt(alarm_1, true); // activation alarme 1 ouverture
         }
-        i2c_eeprom_write_byte(0x57, 0x14, lum.get_m_ouverture()); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x14, lum.get_m_ouverture()); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
         affiChoixOuvFerm();
       }
       if (decalage == 14) {
@@ -427,7 +431,7 @@ void choixOuvFerm () {
           lum.set_m_fermeture(0); // fermeture 0 donc lumiere
           RTC.alarmInterrupt(alarm_2, false);     //disable Alarm2
         }
-        i2c_eeprom_write_byte(0x57, 0x15, lum.get_m_fermeture()); // écriture du type de fermeture @15 de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x15, lum.get_m_fermeture()); // écriture du type de fermeture @15 de l'eeprom de la carte rtc (i2c @ 0x57)
         affiChoixOuvFerm();
       }
     }
@@ -686,9 +690,9 @@ void choixLumMatin() {
         unsigned int lumMatin = lum.reglageLumiere(matin, touche);// reglage de la lumiere du matin
         byte val1 = lumMatin & 0xFF; // ou    byte val1= lowByte(sensorValue);// pf
         byte val2 = (lumMatin >> 8) & 0xFF; // ou  //byte val1= highByte(sensorValue); // Pf
-        i2c_eeprom_write_byte(0x57, 0x16, val1); // écriture de la valeur du reglage de la lumiere du matin low @16  de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x16, val1); // écriture de la valeur du reglage de la lumiere du matin low @16  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-        i2c_eeprom_write_byte(0x57, 0x17, val2); // écriture de la valeur du reglage de la lumiere du matin high @17 de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x17, val2); // écriture de la valeur du reglage de la lumiere du matin high @17 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         affiLumMatin();
       }
@@ -727,9 +731,9 @@ void choixLumSoir() {
         unsigned int lumSoir = lum.reglageLumiere(soir, touche); // reglage de la lumiere du soir
         byte val1 = lumSoir & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (lumSoir >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
-        i2c_eeprom_write_byte(0x57, 0x18, val1); // écriture de la valeur du reglage de la lumiere du soir low @18  de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x18, val1); // écriture de la valeur du reglage de la lumiere du soir low @18  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-        i2c_eeprom_write_byte(0x57, 0x19, val2); // écriture de la valeur du reglage de la lumiere du soir high @19 de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x19, val2); // écriture de la valeur du reglage de la lumiere du soir high @19 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         affiLumSoir();
       }
@@ -861,9 +865,9 @@ void regFinDeCourseFermeture() {
         unsigned int finDeCourse = codOpt.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
         byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
-        i2c_eeprom_write_byte(0x57, 0x20, val1); // écriture de la valeur du reglage de la fin de course haut low @20  de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x20, val1); // écriture de la valeur du reglage de la fin de course haut low @20  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-        i2c_eeprom_write_byte(0x57, 0x21, val2); // écriture de la valeur du reglage de la fin de course haut  high @21 de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x21, val2); // écriture de la valeur du reglage de la fin de course haut  high @21 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         affiFinDeCourseFermeture();
       }
@@ -892,9 +896,9 @@ void regFinDeCourseOuverture() {
         unsigned int finDeCourse = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
         byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
-        i2c_eeprom_write_byte(0x57, 0x22, val1); // écriture de la valeur du reglage de la fin de course bas low @22  de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x22, val1); // écriture de la valeur du reglage de la fin de course bas low @22  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-        i2c_eeprom_write_byte(0x57, 0x23, val2); // écriture de la valeur du reglage de la fin de course bas  high @23 de l'eeprom de la carte rtc (i2c @ 0x57)
+        rtc.i2c_eeprom_write_byte(0x57, 0x23, val2); // écriture de la valeur du reglage de la fin de course bas  high @23 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
 
         // mydisp.drawStr(0, 1, "");
@@ -1325,32 +1329,32 @@ void setup() {
   incrementation = menuManuel; // pour affichage menu
   deroulementMenu (incrementation); // affichage du menu
 
-  lum.set_m_ouverture( i2c_eeprom_read_byte(0x57, 0x14));// lecture du type d'ouverture @14  de l'eeprom de la carte rtc (i2c @ 0x57)
+  lum.set_m_ouverture( rtc.i2c_eeprom_read_byte(0x57, 0x14));// lecture du type d'ouverture @14  de l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
-  lum.set_m_fermeture( i2c_eeprom_read_byte(0x57, 0x15)); // lecture du type de fermeture @15   de l'eeprom de la carte rtc (i2c @ 0x57)
+  lum.set_m_fermeture( rtc.i2c_eeprom_read_byte(0x57, 0x15)); // lecture du type de fermeture @15   de l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
 
-  byte val1 = i2c_eeprom_read_byte(0x57, 0x16); // lecture pf lumière du matin (byte)
+  byte val1 = rtc.i2c_eeprom_read_byte(0x57, 0x16); // lecture pf lumière du matin (byte)
   delay(10);
-  byte val2 = i2c_eeprom_read_byte(0x57, 0x17); // lecture Pf lumiere du matin (byte)
+  byte val2 = rtc.i2c_eeprom_read_byte(0x57, 0x17); // lecture Pf lumiere du matin (byte)
   delay(10);
   lum.set_m_lumMatin((val2 << 8) + val1);// mots 2 byte vers mot int lumMatin
 
-  val1 = i2c_eeprom_read_byte(0x57, 0x18); // lecture pf lumière du soir (byte)
+  val1 = rtc.i2c_eeprom_read_byte(0x57, 0x18); // lecture pf lumière du soir (byte)
   delay(10);
-  val2 = i2c_eeprom_read_byte(0x57, 0x19); // lecture Pf lumiere du soir (byte)
+  val2 = rtc.i2c_eeprom_read_byte(0x57, 0x19); // lecture Pf lumiere du soir (byte)
   delay(10);
   lum.set_m_lumSoir((val2 << 8) + val1);// mots 2 byte vers mot int lumSoir
 
-  val1 = i2c_eeprom_read_byte(0x57, 0x20); // lecture pf fin de course haut (byte)
+  val1 = rtc.i2c_eeprom_read_byte(0x57, 0x20); // lecture pf fin de course haut (byte)
   delay(10);
-  val2 = i2c_eeprom_read_byte(0x57, 0x21); // lecture Pf fin de course haut (byte)
+  val2 = rtc.i2c_eeprom_read_byte(0x57, 0x21); // lecture Pf fin de course haut (byte)
   delay(10);
   codOpt.set_m_finDeCourseFermeture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseFermeture
 
-  val1 = i2c_eeprom_read_byte(0x57, 0x22); // lecture pf fin de course bas (byte)
+  val1 = rtc.i2c_eeprom_read_byte(0x57, 0x22); // lecture pf fin de course bas (byte)
   delay(10);
-  val2 = i2c_eeprom_read_byte(0x57, 0x23); // lecture Pf fin de course bas (byte)
+  val2 = rtc.i2c_eeprom_read_byte(0x57, 0x23); // lecture Pf fin de course bas (byte)
   delay(10);
   codOpt.set_m_finDeCourseOuverture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseOuverture
 
