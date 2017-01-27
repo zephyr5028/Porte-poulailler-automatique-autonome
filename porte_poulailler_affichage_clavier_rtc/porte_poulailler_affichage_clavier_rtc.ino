@@ -97,7 +97,7 @@ volatile int f_wdt = 1; // flag watchdog
 /************************************************************/
 // nombre de boucles du watchdog : environ 64s pour 8 boucles
 
-const byte bouclesWatchdog(2);
+const byte bouclesWatchdog(16);
 
 /************************************************************/
 
@@ -173,10 +173,6 @@ const byte adresseBoitier24C32(0x57);
 const byte jourSemaine(1), jour(2), mois(3), annee(4), heure(5), minutesSecondes(6);
 byte alarm_1 = 1; // alarme 1
 byte alarm_2 = 2; //alarme 2
-/* RTC_DS3231 */
-//#include <DS3232RTC.h>    //http://github.com/JChristensen/DS3232RTC
-//#include <Time.h>         //http://www.arduino.cc/playground/Code/Time
-//#define DS3231_I2C_ADDRESS 0x68
 tmElements_t tm; // declaration de tm pour la lecture des informations date et heure
 HorlogeDS3232 rtc(adresseBoitier24C32, DEBUG);
 
@@ -186,43 +182,6 @@ const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure O
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 const char ouvertureDuBoitier[] PROGMEM = "Ouverture du boitier.";
 const char fermetureDuBoitier[] PROGMEM = "Fermeture du boitier.";
-
-/*
-  //-----routine decToBcd : Convert normal decimal numbers to binary coded decimal-----
-  byte decToBcd(byte val) {
-  return ( (val / 10 * 16) + (val % 10) );
-  }
-
-  //-----routine bcdToDec : Convert binary coded decimal to normal decimal numbers-----
-  byte bcdToDec(byte val) {
-  return ( (val / 16 * 10) + (val % 16) );
-  }
-*/
-
-/* eeprom at24c32 */
-/*
-  //-----ecriture dans l'eeprom at24c32 de la carte rtc------
-  void i2c_eeprom_write_byte( int deviceaddress, unsigned int eeaddress, byte data ) {
-  int rdata = data;
-  Wire.beginTransmission(deviceaddress);   // adresse 0x57 pour l'i2c de l'eeprom de la carte rtc
-  Wire.write((int)(eeaddress >> 8)); // MSB
-  Wire.write((int)(eeaddress & 0xFF)); // LSB
-  Wire.write(rdata);
-  Wire.endTransmission();
-  }
-
-  //-----lecture de l'eeprom at24c32 de la carte rtc------
-  byte i2c_eeprom_read_byte( int deviceaddress, unsigned int eeaddress ) {
-  byte rdata = 0xFF;
-  Wire.beginTransmission(deviceaddress); // adresse 0x57 pour l'i2c de l'eeprom de la carte rtc
-  Wire.write((int)(eeaddress >> 8)); // MSB
-  Wire.write((int)(eeaddress & 0xFF)); // LSB
-  Wire.endTransmission();
-  Wire.requestFrom(deviceaddress, 1);
-  if (Wire.available()) rdata = Wire.read();
-  return rdata;
-  }
-*/
 
 /* clavier */
 //-----lecture clavier------
@@ -279,8 +238,6 @@ void displayTime () {
     RTC.read(tm); // lecture date et heure
     mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second, decalage);
   } else   if (RADIO) {
-    //  int timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure
-    // int timeMinute = bcdToDec(RTC.readRTC(0x01)); // minutes
     int timeHour = rtc.lectureRegistreEtConversion (RTC_HOURS, 0x3f); // heure
     int timeMinute = rtc.lectureRegistreEtConversion( RTC_MINUTES ) ; // minutes
     radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure + etat  boitier
@@ -292,9 +249,6 @@ void displayTime () {
 void openTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte val, val1, val2;
-    // val = bcdToDec(RTC.readRTC(0x09) & 0x3f); // alarme 1 hours
-    //  val1 = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
-    //  val2 = bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
     val = rtc.lectureRegistreEtConversion (ALM1_HOURS & 0x3f); // alarme 1 hours
     val1 = rtc.lectureRegistreEtConversion (ALM1_MINUTES); // alarme 1 minutes
     val2 = rtc.lectureRegistreEtConversion (ALM1_SECONDS & 0x7f); // alarme 1 seconds
@@ -307,8 +261,6 @@ void closeTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
     //Set Alarm2
     byte val, val1, val2(61);
-    //  val = bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
-    //   val1 = bcdToDec(RTC.readRTC(0x0B)); //alarme 2 minutes
     val = rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
     val1 = rtc.lectureRegistreEtConversion(ALM2_MINUTES); //alarme 2 minutes
     mydisp.affichageDateHeure("H", val, val1, val2, decalage);
@@ -398,19 +350,6 @@ void choixOuvFerm () {
     if (incrementation == menuChoix) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 14);// position du cuseur pendant les reglages
     }
-    /*
-      if (touche == 4 and relache == true and incrementation == menuChoix) {
-      relache = false;
-      if (decalage < 15 ) { // boucle de reglage
-        decalage = decalage + 7;   // incrementation decalage
-        reglage = true; // reglages
-      }
-      if (decalage > 14 ) { // fin de la ligne d'affichage si >14
-        decalage = 0;
-        reglage = false;
-      }
-      }
-    */
     if ((touche == 2 or touche == 3) and incrementation == menuChoix and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == deplacement) {
@@ -447,19 +386,6 @@ void reglageHeureFermeture() {
     if (incrementation == menuFermeture) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 10, deplacement, 10);// position du cuseur pendant les reglages
     }
-    /*
-      if (touche == 4 and relache == true and incrementation == menuFermeture) {
-      relache = false;
-      if (decalage < 10 ) { // boucle de reglage
-        decalage = decalage + 4;   // incrementation decalage
-        reglage = true; // reglages
-      }
-      if (decalage > 10 ) { // fin de la ligne d'affichage si >10
-        decalage = 0;
-        reglage = false;
-      }
-      }
-    */
     if ((touche == 2 or touche == 3) and incrementation == menuFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       //byte alarm2Hour =  bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
@@ -488,19 +414,6 @@ void reglageHeureOuverture() {
     if (incrementation == menuOuverture) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
     }
-    /*
-      if (touche == 4 and relache == true and incrementation == menuOuverture) {
-      relache = false;
-      if (decalage < 14 ) { // boucle de reglage
-        decalage = decalage + 4;   // incrementation decalage
-        reglage = true; // reglages
-      }
-      if (decalage > 14 ) { // fin de la ligne d'affichage si >14
-        decalage = 0;
-        reglage = false;
-      }
-      }
-    */
     // Set Alarm1
     if ((touche == 2 or touche == 3) and incrementation == menuOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
@@ -537,19 +450,6 @@ void reglageDate () {
     if (incrementation == menuDate) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
     }
-    /*
-      if (touche == 4 and relache == true and incrementation == menuDate) {
-      relache = false;
-      if (decalage < 14 ) { // boucle de reglage
-        decalage = decalage + 3;   // incrementation decalage
-        reglage = true; // reglages
-      }
-      if (decalage > 14 ) { // fin de la ligne d'affichage si >14
-        decalage = 0;
-        reglage = false;
-      }
-      }
-    */
     if ((touche == 2 or touche == 3) and incrementation == menuDate and relache == true and reglage == true) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == deplacement) {
@@ -589,19 +489,6 @@ void choixLumMatin() {
     if (incrementation == menuLumiereMatin) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 14);// position du cuseur pendant les reglages
     }
-    /*
-      if (touche == 4 and relache == true and incrementation == menuLumiereMatin) {
-      relache = false;
-      if (decalage < 15 ) { // boucle de reglage
-        decalage = decalage + 8;   // incrementation decalage
-        reglage = true; // reglages
-      }
-      if (decalage > 14 ) { // fin de la ligne d'affichage si >14
-        decalage = 0;
-        reglage = false;
-      }
-      }
-    */
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereMatin and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == deplacement) {
@@ -636,19 +523,6 @@ void choixLumSoir() {
     if (incrementation == menuLumiereSoir) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 14);// position du cuseur pendant les reglages
     }
-    /*
-      if (touche == 4 and relache == true and incrementation == menuLumiereSoir) {
-      relache = false;
-      if (decalage < 15 ) { // boucle de reglage
-        decalage = decalage + 8;   // incrementation decalage
-        reglage = true; // reglages
-      }
-      if (decalage > 14 ) { // fin de la ligne d'affichage si >14
-        decalage = 0;
-        reglage = false;
-      }
-      }
-    */
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereSoir and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == deplacement) {
@@ -674,19 +548,6 @@ void reglageTime () {
     if (incrementation == menuHeure) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
     }
-    /*
-      if (touche == 4 and relache == true and incrementation == menuHeure) {
-      relache = false;
-      if (decalage < 14 ) { // boucle de reglage
-        decalage = decalage + 4;   // incrementation decalage
-        reglage = true; // reglages
-      }
-      if (decalage > 14 ) { // fin de la ligne d'affichage si >14
-        decalage = 0;
-        reglage = false;
-      }
-      }
-    */
     if ((touche == 2 or touche == 3) and incrementation == menuHeure and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == deplacement) {
@@ -735,19 +596,6 @@ void regFinDeCourseFermeture() {
     if (incrementation == menuFinDeCourseFermeture) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 12);// position du cuseur pendant les reglages
     }
-    /*
-      if (touche == 4 and relache == true and incrementation == menuFinDeCourseFermeture) {
-      relache = false;
-      if (decalage < 15 ) { // boucle de reglage
-        decalage += 9;   // incrementation decalage
-        reglage = true; // reglages
-      }
-      if (decalage > 12 ) { // fin de la ligne d'affichage si >12
-        decalage = 0;
-        reglage = false;
-      }
-      }
-    */
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == deplacement) {
@@ -772,19 +620,6 @@ void regFinDeCourseOuverture() {
     if (incrementation == menuFinDeCourseOuverture) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 12);// position du cuseur pendant les reglages
     }
-    /*
-      if (touche == 4 and relache == true and incrementation == menuFinDeCourseOuverture) {
-      relache = false;
-      if (decalage < 15 ) { // boucle de reglage
-        decalage +=  9;   // incrementation decalage
-        reglage = true; // reglages
-      }
-      if (decalage > 12 ) { // fin de la ligne d'affichage si >12
-        decalage = 0;
-        reglage = false;
-      }
-      }
-    */
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == deplacement) {
