@@ -19,20 +19,21 @@ class HorlogeDS3232 : public DS3232RTC
 
     // constructeur
     HorlogeDS3232();
-    HorlogeDS3232( boolean debug = false ); // constructeur avec debug
+    HorlogeDS3232(const int adresseMemoireI2C = 0x57, const boolean debug = false ); // constructeur avec debug
     ~HorlogeDS3232(); // destructeur
 
     void init();// initialisation
     byte decToBcd(byte val); //routine decToBcd : Convert normal decimal numbers to binary coded decimal
     byte bcdToDec(byte val);//routine bcdToDec : Convert binary coded decimal to normal decimal numbers
-    void i2c_eeprom_write_byte( int deviceaddress, unsigned int eeaddress, byte data );//ecriture dans l'eeprom at24c32 de la carte rtc
-    byte i2c_eeprom_read_byte( int deviceaddress, unsigned int eeaddress );//lecture de l'eeprom at24c32 de la carte rtc
+    void i2c_eeprom_write_byte(  unsigned int eeaddress, byte data );//ecriture dans l'eeprom at24c32 de la carte rtc
+    byte i2c_eeprom_read_byte(  unsigned int eeaddress );//lecture de l'eeprom at24c32 de la carte rtc
     byte lectureRegistreEtConversion (byte adresse, byte operationAND = 0xFF);//lecture registre et conversion
 
 
   protected:
 
     const boolean m_debug ; // pour affichage console si nécessaire
+    const int m_deviceAddress ; // adresse du boitier mémoire 24C32 I2C = 0x57
 
 
 };
