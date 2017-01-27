@@ -97,7 +97,7 @@ volatile int f_wdt = 1; // flag watchdog
 /************************************************************/
 // nombre de boucles du watchdog : environ 64s pour 8 boucles
 
-const byte bouclesWatchdog(16);
+const byte bouclesWatchdog(2);
 
 /************************************************************/
 
@@ -169,7 +169,8 @@ LcdPCF8574  mydisp(0x27, 16, 2);
 /* RTC_DS3231 */
 #include "HorlogeDS3232.h"
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
-const uint8_t adresseBoitier24C32(0x57);
+const byte adresseBoitier24C32(0x57);
+const byte jourSemaine(1), jour(2), mois(3), annee(4), heure(5), minutesSecondes(6);
 byte alarm_1 = 1; // alarme 1
 byte alarm_2 = 2; //alarme 2
 /* RTC_DS3231 */
@@ -454,38 +455,12 @@ void reglageHeureFermeture() {
       byte alarm2Hour =  rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
       byte alarm2Minute = rtc.lectureRegistreEtConversion(ALM2_MINUTES); // alarme 2 minutes
       if (decalage == 4) {
-        if (touche == 2 ) {
-          if (alarm2Hour < 24) {
-            alarm2Hour++; // incrementation de l heure
-          } else {
-            alarm2Hour = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (alarm2Hour > 0) {
-            alarm2Hour--; // decrementation de l heure
-          } else {
-            alarm2Hour = 24;
-          }
-        }
+         alarm2Hour = rtc.reglageHeure(touche, alarm2Hour, heure);
         RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0); // écriture de l'heure alarme 2
         closeTime(); // affichage de l'heure d'ouverture
       }
       if (decalage == 8) {
-        if (touche == 2) {
-          if (alarm2Minute < 59) {
-            alarm2Minute++; // incrementation des minutes
-          } else {
-            alarm2Minute = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (alarm2Minute > 0) {
-            alarm2Minute--; // decrementation de l'heure
-          } else {
-            alarm2Minute = 59;
-          }
-        }
+        alarm2Minute = rtc.reglageHeure(touche, alarm2Minute, minutesSecondes);
         RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0);  // écriture de l'heure alarme 2
         closeTime(); // affichage de l'heure d'ouverture
       }
@@ -518,56 +493,17 @@ void reglageHeureOuverture() {
       byte alarm1Minute = rtc.lectureRegistreEtConversion(ALM1_MINUTES); // alarme 1 minutes
       byte alarm1Second =  rtc.lectureRegistreEtConversion(ALM1_SECONDS & 0x7f); // alarme 1 seconds
       if (decalage == 4) {
-        if (touche == 2 ) {
-          if (alarm1Hour < 24) {
-            alarm1Hour++; // incrementation de l heure
-          } else {
-            alarm1Hour = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (alarm1Hour > 0) {
-            alarm1Hour--; // decrementation de l heure
-          } else {
-            alarm1Hour = 24;
-          }
-        }
+        alarm1Hour = rtc.reglageHeure(touche, alarm1Hour, heure);
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
       if (decalage == 8) {
-        if (touche == 2) {
-          if (alarm1Minute < 59) {
-            alarm1Minute++; // incrementation des minutes
-          } else {
-            alarm1Minute = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (alarm1Minute > 0) {
-            alarm1Minute--; // decrementation de l heure
-          } else {
-            alarm1Minute = 59;
-          }
-        }
+         alarm1Minute = rtc.reglageHeure(touche, alarm1Minute, minutesSecondes);
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
       if (decalage == 12) {
-        if (touche == 2 ) {
-          if (alarm1Second < 59) {
-            alarm1Second++; // incrementation des secondes
-          } else {
-            alarm1Second = 0;
-          }
-        }
-        if (touche == 3) {
-          if ( alarm1Second > 0) {
-            alarm1Second--; // decrementation des secondes
-          } else {
-            alarm1Second = 59;
-          }
-        }
+         alarm1Second = rtc.reglageHeure(touche, alarm1Second, minutesSecondes);
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
@@ -593,65 +529,19 @@ void reglageDate () {
     if ((touche == 2 or touche == 3) and incrementation == menuDate and relache == true and reglage == true) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 3) {
-        if (touche == 2) {
-          if (tm.Wday < 7) {
-            tm.Wday++; // incrementation du jour de la semaine
-          } else {
-            tm.Wday = 1; // dimanche
-          }
-        }
-        if (touche == 3) {
-          if (tm.Wday > 1) {
-            tm.Wday--; // decrementation du jour de la semaine
-          } else {
-            tm.Wday = 7;
-          }
-        }
+        tm.Wday = rtc.reglageHeure(touche, tm.Wday, jourSemaine);
         ecritureDateTime();
       }
       if (decalage == 6) {
-        if (touche == 2) {
-          if (tm.Day < 31) {
-            tm.Day++; // incrementation des jours
-          } else {
-            tm.Day = 1;
-          }
-        }
-        if (touche == 3 ) {
-          if (tm.Day > 1) {
-            tm.Day--; // decrementation du jour
-          } else {
-            tm.Day = 31;
-          }
-        }
+        tm.Day = rtc.reglageHeure(touche, tm.Day, jour);
         ecritureDateTime();
       }
       if (decalage == 9) {
-        if (touche == 2) {
-          if (tm.Month < 12) {
-            tm.Month++; // incrementation des mois
-          } else {
-            tm.Month = 1;
-          }
-        }
-        if (touche == 3) {
-          if (tm.Month > 1) {
-            tm.Month--; // decrementation des mois
-          } else {
-            tm.Month = 12;
-          }
-        }
+        tm.Month = rtc.reglageHeure(touche, tm.Month, mois);
         ecritureDateTime();
       }
       if (decalage == 12 ) {
-        if (touche == 2 ) {
-          tm.Year++; // incrementation de l'année
-        }
-        if (touche == 3 ) {
-          if (tm.Year > 30) {
-            tm.Year--; // decrementation de l'année si > 2000
-          }
-        }
+        tm.Year = rtc.reglageHeure(touche, tm.Year, annee);
         ecritureDateTime();
       }
     }
@@ -758,54 +648,15 @@ void reglageTime () {
     if ((touche == 2 or touche == 3) and incrementation == menuHeure and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == 4) {
-        if (touche == 2 ) {
-          if (tm.Hour < 24) {
-            tm.Hour++; // incrementation de l heure
-          } else {
-            tm.Hour = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (tm.Hour > 0) {
-            tm.Hour--; // decrementation de l heure
-          } else {
-            tm.Hour = 24;
-          }
-        }
+        tm.Hour = rtc.reglageHeure(touche, tm.Hour, heure);
         ecritureDateTime(); // routine écriture date and time
       }
       if (decalage == 8) {
-        if (touche == 2) {
-          if (tm.Minute < 59) {
-            tm.Minute++; // incrementation des minutes
-          } else {
-            tm.Minute = 0;
-          }
-        }
-        if (touche == 3 ) {
-          if (tm.Minute > 0) {
-            tm.Minute--; // decrementation de l heure
-          } else {
-            tm.Minute = 59;
-          }
-        }
+        tm.Minute = rtc.reglageHeure(touche, tm.Minute, minutesSecondes);
         ecritureDateTime();
       }
       if (decalage == 12) {
-        if (touche == 2 ) {
-          if (tm.Second < 59) {
-            tm.Second++; // incrementation des secondes
-          } else {
-            tm.Second = 0;
-          }
-        }
-        if (touche == 3) {
-          if (tm.Second > 0) {
-            tm.Second--; // decrementation des secondes
-          } else {
-            tm.Second = 59;
-          }
-        }
+        tm.Second = rtc.reglageHeure(touche, tm.Second, minutesSecondes);
         ecritureDateTime();
       }
     }
