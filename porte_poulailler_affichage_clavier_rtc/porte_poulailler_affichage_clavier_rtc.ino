@@ -149,7 +149,7 @@ bool relacheBp(true); // relache du Bp
 Clavier clav(menuManuel, pinBp, pinBoitier, debounce, DEBUG); // class Clavier avec le nombre de lignes du menu
 
 /*** LCD DigoleSerialI2C ***/
-const int boucleTemps(200); // temps entre deux affichages
+const int boucleTemps(100); // temps entre deux affichages
 byte decalage(0); // position du curseur
 bool LcdCursor(true) ; //curseur du lcd if treu = enable
 int temps(0);
@@ -394,7 +394,12 @@ void affiChoixOuvFerm() {
 //-----routine choix ouverture fermeture-----
 void choixOuvFerm () {
   if (boitierOuvert) {
-    if (touche == 4 and relache == true and incrementation == menuChoix) {
+    byte deplacement(7);
+    if (incrementation == menuChoix) {
+      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 14);// position du cuseur pendant les reglages
+    }
+    /*
+      if (touche == 4 and relache == true and incrementation == menuChoix) {
       relache = false;
       if (decalage < 15 ) { // boucle de reglage
         decalage = decalage + 7;   // incrementation decalage
@@ -404,10 +409,11 @@ void choixOuvFerm () {
         decalage = 0;
         reglage = false;
       }
-    }
+      }
+    */
     if ((touche == 2 or touche == 3) and incrementation == menuChoix and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == 7) {
+      if (decalage == deplacement) {
         if (lum.get_m_ouverture()) {
           lum.set_m_ouverture(0); // ouverture 0 donc lumière
           RTC.alarmInterrupt(alarm_1, false);     //disable Alarm1
@@ -418,7 +424,7 @@ void choixOuvFerm () {
         rtc.i2c_eeprom_write_byte( 0x14, lum.get_m_ouverture()); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
         affiChoixOuvFerm();
       }
-      if (decalage == 14) {
+      if (decalage == 2*deplacement) {
         if (!lum.get_m_fermeture()) {
           lum.set_m_fermeture(1); // fermeture 1 donc heure
           RTC.alarmInterrupt(alarm_2, true);// activation alarme 2 fermeture
@@ -437,7 +443,12 @@ void choixOuvFerm () {
 //-----reglage de l'heure de fermeture------
 void reglageHeureFermeture() {
   if (boitierOuvert) {
-    if (touche == 4 and relache == true and incrementation == menuFermeture) {
+    byte deplacement(4);
+    if (incrementation == menuFermeture) {
+      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 10, deplacement, 10);// position du cuseur pendant les reglages
+    }
+    /*
+      if (touche == 4 and relache == true and incrementation == menuFermeture) {
       relache = false;
       if (decalage < 10 ) { // boucle de reglage
         decalage = decalage + 4;   // incrementation decalage
@@ -447,19 +458,20 @@ void reglageHeureFermeture() {
         decalage = 0;
         reglage = false;
       }
-    }
+      }
+    */
     if ((touche == 2 or touche == 3) and incrementation == menuFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       //byte alarm2Hour =  bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
       // byte alarm2Minute = bcdToDec(RTC.readRTC(0x0B)); // alarme 2 minutes
       byte alarm2Hour =  rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
       byte alarm2Minute = rtc.lectureRegistreEtConversion(ALM2_MINUTES); // alarme 2 minutes
-      if (decalage == 4) {
-         alarm2Hour = rtc.reglageHeure(touche, alarm2Hour, heure);
+      if (decalage == deplacement) {
+        alarm2Hour = rtc.reglageHeure(touche, alarm2Hour, heure);
         RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0); // écriture de l'heure alarme 2
         closeTime(); // affichage de l'heure d'ouverture
       }
-      if (decalage == 8) {
+      if (decalage == 2*deplacement) {
         alarm2Minute = rtc.reglageHeure(touche, alarm2Minute, minutesSecondes);
         RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0);  // écriture de l'heure alarme 2
         closeTime(); // affichage de l'heure d'ouverture
@@ -472,7 +484,12 @@ void reglageHeureFermeture() {
 //-----routine de reglage de l'heure d'ouverture-----
 void reglageHeureOuverture() {
   if (boitierOuvert) {
-    if (touche == 4 and relache == true and incrementation == menuOuverture) {
+     byte deplacement(4);
+    if (incrementation == menuOuverture) {
+      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
+    }
+    /*
+      if (touche == 4 and relache == true and incrementation == menuOuverture) {
       relache = false;
       if (decalage < 14 ) { // boucle de reglage
         decalage = decalage + 4;   // incrementation decalage
@@ -482,7 +499,8 @@ void reglageHeureOuverture() {
         decalage = 0;
         reglage = false;
       }
-    }
+      }
+    */
     // Set Alarm1
     if ((touche == 2 or touche == 3) and incrementation == menuOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
@@ -492,18 +510,18 @@ void reglageHeureOuverture() {
       byte alarm1Hour =  rtc.lectureRegistreEtConversion(ALM1_HOURS & 0x3f); // alarme 1 hours
       byte alarm1Minute = rtc.lectureRegistreEtConversion(ALM1_MINUTES); // alarme 1 minutes
       byte alarm1Second =  rtc.lectureRegistreEtConversion(ALM1_SECONDS & 0x7f); // alarme 1 seconds
-      if (decalage == 4) {
+      if (decalage == deplacement) {
         alarm1Hour = rtc.reglageHeure(touche, alarm1Hour, heure);
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
-      if (decalage == 8) {
-         alarm1Minute = rtc.reglageHeure(touche, alarm1Minute, minutesSecondes);
+      if (decalage == 2*deplacement) {
+        alarm1Minute = rtc.reglageHeure(touche, alarm1Minute, minutesSecondes);
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
-      if (decalage == 12) {
-         alarm1Second = rtc.reglageHeure(touche, alarm1Second, minutesSecondes);
+      if (decalage == 3*deplacement) {
+        alarm1Second = rtc.reglageHeure(touche, alarm1Second, minutesSecondes);
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
@@ -515,7 +533,12 @@ void reglageHeureOuverture() {
 //----routine reglage jour semaine, jour, mois, annee-----
 void reglageDate () {
   if (boitierOuvert) {
-    if (touche == 4 and relache == true and incrementation == menuDate) {
+      byte deplacement(3);
+    if (incrementation == menuDate) {
+      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
+    }
+    /*
+      if (touche == 4 and relache == true and incrementation == menuDate) {
       relache = false;
       if (decalage < 14 ) { // boucle de reglage
         decalage = decalage + 3;   // incrementation decalage
@@ -525,22 +548,23 @@ void reglageDate () {
         decalage = 0;
         reglage = false;
       }
-    }
+      }
+    */
     if ((touche == 2 or touche == 3) and incrementation == menuDate and relache == true and reglage == true) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == 3) {
+      if (decalage == deplacement) {
         tm.Wday = rtc.reglageHeure(touche, tm.Wday, jourSemaine);
         ecritureDateTime();
       }
-      if (decalage == 6) {
+      if (decalage == 2*deplacement) {
         tm.Day = rtc.reglageHeure(touche, tm.Day, jour);
         ecritureDateTime();
       }
-      if (decalage == 9) {
+      if (decalage == 3*deplacement) {
         tm.Month = rtc.reglageHeure(touche, tm.Month, mois);
         ecritureDateTime();
       }
-      if (decalage == 12 ) {
+      if (decalage == 4*deplacement ) {
         tm.Year = rtc.reglageHeure(touche, tm.Year, annee);
         ecritureDateTime();
       }
@@ -561,7 +585,12 @@ void affiLumMatin() {
 //-----reglage du choix de la lumiere du matin-------
 void choixLumMatin() {
   if (boitierOuvert) {
-    if (touche == 4 and relache == true and incrementation == menuLumiereMatin) {
+    byte deplacement(8);
+    if (incrementation == menuLumiereMatin) {
+      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 14);// position du cuseur pendant les reglages
+    }
+    /*
+      if (touche == 4 and relache == true and incrementation == menuLumiereMatin) {
       relache = false;
       if (decalage < 15 ) { // boucle de reglage
         decalage = decalage + 8;   // incrementation decalage
@@ -571,10 +600,11 @@ void choixLumMatin() {
         decalage = 0;
         reglage = false;
       }
-    }
+      }
+    */
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereMatin and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == 8) {
+      if (decalage == deplacement) {
         bool matin(1);
         unsigned int lumMatin = lum.reglageLumiere(matin, touche);// reglage de la lumiere du matin
         byte val1 = lumMatin & 0xFF; // ou    byte val1= lowByte(sensorValue);// pf
@@ -602,7 +632,12 @@ void affiLumSoir() {
 //------reglage du choix de la lumiere du soir--------
 void choixLumSoir() {
   if (boitierOuvert) {
-    if (touche == 4 and relache == true and incrementation == menuLumiereSoir) {
+    byte deplacement(8);
+    if (incrementation == menuLumiereSoir) {
+      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 14);// position du cuseur pendant les reglages
+    }
+    /*
+      if (touche == 4 and relache == true and incrementation == menuLumiereSoir) {
       relache = false;
       if (decalage < 15 ) { // boucle de reglage
         decalage = decalage + 8;   // incrementation decalage
@@ -612,10 +647,11 @@ void choixLumSoir() {
         decalage = 0;
         reglage = false;
       }
-    }
+      }
+    */
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereSoir and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == 8) {
+      if (decalage == deplacement) {
         bool soir(0);
         unsigned int lumSoir = lum.reglageLumiere(soir, touche); // reglage de la lumiere du soir
         byte val1 = lumSoir & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
@@ -634,7 +670,12 @@ void choixLumSoir() {
 //-----routine reglage heure , minute , seconde-----
 void reglageTime () {
   if (boitierOuvert) {
-    if (touche == 4 and relache == true and incrementation == menuHeure) {
+      byte deplacement(4);
+    if (incrementation == menuHeure) {
+      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
+    }
+    /*
+      if (touche == 4 and relache == true and incrementation == menuHeure) {
       relache = false;
       if (decalage < 14 ) { // boucle de reglage
         decalage = decalage + 4;   // incrementation decalage
@@ -644,18 +685,19 @@ void reglageTime () {
         decalage = 0;
         reglage = false;
       }
-    }
+      }
+    */
     if ((touche == 2 or touche == 3) and incrementation == menuHeure and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == 4) {
+      if (decalage == deplacement) {
         tm.Hour = rtc.reglageHeure(touche, tm.Hour, heure);
         ecritureDateTime(); // routine écriture date and time
       }
-      if (decalage == 8) {
+      if (decalage == 2*deplacement) {
         tm.Minute = rtc.reglageHeure(touche, tm.Minute, minutesSecondes);
         ecritureDateTime();
       }
-      if (decalage == 12) {
+      if (decalage == 3*deplacement) {
         tm.Second = rtc.reglageHeure(touche, tm.Second, minutesSecondes);
         ecritureDateTime();
       }
@@ -689,7 +731,12 @@ void affiFinDeCourseOuverture() {
 //------reglage fin de course Fermeture------
 void regFinDeCourseFermeture() {
   if (boitierOuvert) {
-    if (touche == 4 and relache == true and incrementation == menuFinDeCourseFermeture) {
+     byte deplacement(8);
+    if (incrementation == menuFinDeCourseFermeture) {
+      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 12);// position du cuseur pendant les reglages
+    }
+    /*
+      if (touche == 4 and relache == true and incrementation == menuFinDeCourseFermeture) {
       relache = false;
       if (decalage < 15 ) { // boucle de reglage
         decalage += 9;   // incrementation decalage
@@ -699,10 +746,11 @@ void regFinDeCourseFermeture() {
         decalage = 0;
         reglage = false;
       }
-    }
+      }
+    */
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == 9) {
+      if (decalage == deplacement) {
         bool fermeture(0);
         unsigned int finDeCourse = codOpt.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
         byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
@@ -720,7 +768,12 @@ void regFinDeCourseFermeture() {
 //-----regalge fin de course ouverture------
 void regFinDeCourseOuverture() {
   if (boitierOuvert) {
-    if (touche == 4 and relache == true and incrementation == menuFinDeCourseOuverture) {
+    byte deplacement(8);
+    if (incrementation == menuFinDeCourseOuverture) {
+      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 12);// position du cuseur pendant les reglages
+    }
+    /*
+      if (touche == 4 and relache == true and incrementation == menuFinDeCourseOuverture) {
       relache = false;
       if (decalage < 15 ) { // boucle de reglage
         decalage +=  9;   // incrementation decalage
@@ -730,10 +783,11 @@ void regFinDeCourseOuverture() {
         decalage = 0;
         reglage = false;
       }
-    }
+      }
+    */
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == 9) {
+      if (decalage == deplacement) {
         bool ouverture(1);
         unsigned int finDeCourse = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
         byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf

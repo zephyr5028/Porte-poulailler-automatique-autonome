@@ -45,7 +45,8 @@ class LcdDigoleI2C  : public DigoleSerialDisp  {
     void gestionCurseur (bool curseur);//activation / desactivation du curseur
     void retroEclairage ();//activation / desactivation du retro eclairage (bascule)
     void choixRetroEclairage (bool choix);//choix activation / desactivation du retro eclairage
-
+    //position du cuseur pendant les reglages
+    void cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, byte &decalage, const byte decalageSup, const byte deplacement, const byte decalageInf);
 
   protected:
 

@@ -203,3 +203,19 @@ void LcdPCF8574::cursorPosition(byte decalage, byte ligne, char *texte) {
   setCursor(m_decalage, m_ligne);
 }
 
+//-----position du cuseur pendant les reglages-----
+void LcdPCF8574::cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, byte &decalage, const byte decalageSup, const byte deplacement, const byte decalageInf) {
+  if (touche == 4 and relache == true ) {
+    relache = false;
+    if (decalage < decalageSup ) { // boucle de reglage
+      decalage = decalage + deplacement;   // incrementation decalage
+      reglage = true; // reglages
+    }
+    if (decalage > decalageInf ) { // fin de la ligne d'affichage si > decalageInf
+      decalage = 0;
+      reglage = false;
+    }
+    m_decalage = decalage;
+  }
+}
+

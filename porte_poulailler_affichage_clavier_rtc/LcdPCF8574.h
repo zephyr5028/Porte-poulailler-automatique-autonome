@@ -36,9 +36,12 @@ class LcdPCF8574  : public LiquidCrystal_I2C
     void gestionCurseur (bool curseur);//activation / desactivation du curseur
     void retroEclairage ();//activation / desactivation du retro eclairage (bascule)
     void choixRetroEclairage (bool choix);//choix activation / desactivation du retro eclairage
+    //position du cuseur pendant les reglages
+    void cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, byte &decalage, const byte decalageSup, const byte deplacement, const byte decalageInf);
+
 
   protected:
-    
+
     const boolean m_debug ; // pour affichage console si nécessaire
     int const m_taille; // taille du tableau - 16 caractères
     byte m_decalage; // position du curseur

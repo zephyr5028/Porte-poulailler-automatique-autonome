@@ -204,3 +204,19 @@ void LcdDigoleI2C::cursorPosition(byte decalage, byte ligne, char *texte) {
   drawStr(m_decalage, m_ligne, texte);
 }
 
+//-----position du cuseur pendant les reglages-----
+void LcdDigoleI2C::cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, byte &decalage, const byte decalageSup, const byte deplacement, const byte decalageInf) {
+  if (touche == 4 and relache == true ) {
+    relache = false;
+    if (decalage < decalageSup ) { // boucle de reglage
+      decalage = decalage + deplacement;   // incrementation decalage
+      reglage = true; // reglages
+    }
+    if (decalage > decalageInf ) { // fin de la ligne d'affichage si > decalageInf
+      decalage = 0;
+      reglage = false;
+    }
+    m_decalage = decalage;
+  }
+}
+
