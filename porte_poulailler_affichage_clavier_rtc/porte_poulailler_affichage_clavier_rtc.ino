@@ -97,7 +97,7 @@ volatile int f_wdt = 1; // flag watchdog
 /************************************************************/
 // nombre de boucles du watchdog : environ 64s pour 8 boucles
 
-const byte bouclesWatchdog(2);
+const byte bouclesWatchdog(16);
 
 /************************************************************/
 
@@ -184,6 +184,7 @@ const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en m
 const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin course fer . Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 const char ouvertureDuBoitier[] PROGMEM = "Ouverture du boitier.";
+const char fermetureDuBoitier[] PROGMEM = "Fermeture du boitier.";
 
 /*
   //-----routine decToBcd : Convert normal decimal numbers to binary coded decimal-----
@@ -276,19 +277,13 @@ void displayTime () {
   if ( boitierOuvert) { // si le boitier est ouvert
     RTC.read(tm); // lecture date et heure
     mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second, decalage);
-  }
-  if (DEBUG or RADIO) {
+  } else   if (RADIO) {
     //  int timeHour =  bcdToDec(RTC.readRTC(0x02) & 0x3f); // heure
     // int timeMinute = bcdToDec(RTC.readRTC(0x01)); // minutes
     int timeHour = rtc.lectureRegistreEtConversion (RTC_HOURS, 0x3f); // heure
     int timeMinute = rtc.lectureRegistreEtConversion( RTC_MINUTES ) ; // minutes
-    if (DEBUG) {
-
-    }
-    if (RADIO) {
-      radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure + etat  boitier
-      radio.envoiUnsignedInt(timeMinute,  boitierOuvert, "m;");// envoi message radio minute  + etat  boitier
-    }
+    radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure + etat  boitier
+    radio.envoiUnsignedInt(timeMinute,  boitierOuvert, "m;");// envoi message radio minute  + etat  boitier
   }
 }
 
@@ -328,11 +323,7 @@ void affiPulsePlusCptRoue() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageServo(pulse, compteRoueCodeuse, decalage, ligne);
-  }
-  if (DEBUG) {
-
-  }
-  if (RADIO and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
+  } else   if (RADIO and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     switch (test) {
       case 1: // mise sous tension du servo pour l'ouverture de la porte
@@ -369,11 +360,7 @@ void affiTensionBatCdes() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
-  }
-  if (DEBUG) {
-
-  }
-  if (RADIO) {
+  } else   if (RADIO) {
     radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
   }
 }
@@ -386,11 +373,7 @@ void affiTensionBatServo() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
-  }
-  if (DEBUG) {
-
-  }
-  if (RADIO) {
+  } else   if (RADIO) {
     radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
   }
 }
@@ -836,11 +819,7 @@ void affiFinDeCourseFermeture() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageLumFinCourse(finDeCourseFermeture, decalage, ligne);
-  }
-  if (DEBUG) {
-
-  }
-  if (RADIO) {
+  } else   if (RADIO) {
     radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
   }
 }
@@ -851,11 +830,7 @@ void affiFinDeCourseOuverture() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
-  }
-  if (DEBUG) {
-
-  }
-  if (RADIO) {
+  } else   if (RADIO) {
     radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
   }
 }
@@ -1017,11 +992,7 @@ void read_temp(boolean typeTemperature) {
     } else {
       mydisp.affichageVoltage(fahrenheit, "F", decalage, ligne);
     }
-  }
-  if (DEBUG) {
-
-  }
-  if (RADIO) {
+  } else   if (RADIO) {
     char temp[3] = "";
     if (typeTemperature)  strcat(temp, "C;"); else strcat(temp, "F;");
     radio.envoiFloat(celsius, boitierOuvert, temp);
@@ -1148,6 +1119,13 @@ void  routineTestFermetureBoitier() {
     boitierOuvert = false; // boitier ferme
     interruptOuvBoi = false; // autorisation de la prise en compte de l'IT
     mydisp.choixRetroEclairage (0);// extinction retro eclairage
+    char chaine[22] = "";
+    for (byte i = 0; i < 22 ; i++) {
+      chaine[i] = pgm_read_byte(fermetureDuBoitier + i);
+    }
+    radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
+    displayTime();// avec affichage de l'heure de fermeture
+    radio.chaineVide();
   }
 }
 
@@ -1160,11 +1138,7 @@ void lumiere() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);// première ligne car non reglable
     mydisp.affichageLumFinCourse(lumValue, decalage, ligne);
-  }
-  if (DEBUG) {
-
-  }
-  if (RADIO) {
+  } else   if (RADIO) {
     radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
     radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
   }
