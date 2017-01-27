@@ -18,6 +18,7 @@ Radio::~Radio()
 
 //initialisation-----
 void Radio::init () {
+  m_chaine[0] = '\0'; // effacement du tableau
   vw_set_tx_pin(m_pinEmRadio); // broche d10 emetteur
   vw_setup(m_vitesseTransmission); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
 }
@@ -56,18 +57,16 @@ void Radio::envoiMessage(char *chaine1) {
 
 //----message Radio sans parametre-----
 void Radio::messageSansParametre() {
-  Serial.println(m_chaine);
   //strcat(m_chaine, "\0");
-  byte leng = strlen(m_chaine);
-  m_chaine[leng + 1] = '\0';
+  byte leng = strlen(m_chaine);// longueur du tableau
+  m_chaine[leng + 1] = '\0';// fin de tableau
+ // for (byte i = 0; i < leng; i++)  Serial.print(m_chaine[i], DEC);
+  Serial.println(" ");
   vw_send((uint8_t *)m_chaine, leng + 1); // On envoie le message
   // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
   vw_wait_tx(); // On attend la fin de l'envoi
   delay(10);
-  for (byte i = 0; i < leng + 1; i++) {
-    m_chaine[i] = {0};
-  }
-  // m_chaine[0] = '\0'; // effacement du tableau
+  for (byte i = 0; i < leng + 1; i++)   m_chaine[i] = {0};
 }
 
 //----chaine radio fin de ligne avant transmission-----

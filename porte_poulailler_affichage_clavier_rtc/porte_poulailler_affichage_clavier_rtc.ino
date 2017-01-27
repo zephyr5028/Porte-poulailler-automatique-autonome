@@ -183,7 +183,7 @@ const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en m
 const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin course fer . Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 
-
+/*
 //-----routine decToBcd : Convert normal decimal numbers to binary coded decimal-----
 byte decToBcd(byte val) {
   return ( (val / 10 * 16) + (val % 10) );
@@ -193,7 +193,7 @@ byte decToBcd(byte val) {
 byte bcdToDec(byte val) {
   return ( (val / 16 * 10) + (val % 16) );
 }
-
+*/
 
 /* eeprom at24c32 */
 /*
@@ -1301,7 +1301,7 @@ void routineGestionWatchdog() {
         // informations à afficher
         if (RADIO) {     
           displayTime();
-          radio.chaineVide();
+         // radio.chaineVide();
           read_temp(TEMPERATURE); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
