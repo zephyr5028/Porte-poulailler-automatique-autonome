@@ -28,6 +28,10 @@ class HorlogeDS3232 : public DS3232RTC
     void i2c_eeprom_write_byte(  unsigned int eeaddress, byte data );//ecriture dans l'eeprom at24c32 de la carte rtc
     byte i2c_eeprom_read_byte(  unsigned int eeaddress );//lecture de l'eeprom at24c32 de la carte rtc
     byte lectureRegistreEtConversion (byte adresse, byte operationAND = 0xFF);//lecture registre et conversion
+    /*
+     *   static byte read(tmElements_t &tm);
+        byte write(tmElements_t &tm);
+     */
 
 
   protected:

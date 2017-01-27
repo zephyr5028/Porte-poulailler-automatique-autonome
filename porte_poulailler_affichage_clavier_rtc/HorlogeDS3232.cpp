@@ -63,3 +63,76 @@ byte HorlogeDS3232::lectureRegistreEtConversion (byte adresse, byte operationAND
   return bcdToDec(RTC.readRTC(adresse) & operationAND);
 }
 
+/*----------------------------------------------------------------------*
+ * Reads the current time from the RTC and returns it in a tmElements_t *
+ * structure. Returns the I2C status (zero if successful).              *
+ *----------------------------------------------------------------------*/
+ /*
+byte DS3232RTC::read(tmElements_t &tm)
+{
+    i2cBeginTransmission(RTC_ADDR);
+    i2cWrite((uint8_t)RTC_SECONDS);
+    if ( byte e = i2cEndTransmission() ) return e;
+    //request 7 bytes (secs, min, hr, dow, date, mth, yr)
+    i2cRequestFrom(RTC_ADDR, tmNbrFields);
+    tm.Second = bcd2dec(i2cRead() & ~_BV(DS1307_CH));   
+    tm.Minute = bcd2dec(i2cRead());
+    tm.Hour = bcd2dec(i2cRead() & ~_BV(HR1224));    //assumes 24hr clock
+    tm.Wday = i2cRead();
+    tm.Day = bcd2dec(i2cRead());
+    tm.Month = bcd2dec(i2cRead() & ~_BV(CENTURY));  //don't use the Century bit
+    tm.Year = y2kYearToTm(bcd2dec(i2cRead()));
+    return 0;
+}
+*/
+
+/*----------------------------------------------------------------------*
+ * Sets the RTC's time from a tmElements_t structure and clears the     *
+ * oscillator stop flag (OSF) in the Control/Status register.           *
+ * Returns the I2C status (zero if successful).                         *
+ *----------------------------------------------------------------------*/
+ /*
+byte DS3232RTC::write(tmElements_t &tm)
+{
+    i2cBeginTransmission(RTC_ADDR);
+    i2cWrite((uint8_t)RTC_SECONDS);
+    i2cWrite(dec2bcd(tm.Second));
+    i2cWrite(dec2bcd(tm.Minute));
+    i2cWrite(dec2bcd(tm.Hour));         //sets 24 hour format (Bit 6 == 0)
+    i2cWrite(tm.Wday);
+    i2cWrite(dec2bcd(tm.Day));
+    i2cWrite(dec2bcd(tm.Month));
+    i2cWrite(dec2bcd(tmYearToY2k(tm.Year))); 
+    byte ret = i2cEndTransmission();
+    uint8_t s = readRTC(RTC_STATUS);        //read the status register
+    writeRTC( RTC_STATUS, s & ~_BV(OSF) );  //clear the Oscillator Stop Flag
+    return ret;
+}
+*/
+
+/*
+//-----reglage de la lumiere du matin ou du soir-----
+unsigned int  Lumiere::reglageLumiere (bool matinSoir, byte touche) {
+  if (touche == 2 or touche == 3) {
+    unsigned int lumiere;
+    if (matinSoir) lumiere = m_lumMatin; else lumiere = m_lumSoir;
+    if (touche == 2) {
+      if (lumiere < m_lumiereMax) {
+        lumiere += m_incrementation; //incrementation de la lumiere
+      } else {
+        lumiere = 0;
+      }
+    } else {
+      if (lumiere > 0) {
+        lumiere -= m_incrementation; //decrementation de la lumiere
+      } else {
+        lumiere =  m_lumiereMax;
+      }
+    }
+    if (matinSoir) m_lumMatin = lumiere; else m_lumSoir = lumiere;
+    return lumiere;
+  }
+  if (matinSoir) return m_lumMatin ; else return m_lumSoir ;
+}*/
+
+
