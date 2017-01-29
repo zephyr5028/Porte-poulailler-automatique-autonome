@@ -143,9 +143,9 @@ const int debounce(350); // debounce latency in ms
 byte incrementation(0); // incrementation verticale
 boolean relache(false); // relache de la touche
 byte touche(-1); // valeur de la touche appuyee
-unsigned long tempoDebounce(0); // temporisation pour debounce
+//unsigned long tempoDebounce(0); // temporisation pour debounce
 boolean  boitierOuvert(true); // le boitier est ouvert
-bool relacheBp(true); // relache du Bp
+//bool relacheBp(true); // relache du Bp
 Clavier clav(menuManuel, pinBp, pinBoitier, debounce, DEBUG); // class Clavier avec le nombre de lignes du menu
 
 /*** LCD DigoleSerialI2C ***/
@@ -799,7 +799,8 @@ void myInterruptINT1() {
   if (!digitalRead(rtcINT)) { // entree 10 pour interruption RTC
     interruptRTC = true;
   }
-  clav.testInterruptionBp (interruptBp, tempoDebounce);
+ // clav.testInterruptionBp (interruptBp, tempoDebounce);
+ clav.testInterruptionBp (interruptBp);
   clav.testInterruptionBoitier (interruptOuvBoi);
 }
 
@@ -807,7 +808,8 @@ void myInterruptINT1() {
 void routineInterruptionBp() {
   if (interruptBp) { // test de l'appui sur bouton bp
     // If the switch changed, due to noise or pressing
-    if (clav.testToucheBp (tempoDebounce)) {
+   // if (clav.testToucheBp (tempoDebounce)) {
+       if (clav.testToucheBp ()) {
       if (monServo.get_m_ouvFerm())  monServo.set_m_ouvFerm(false); else  monServo.set_m_ouvFerm(true);
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
