@@ -3,7 +3,7 @@
   gestion du servo moteur au travers de la bibliothèque ServoTimer2
 */
 
-#ifndef ServoMoeur_h
+#ifndef ServoMoteur_h
 #define ServoMoteur_h
 
 #include "Arduino.h"
