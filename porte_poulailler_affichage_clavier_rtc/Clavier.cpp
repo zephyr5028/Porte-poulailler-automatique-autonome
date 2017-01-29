@@ -4,18 +4,15 @@
 
 #include "Clavier.h"
 
-Clavier::Clavier() : m_oldKey (-1), m_MenuManuel(14), m_NumKeys(6), m_pinBp(9), m_pinBoitier(6), m_relacheBp(true), m_debounce(350),
-  m_AdcKeyVal( {
-  50, 200, 400, 600, 800
-})
+Clavier::Clavier() : Bouton(  ), m_oldKey (-1), m_MenuManuel(14), m_NumKeys(6), 
+m_AdcKeyVal( {  50, 200, 400, 600, 800})
 {
 
 }
 /* sucharge du constructeur avec le nombre de lignes du menu */
-Clavier::Clavier(byte nbMenu, const byte pinBp, const byte pinBoitier, const int debounce, const boolean debug) : m_oldKey (-1), m_MenuManuel(nbMenu), m_debug(debug), m_NumKeys(6),
-  m_pinBp(pinBp), m_pinBoitier(pinBoitier), m_relacheBp(true), m_debounce(debounce), m_AdcKeyVal( {
-  50, 200, 400, 600, 800
-})
+Clavier::Clavier(byte nbMenu, const byte pinBp, const byte pinBoitier, const int debounce, const boolean debug) :  
+Bouton(  pinBp, pinBoitier,  debounce,  debug ),
+m_oldKey (-1), m_MenuManuel(nbMenu), m_debug(debug), m_NumKeys(6), m_AdcKeyVal( {  50, 200, 400, 600, 800})
 {
 
 }
@@ -100,7 +97,7 @@ bool Clavier::testTouche5(const &touche, bool &relache) {
     return false;
   }
 }
-
+/*
 //-----test touche Bp-----
 bool Clavier::testToucheBp(unsigned long  &tempoDebounce) {
   if (((millis() - tempoDebounce) > m_debounce)  and  m_relacheBp == true and !digitalRead(m_pinBp) ) {
@@ -151,4 +148,4 @@ bool  Clavier::testBoitierFerme(const volatile bool &interruptOuvBoi, const bool
     return false;
   }
 }
-
+*/

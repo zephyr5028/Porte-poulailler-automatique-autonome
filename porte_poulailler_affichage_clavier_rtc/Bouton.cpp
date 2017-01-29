@@ -4,7 +4,7 @@
 
 #include "Bouton.h"
 
-Bouton::Bouton() :  m_pinBp(9), m_pinBoitier(6), m_debounce(350)
+Bouton::Bouton() :  m_pinBp(9), m_pinBoitier(6), m_debounce(350), m_relacheBp(true)
 {
 
 }
