@@ -97,7 +97,7 @@ volatile int f_wdt = 1; // flag watchdog
 /************************************************************/
 // nombre de boucles du watchdog : environ 64s pour 8 boucles
 
-const byte bouclesWatchdog(16);
+const byte bouclesWatchdog(32);
 
 /************************************************************/
 
