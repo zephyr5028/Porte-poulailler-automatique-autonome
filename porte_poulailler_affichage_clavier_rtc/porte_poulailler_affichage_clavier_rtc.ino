@@ -1,7 +1,8 @@
 /* porte-poulailler : affichage + clavier + rtc */
 
 /*
-   29 12 2016 classe Codeur (optique)
+  01 2017 classes radio, lcd (digole et liquidcrystal), horloge, bouton
+  29 12 2016 classe Codeur (optique)
   28 12 2016 classe Lumiere - ok
   26 12 2016 classe Accus - ok
   21 12 2016 ajout de la classe servo - ok
@@ -143,9 +144,7 @@ const int debounce(350); // debounce latency in ms
 byte incrementation(0); // incrementation verticale
 boolean relache(false); // relache de la touche
 byte touche(-1); // valeur de la touche appuyee
-//unsigned long tempoDebounce(0); // temporisation pour debounce
 boolean  boitierOuvert(true); // le boitier est ouvert
-//bool relacheBp(true); // relache du Bp
 Clavier clav(menuManuel, pinBp, pinBoitier, debounce, DEBUG); // class Clavier avec le nombre de lignes du menu
 
 /*** LCD DigoleSerialI2C ***/
@@ -248,22 +247,16 @@ void displayTime () {
 //----routine door open time-----
 void openTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
-    //  byte val, val1, val2;
-    // val = rtc.lectureRegistreEtConversion (ALM1_HOURS & 0x3f); // alarme 1 hours
-    // val1 = rtc.lectureRegistreEtConversion (ALM1_MINUTES); // alarme 1 minutes
-    // val2 = rtc.lectureRegistreEtConversion (ALM1_SECONDS & 0x7f); // alarme 1 seconds
-    mydisp.affichageDateHeure("H", rtc.get_m_alarm1Hour(), rtc.get_m_alarm1Minute() , rtc.get_m_alarm1Second(), decalage);// affichage de l'horaire de l'alarme 1
+    // affichage de l'horaire de l'alarme 1
+    mydisp.affichageDateHeure("H", rtc.get_m_alarm1Hour(), rtc.get_m_alarm1Minute() , rtc.get_m_alarm1Second(), decalage);
   }
 }
 
 //-----routine door close time-----
 void closeTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
-    //Set Alarm2
-    // byte val, val1, val2(61);
-    // val = rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
-    // val1 = rtc.lectureRegistreEtConversion(ALM2_MINUTES); //alarme 2 minutes
-    mydisp.affichageDateHeure("H", rtc.get_m_alarm2Hour(), rtc.get_m_alarm2Minute(), 61, decalage); // affichage de l'horaire de l'alarme 2 - 61 pour ne pas afficher les secondes
+    // affichage de l'horaire de l'alarme 2 - 61 pour ne pas afficher les secondes
+    mydisp.affichageDateHeure("H", rtc.get_m_alarm2Hour(), rtc.get_m_alarm2Minute(), 61, decalage);
   }
 }
 
@@ -386,24 +379,16 @@ void reglageHeureFermeture() {
     if (incrementation == menuFermeture) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 10, deplacement, 10);// position du cuseur pendant les reglages
     }
+    // Set Alarm2
     if ((touche == 2 or touche == 3) and incrementation == menuFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      //byte alarm2Hour =  bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
-      // byte alarm2Minute = bcdToDec(RTC.readRTC(0x0B)); // alarme 2 minutes
-      //// rtc.lectureHoraireALARM2(); // lecture horaire de l'alarme2
-      //byte alarm2Hour =  rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
-      //byte alarm2Minute = rtc.lectureRegistreEtConversion(ALM2_MINUTES); // alarme 2 minutes
       if (decalage == deplacement) {
         rtc.reglageAlarme( touche, alarm_2, heure); // reglage de l'alarme 2 - heure
-        // alarm2Hour = rtc.reglageHeure(touche, alarm2Hour, heure);
-        //  RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0); // écriture de l'heure alarme 2
-        closeTime(); // affichage de l'heure d'ouverture
+        closeTime(); // affichage de l'heure de fermeture
       }
       if (decalage == 2 * deplacement) {
         rtc.reglageAlarme( touche, alarm_2, minutes); // reglage de l'alarme 2 - minutes
-        // alarm2Minute = rtc.reglageHeure(touche, alarm2Minute, minutes);
-        //  RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0);  // écriture de l'heure alarme 2
-        closeTime(); // affichage de l'heure d'ouverture
+        closeTime(); // affichage de l'heure de fermeture
       }
     }
   }
@@ -420,29 +405,16 @@ void reglageHeureOuverture() {
     // Set Alarm1
     if ((touche == 2 or touche == 3) and incrementation == menuOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      // byte alarm1Hour =  bcdToDec(RTC.readRTC(0x09) & 0x3f); // alarme 1 hours
-      //  byte alarm1Minute = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
-      // byte alarm1Second =  bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
-      //// rtc.lectureHoraireALARM1();// lecture horaire de l'alarme1
-      //  byte alarm1Hour =  rtc.lectureRegistreEtConversion(ALM1_HOURS & 0x3f); // alarme 1 hours
-      //  byte alarm1Minute = rtc.lectureRegistreEtConversion(ALM1_MINUTES); // alarme 1 minutes
-      // byte alarm1Second =  rtc.lectureRegistreEtConversion(ALM1_SECONDS & 0x7f); // alarme 1 seconds
       if (decalage == deplacement) {
         rtc.reglageAlarme( touche, alarm_1, heure); // reglage de l'alarme 1 - heure
-        // alarm1Hour = rtc.reglageHeure(touche, alarm1Hour, heure);
-        //  RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
       if (decalage == 2 * deplacement) {
         rtc.reglageAlarme( touche, alarm_1, minutes); // reglage de l'alarme 1 - minutes
-        //   alarm1Minute = rtc.reglageHeure(touche, alarm1Minute, minutes);
-        //  RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
       if (decalage == 3 * deplacement) {
         rtc.reglageAlarme( touche, alarm_1, secondes); // reglage de l'alarme 1 - secondes
-        // alarm1Second = rtc.reglageHeure(touche, alarm1Second, secondes);
-        // RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
     }
