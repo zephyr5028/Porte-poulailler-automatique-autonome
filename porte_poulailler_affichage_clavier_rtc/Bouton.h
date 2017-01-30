@@ -15,11 +15,9 @@ class Bouton
     Bouton( const byte pinBp, const byte pinBoitier, const int debounce = 350, const boolean debug = false ); // surcharge du constructeur
     ~Bouton(); // destructeur
 
-   // bool testToucheBp(unsigned long  &tempoDebounce);  //test touche Bp
-     bool testToucheBp();  //test touche Bp
+    bool testToucheBp();  //test touche Bp
     void testRelacheBp (volatile bool &interruptBp);//test relache Bp
-   // void testInterruptionBp (volatile bool &interruptBp, unsigned long  &tempoDebounce); //test Bp suite interruption
-     void testInterruptionBp (volatile bool &interruptBp); //test Bp suite interruption
+    void testInterruptionBp (volatile bool &interruptBp); //test Bp suite interruption
     void testInterruptionBoitier (volatile bool &interruptOuvBoi); //test IT ouverture boitier
     bool  testBoitierOuvert(const volatile bool &interruptOuvBoi, const bool &boitierOuvert);//test boitier ouvert
     bool  testBoitierFerme(const volatile bool &interruptOuvBoi, const  bool &boitierOuvert); //test boitier ferme

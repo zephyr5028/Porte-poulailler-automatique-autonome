@@ -10,7 +10,7 @@ Bouton::Bouton() :  m_pinBp(9), m_pinBoitier(6), m_debounce(350), m_relacheBp(tr
 }
 /* sucharge du constructeur avec le nombre de lignes du menu */
 Bouton::Bouton( const byte pinBp, const byte pinBoitier, const int debounce, const boolean debug) : m_debug(debug), m_pinBp(pinBp),
-m_pinBoitier(pinBoitier), m_relacheBp(true), m_debounce(debounce), m_tempoDebounce(0)
+  m_pinBoitier(pinBoitier), m_relacheBp(true), m_debounce(debounce), m_tempoDebounce(0)
 {
 
 }
@@ -20,7 +20,6 @@ Bouton::~Bouton() {
 }
 
 //-----test touche Bp-----
-//bool Bouton::testToucheBp(unsigned long  &tempoDebounce) {
 bool Bouton::testToucheBp() {
   if (((millis() - m_tempoDebounce) > m_debounce)  and  m_relacheBp == true and !digitalRead(m_pinBp) ) {
     m_relacheBp = false;
@@ -39,8 +38,7 @@ void Bouton::testRelacheBp (volatile bool &interruptBp) {
 }
 
 //-----test IT Bp-----
-//void Bouton::testInterruptionBp (volatile bool &interruptBp, unsigned long  &tempoDebounce) {
-  void Bouton::testInterruptionBp (volatile bool &interruptBp) {
+void Bouton::testInterruptionBp (volatile bool &interruptBp) {
   if (!digitalRead(m_pinBp) and !interruptBp) { // entree 9 pour interruption BP
     interruptBp = true;
     m_tempoDebounce = millis();

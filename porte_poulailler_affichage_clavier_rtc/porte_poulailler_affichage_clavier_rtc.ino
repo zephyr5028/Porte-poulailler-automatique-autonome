@@ -610,9 +610,6 @@ void regFinDeCourseOuverture() {
         delay(10);
         rtc.i2c_eeprom_write_byte( 0x23, val2); // écriture de la valeur du reglage de la fin de course bas  high @23 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
-
-        // mydisp.drawStr(0, 1, "");
-
         affiFinDeCourseOuverture();
       }
     }
@@ -776,27 +773,19 @@ void myInterruptINT0() {
 //-----routine interruption D3 INT1-----
 void myInterruptINT1() {
   rtc.testInterruptRTC(interruptRTC);// test de l'entree 5 - interruption du rtc
-  /*
-    if (!digitalRead(rtcINT)) { // entree 5 pour interruption RTC
-    interruptRTC = true;
-    }
-  */
-  // clav.testInterruptionBp (interruptBp, tempoDebounce);
-  clav.testInterruptionBp (interruptBp);
-  clav.testInterruptionBoitier (interruptOuvBoi);
+  clav.testInterruptionBp (interruptBp);// test l'it du bp
+  clav.testInterruptionBoitier (interruptOuvBoi);// test l'it de l'interrupteur du boitier
 }
 
 //-----routine interruption Bp-----
 void routineInterruptionBp() {
   if (interruptBp) { // test de l'appui sur bouton bp
-    // If the switch changed, due to noise or pressing
-    // if (clav.testToucheBp (tempoDebounce)) {
     if (clav.testToucheBp ()) {
       if (monServo.get_m_ouvFerm())  monServo.set_m_ouvFerm(false); else  monServo.set_m_ouvFerm(true);
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
     }
-    clav.testRelacheBp(interruptBp);
+    clav.testRelacheBp(interruptBp);// tst du relache du bp
   }
 }
 
@@ -870,7 +859,6 @@ void lumiere() {
 
 //-----ouverture/fermeture par test de la lumière----
 void ouvFermLum() {
-  //byte  valHeure = bcdToDec(RTC.readRTC(0x02) & 0x3f); // lecture de l'heure
   byte  valHeure = rtc.lectureRegistreEtConversion(RTC_HOURS & 0x3f); // lecture de l'heure
   lum.testLuminosite(); // test de la luminosite pour mise à jour du compteur watchdog lumiere
   //fenetre de non declenchement pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 et mise à jour du compteur watchdog lumiere
@@ -1004,7 +992,6 @@ void routineGestionWatchdog() {
         // informations à afficher
         if (RADIO) {
           displayTime();
-          // radio.chaineVide();
           read_temp(TEMPERATURE); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
@@ -1079,8 +1066,6 @@ void setup() {
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
 
-  //RTC.writeRTC(0x0E,0x06); // registre control rtc
-  //RTC.writeRTC(0x0F, 0x00); // registre status rtc
   rtc.init();// initialisation de l'horloge
 
   //Optimisation de la consommation
