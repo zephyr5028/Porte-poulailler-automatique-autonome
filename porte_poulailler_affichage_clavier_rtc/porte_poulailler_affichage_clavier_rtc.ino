@@ -248,11 +248,11 @@ void displayTime () {
 //----routine door open time-----
 void openTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
-    byte val, val1, val2;
-    val = rtc.lectureRegistreEtConversion (ALM1_HOURS & 0x3f); // alarme 1 hours
-    val1 = rtc.lectureRegistreEtConversion (ALM1_MINUTES); // alarme 1 minutes
-    val2 = rtc.lectureRegistreEtConversion (ALM1_SECONDS & 0x7f); // alarme 1 seconds
-    mydisp.affichageDateHeure("H", val, val1, val2, decalage);
+    //  byte val, val1, val2;
+    // val = rtc.lectureRegistreEtConversion (ALM1_HOURS & 0x3f); // alarme 1 hours
+    // val1 = rtc.lectureRegistreEtConversion (ALM1_MINUTES); // alarme 1 minutes
+    // val2 = rtc.lectureRegistreEtConversion (ALM1_SECONDS & 0x7f); // alarme 1 seconds
+    mydisp.affichageDateHeure("H", rtc.get_m_alarm1Hour(), rtc.get_m_alarm1Minute() , rtc.get_m_alarm1Second(), decalage);// affichage de l'horaire de l'alarme 1
   }
 }
 
@@ -260,10 +260,10 @@ void openTime() {
 void closeTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
     //Set Alarm2
-    byte val, val1, val2(61);
-    val = rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
-    val1 = rtc.lectureRegistreEtConversion(ALM2_MINUTES); //alarme 2 minutes
-    mydisp.affichageDateHeure("H", val, val1, val2, decalage);
+    // byte val, val1, val2(61);
+    // val = rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
+    // val1 = rtc.lectureRegistreEtConversion(ALM2_MINUTES); //alarme 2 minutes
+    mydisp.affichageDateHeure("H", rtc.get_m_alarm2Hour(), rtc.get_m_alarm2Minute(), 61, decalage); // affichage de l'horaire de l'alarme 2 - 61 pour ne pas afficher les secondes
   }
 }
 
@@ -729,8 +729,8 @@ void testServo() {
 /* temperature */
 //-----routine lecture température sur ds3231 rtc type celsius=true ,fahrenheit=false------
 void read_temp(boolean typeTemperature) {
-  int temperature = RTC.temperature();
-  float celsius = temperature / 4.0;
+  int t = RTC.temperature();
+  float celsius = t / 4.0;
   float fahrenheit = celsius * 9.0 / 5.0 + 32.0;
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);

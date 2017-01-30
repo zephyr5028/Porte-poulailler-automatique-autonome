@@ -154,3 +154,28 @@ void HorlogeDS3232::reglageAlarme( const byte touche, const byte alarme, const b
   }
 }
 
+//-----accesseur - getter-----
+byte HorlogeDS3232::get_m_alarm1Hour() {
+  return m_alarm1Hour;
+}
+
+//-----accesseur - getter-----
+byte HorlogeDS3232::get_m_alarm1Minute() {
+  return m_alarm1Minute;
+}
+
+//-----accesseur - getter-----
+byte HorlogeDS3232::get_m_alarm1Second() {
+  return m_alarm1Second;
+}
+
+//-----accesseur - getter-----
+byte HorlogeDS3232::get_m_alarm2Hour() {
+  return m_alarm1Hour;
+}
+
+//-----accesseur - getter-----
+byte HorlogeDS3232::get_m_alarm2Minute() {
+  return m_alarm1Minute;
+}
+

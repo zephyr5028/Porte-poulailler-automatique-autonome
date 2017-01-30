@@ -30,12 +30,16 @@ class HorlogeDS3232 : public DS3232RTC
     byte lectureRegistreEtConversion (byte adresse, byte operationAND = 0xFF);//lecture registre et conversion
     byte reglageHeure(const byte touche, byte tmDateTime, const byte type);// reglage date time
     void testInterruptRTC (volatile bool &interruptRTC); //test IT RTC
-    void lectureHoraireALARM1();//lecture horaire ALARM1
-    void lectureHoraireALARM2();//lecture horaire ALARM2
     void reglageAlarme( const byte touche, const byte alarme, const byte type); //reglage de l'alarme
+    byte get_m_alarm1Hour();//accesseur - getter
+    byte get_m_alarm1Minute();//accesseur - getter
+    byte get_m_alarm1Second();//accesseur - getter
+    byte get_m_alarm2Hour();//accesseur - getter
+    byte get_m_alarm2Minute();//accesseur - getter
 
 
   protected:
+
 
     void lectureHoraireALARM1();//lecture horaire ALARM1
     void lectureHoraireALARM2();//lecture horaire ALARM2
