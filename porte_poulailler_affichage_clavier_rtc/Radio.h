@@ -19,17 +19,13 @@ class Radio
     ~Radio(); // destructeur
 
     void init();// initialisation
-    // void envoiMessage(char chaine1[]);//routine construction message radio
     void envoiMessage(char *chaine1);//routine construction message radio
-    // void messageRadio(char chaine1[]);  // message Radio
     void messageRadio(char *chaine1);  // message Radio
     void messageSansParametre();//message Radio sans parametre
     void chaineVide();//chaine radio fin de ligne avant transmission
     //envoi message float avec test de l'ouverture du boitier plus texte
-    // void envoiFloat(float valeur , boolean boitierOuvert = true, char texte[] = "");
     void envoiFloat(float valeur, boolean boitierOuvert = true, char *texte = "");
     // envoi du message unsigned int avec test de l'ouverture du boitier
-   // void envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert = true, char texte[] = "");
      void envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert = true, char *texte = "");
 
   protected:

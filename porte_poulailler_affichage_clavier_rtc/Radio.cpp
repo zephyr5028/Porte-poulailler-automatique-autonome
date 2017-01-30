@@ -47,9 +47,6 @@ void Radio::envoiMessage(char *chaine1) {
       m_chaine[len_m_chaine + pos] = chaine1[pos];
       m_chaine[len_m_chaine + lenChaine1] = '\0';
     }
-    if (m_debug) {
-      Serial.println(m_chaine);
-    }
   } else {
     messageSansParametre();// envoi du message contenu dans m_chaine[]
   }
@@ -60,8 +57,6 @@ void Radio::messageSansParametre() {
   //strcat(m_chaine, "\0");
   byte leng = strlen(m_chaine);// longueur du tableau
   m_chaine[leng + 1] = '\0';// fin de tableau
- // for (byte i = 0; i < leng; i++)  Serial.print(m_chaine[i], DEC);
-  Serial.println(" ");
   vw_send((uint8_t *)m_chaine, leng + 1); // On envoie le message
   // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
   vw_wait_tx(); // On attend la fin de l'envoi

@@ -6,11 +6,11 @@
 #include "Lumiere.h"
 
 //constructeur avec debug
-Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const float rapportConvertion, const boolean debug) :
+Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetre, const float rapportConvertion, const boolean debug) :
   m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir),
   m_rapportConvertion(rapportConvertion), m_debug(debug), m_ouverture(1), m_fermeture(0),
   m_lumiereMax(1020), m_incrementation(10), m_maxCAD(1023), m_compteurWatchdogLumiere(0),
-  m_heureFenetre(17), m_tempsLum(2)
+  m_heureFenetre(heureFenetre), m_tempsLum(2)
 {
 }
 

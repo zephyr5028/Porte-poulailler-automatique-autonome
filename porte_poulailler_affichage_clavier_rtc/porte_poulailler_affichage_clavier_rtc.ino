@@ -94,14 +94,12 @@ Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRo
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
-
 /************************************************************/
 // nombre de boucles du watchdog : environ 64s pour 8 boucles
 
 const byte bouclesWatchdog(32);
 
 /************************************************************/
-
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
 boolean reglage = false; // menu=false ou reglage=true
 
@@ -109,9 +107,14 @@ boolean reglage = false; // menu=false ou reglage=true
 #include "Lumiere.h"
 const byte lumierePin(0); //analog pin A0 : luminosite
 const float convertion(5);// rapport de convertion CAD float
+/***************************************************************************/
+
+const heureFenetre(17); //horaire de la fenetre de non declenchement : 17h
+
+/***************************************************************************/
 const unsigned int lumMatin(300); // valeur de la lumière du matin
 const unsigned int lumSoir(900); // valeur de la lumiere du soir
-Lumiere lum(lumierePin, lumMatin, lumSoir, convertion, DEBUG); // objet lumiere
+Lumiere lum(lumierePin, lumMatin, lumSoir, heureFenetre, convertion, DEBUG); // objet lumiere
 
 /* interruptions */
 volatile boolean interruptBp(false); // etat interruption entree 9
@@ -472,13 +475,17 @@ void choixLumMatin() {
       relache = false;
       if (decalage == deplacement) {
         bool matin(1);
+        bool lumiere(1);
         unsigned int lumMatin = lum.reglageLumiere(matin, touche);// reglage de la lumiere du matin
+        rtc.sauvEepromChoix ( lumMatin, matin, lumiere);// sauvegarde dans l'eeprom I2C le choix de la lumiere du matin @0x16 et 0x17
+        /*
         byte val1 = lumMatin & 0xFF; // ou    byte val1= lowByte(sensorValue);// pf
         byte val2 = (lumMatin >> 8) & 0xFF; // ou  //byte val1= highByte(sensorValue); // Pf
         rtc.i2c_eeprom_write_byte( 0x16, val1); // écriture de la valeur du reglage de la lumiere du matin low @16  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         rtc.i2c_eeprom_write_byte( 0x17, val2); // écriture de la valeur du reglage de la lumiere du matin high @17 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
+        */
         affiLumMatin();
       }
     }
@@ -506,13 +513,17 @@ void choixLumSoir() {
       relache = false;
       if (decalage == deplacement) {
         bool soir(0);
+        bool lumiere(1);
         unsigned int lumSoir = lum.reglageLumiere(soir, touche); // reglage de la lumiere du soir
+         rtc.sauvEepromChoix ( lumSoir, soir, lumiere);// sauvegarde dans l'eeprom I2C le choix de la lumiere du soir  @0x18 et 0x19
+         /*
         byte val1 = lumSoir & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (lumSoir >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
         rtc.i2c_eeprom_write_byte( 0x18, val1); // écriture de la valeur du reglage de la lumiere du soir low @18  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         rtc.i2c_eeprom_write_byte( 0x19, val2); // écriture de la valeur du reglage de la lumiere du soir high @19 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
+        */
         affiLumSoir();
       }
     }
@@ -579,13 +590,17 @@ void regFinDeCourseFermeture() {
       relache = false;
       if (decalage == deplacement) {
         bool fermeture(0);
-        unsigned int finDeCourse = codOpt.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
+        bool finDeCourse(0);
+        unsigned int finDeCourseFermeture = codOpt.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
+        rtc.sauvEepromChoix ( finDeCourseFermeture, fermeture, finDeCourse);// sauvegarde dans l'eeprom I2C de la valeur de fin de course fermeture @0x20 et 0x21
+        /*
         byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
         rtc.i2c_eeprom_write_byte( 0x20, val1); // écriture de la valeur du reglage de la fin de course haut low @20  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         rtc.i2c_eeprom_write_byte( 0x21, val2); // écriture de la valeur du reglage de la fin de course haut  high @21 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
+        */
         affiFinDeCourseFermeture();
       }
     }
@@ -603,13 +618,17 @@ void regFinDeCourseOuverture() {
       relache = false;
       if (decalage == deplacement) {
         bool ouverture(1);
-        unsigned int finDeCourse = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
+        bool finDeCourse(0);
+        unsigned int finDeCourseOuverture = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
+        rtc.sauvEepromChoix ( finDeCourseOuverture, ouverture, finDeCourse);// sauvegarde dans l'eeprom I2C de la valeur de fin de course ouverture @0x22 et 0x23
+        /*
         byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
         byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
         rtc.i2c_eeprom_write_byte( 0x22, val1); // écriture de la valeur du reglage de la fin de course bas low @22  de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
         rtc.i2c_eeprom_write_byte( 0x23, val2); // écriture de la valeur du reglage de la fin de course bas  high @23 de l'eeprom de la carte rtc (i2c @ 0x57)
         delay(10);
+        */
         affiFinDeCourseOuverture();
       }
     }

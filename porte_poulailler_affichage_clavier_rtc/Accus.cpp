@@ -20,9 +20,6 @@ bool Accus::accusFaible() {
   bool batterieFaible;
   int convertMiniTension = (m_maxCAD * m_tensionMiniAccus) / m_rapportConvertion; // convertion tension mini en pas du CAD
   int valAccus = analogRead(m_accusPin); // read the input on analog pin  tension batterie
-  if (m_debug) {
-    Serial.println (convertMiniTension);
-  }
   if (valAccus < convertMiniTension) { // si la batterie est faible < 4,8v (654)
     return batterieFaible = true;
   } else {

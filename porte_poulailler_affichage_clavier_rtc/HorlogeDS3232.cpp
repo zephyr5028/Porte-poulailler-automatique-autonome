@@ -142,7 +142,6 @@ void HorlogeDS3232::reglageAlarme( const byte touche, const byte alarme, const b
     RTC.setAlarm(ALM1_MATCH_HOURS, m_alarm1Second, m_alarm1Minute, m_alarm1Hour, 0); // écriture alarm 1
   }
   if (alarme == 2) {
-    Serial.println(alarme);
     switch (type) { // test de type date time
       case 5: // heure
         m_alarm2Hour = reglageHeure(touche, m_alarm2Hour, type);
@@ -153,6 +152,22 @@ void HorlogeDS3232::reglageAlarme( const byte touche, const byte alarme, const b
     }
     RTC.setAlarm(ALM2_MATCH_HOURS, m_alarm2Minute, m_alarm2Hour, 0);  // écriture de l'heure alarme 2
   }
+}
+
+//-----sauvegarde dans l'eeprom I2C le choix de la lumiere ou de la valeur de fin de course-----
+void HorlogeDS3232::sauvEepromChoix ( unsigned int valeurChoix, const bool matinSoirOuvFerm, const bool lumiereFinDeCourse) {
+  byte val1 = valeurChoix & 0xFF; // pf
+  byte val2 = (valeurChoix >> 8) & 0xFF; //  PF
+  byte adresseMemoire(0);
+  if (lumiereFinDeCourse) {
+    if (matinSoirOuvFerm) adresseMemoire = 0x16; else adresseMemoire = 0x18; // début adresses memoire de sauvegarde
+  } else {
+    if (matinSoirOuvFerm) adresseMemoire = 0x22; else adresseMemoire = 0x20; // début adresses memoire de sauvegarde
+  }
+  i2c_eeprom_write_byte( adresseMemoire, val1); // écriture de la valeur du reglage de la lumiere ( low )  dans l'eeprom de la carte rtc (i2c @ 0x57)
+  delay(10);
+  i2c_eeprom_write_byte( adresseMemoire + 1, val2); // écriture de la valeur du reglage de la lumiere ( high )dans l'eeprom de la carte rtc (i2c @ 0x57)
+  delay(10);
 }
 
 //-----accesseur - getter-----
