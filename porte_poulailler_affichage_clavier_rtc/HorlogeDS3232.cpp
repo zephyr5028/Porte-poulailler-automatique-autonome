@@ -5,13 +5,13 @@
 
 #include "HorlogeDS3232.h"
 
-HorlogeDS3232::HorlogeDS3232() : DS3232RTC(), m_deviceAddress(0x57), m_debug(false)
+HorlogeDS3232::HorlogeDS3232() : DS3232RTC(), m_deviceAddress(0x57), m_rtcINT(5), m_debug(false)
 {
 
 }
 /* sucharge du constructeur avec le nombre de lignes du menu */
-HorlogeDS3232::HorlogeDS3232 ( const byte adresseMemoireI2C, const boolean debug) : DS3232RTC(),
-  m_deviceAddress(adresseMemoireI2C), m_debug(debug)
+HorlogeDS3232::HorlogeDS3232 ( const byte adresseMemoireI2C, const byte rtcINT, const boolean debug) : DS3232RTC(),
+  m_deviceAddress(adresseMemoireI2C), m_rtcINT(rtcINT), m_debug(debug)
 {
 
 }
@@ -23,6 +23,13 @@ HorlogeDS3232::~HorlogeDS3232() {
 //-----initialisation-----
 void HorlogeDS3232::init() {
   //Wire.begin();
+}
+
+//-----test IT RTC-----
+void HorlogeDS3232::testInterruptRTC (volatile bool &interruptRTC) {
+  if (!digitalRead(m_rtcINT)) { //pin 5 interruption RTC
+    interruptRTC = true;
+  }
 }
 
 //-----routine decToBcd : Convert normal decimal numbers to binary coded decimal-----
@@ -82,7 +89,10 @@ byte HorlogeDS3232::reglageHeure(const byte touche, byte tmDateTime, const byte 
     case 5: // heure
       haut = 24; bas = 0;
       break;
-    case 6: // minute , secondes
+    case 6: // minute
+      haut = 59; bas = 0;
+      break;
+    case 7: // secondes
       haut = 59; bas = 0;
       break;
   }

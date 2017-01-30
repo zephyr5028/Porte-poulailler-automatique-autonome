@@ -114,7 +114,7 @@ Lumiere lum(lumierePin, lumMatin, lumSoir, convertion, DEBUG); // objet lumiere
 
 /* interruptions */
 volatile boolean interruptBp(false); // etat interruption entree 9
-volatile boolean interruptRTC = false; // etat interruption entree 10
+volatile boolean interruptRTC = false; // etat interruption entree 5
 volatile boolean interruptOuvBoi = false; // etat interruption entree 6
 
 /*** Clavier ***/
@@ -157,7 +157,7 @@ int temps(0);
 #ifdef  LCDDIGOLE
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
-LcdDigoleI2C mydisp(&Wire, '\x27', colonnes, DEBUG); // classe lcd digole i2c (lcd 2*16 caracteres)
+LcdDigoleI2C mydisp( &Wire, '\x27', colonnes, DEBUG); // classe lcd digole i2c (lcd 2*16 caracteres)
 #endif
 
 #ifdef LCDLIQIDCRYSTAL
@@ -170,11 +170,11 @@ LcdPCF8574  mydisp(0x27, 16, 2);
 #include "HorlogeDS3232.h"
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
 const byte adresseBoitier24C32(0x57);
-const byte jourSemaine(1), jour(2), mois(3), annee(4), heure(5), minutesSecondes(6);
+const byte jourSemaine(1), jour(2), mois(3), annee(4), heure(5), minutes(6),secondes(7);
 byte alarm_1 = 1; // alarme 1
 byte alarm_2 = 2; //alarme 2
 tmElements_t tm; // declaration de tm pour la lecture des informations date et heure
-HorlogeDS3232 rtc(adresseBoitier24C32, DEBUG);
+HorlogeDS3232 rtc(adresseBoitier24C32, rtcINT, DEBUG);
 
 /* progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
@@ -398,7 +398,7 @@ void reglageHeureFermeture() {
         closeTime(); // affichage de l'heure d'ouverture
       }
       if (decalage == 2*deplacement) {
-        alarm2Minute = rtc.reglageHeure(touche, alarm2Minute, minutesSecondes);
+        alarm2Minute = rtc.reglageHeure(touche, alarm2Minute, minutes);
         RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0);  // écriture de l'heure alarme 2
         closeTime(); // affichage de l'heure d'ouverture
       }
@@ -429,12 +429,12 @@ void reglageHeureOuverture() {
         openTime(); // affichage de l'heure d'ouverture
       }
       if (decalage == 2*deplacement) {
-        alarm1Minute = rtc.reglageHeure(touche, alarm1Minute, minutesSecondes);
+        alarm1Minute = rtc.reglageHeure(touche, alarm1Minute, minutes);
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
       if (decalage == 3*deplacement) {
-        alarm1Second = rtc.reglageHeure(touche, alarm1Second, minutesSecondes);
+        alarm1Second = rtc.reglageHeure(touche, alarm1Second, secondes);
         RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
@@ -555,11 +555,11 @@ void reglageTime () {
         ecritureDateTime(); // routine écriture date and time
       }
       if (decalage == 2*deplacement) {
-        tm.Minute = rtc.reglageHeure(touche, tm.Minute, minutesSecondes);
+        tm.Minute = rtc.reglageHeure(touche, tm.Minute, minutes);
         ecritureDateTime();
       }
       if (decalage == 3*deplacement) {
-        tm.Second = rtc.reglageHeure(touche, tm.Second, minutesSecondes);
+        tm.Second = rtc.reglageHeure(touche, tm.Second, secondes);
         ecritureDateTime();
       }
     }
@@ -796,9 +796,12 @@ void myInterruptINT0() {
 
 //-----routine interruption D3 INT1-----
 void myInterruptINT1() {
-  if (!digitalRead(rtcINT)) { // entree 10 pour interruption RTC
+  rtc.testInterruptRTC(interruptRTC);// test de l'entree 5 - interruption du rtc
+  /*
+  if (!digitalRead(rtcINT)) { // entree 5 pour interruption RTC
     interruptRTC = true;
   }
+  */
  // clav.testInterruptionBp (interruptBp, tempoDebounce);
  clav.testInterruptionBp (interruptBp);
   clav.testInterruptionBoitier (interruptOuvBoi);
@@ -895,7 +898,7 @@ void ouvFermLum() {
   lum.fenetreNonDeclenchement(valHeure) ;
   //non eclenchement en fonction de la position du servo et mise à jour du compteur watchdog lumiere
   lum.nonDeclenchementPositionServo (codOpt.get_m_compteRoueCodeuse(), codOpt.get_m_finDeCourseFermeture(), codOpt.get_m_finDeCourseOuverture());
-  byte declenchementLuminosite = lum.declenchementServoLuminosite(); // test de laluninosite et declenchement du servo
+  byte declenchementLuminosite = lum.declenchementServoLuminosite(); // test de la luninosite et declenchement du servo
   switch (declenchementLuminosite) {
     case 1: // mise sous tension du servo pour l'ouverture de la porte
       monServo.set_m_ouvFerm(true); // ouverture

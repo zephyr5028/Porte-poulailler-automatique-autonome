@@ -19,7 +19,7 @@ class HorlogeDS3232 : public DS3232RTC
 
     // constructeur
     HorlogeDS3232();
-    HorlogeDS3232(const byte adresseMemoireI2C = 0x57, const boolean debug = false ); // constructeur avec debug
+    HorlogeDS3232(const byte adresseMemoireI2C = 0x57, const byte m_rtcINT = 5, const boolean debug = false ); // constructeur avec debug
     ~HorlogeDS3232(); // destructeur
 
     void init();// initialisation
@@ -29,13 +29,14 @@ class HorlogeDS3232 : public DS3232RTC
     byte i2c_eeprom_read_byte(  unsigned int eeaddress );//lecture de l'eeprom at24c32 de la carte rtc
     byte lectureRegistreEtConversion (byte adresse, byte operationAND = 0xFF);//lecture registre et conversion
     byte reglageHeure(const byte touche, byte tmDateTime, const byte type);// reglage date time
+    void HorlogeDS3232::testInterruptRTC (volatile bool &interruptRTC); //test IT RTC
 
 
   protected:
 
     const boolean m_debug ; // pour affichage console si nécessaire
     const int m_deviceAddress ; // adresse du boitier mémoire 24C32 I2C = 0x57
-
+    const byte m_rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
 
 };
 
