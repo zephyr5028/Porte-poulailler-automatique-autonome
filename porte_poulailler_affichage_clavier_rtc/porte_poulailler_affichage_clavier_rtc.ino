@@ -170,9 +170,9 @@ LcdPCF8574  mydisp(0x27, 16, 2);
 #include "HorlogeDS3232.h"
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
 const byte adresseBoitier24C32(0x57);
-const byte jourSemaine(1), jour(2), mois(3), annee(4), heure(5), minutes(6),secondes(7);
-byte alarm_1 = 1; // alarme 1
-byte alarm_2 = 2; //alarme 2
+const byte jourSemaine(1), jour(2), mois(3), annee(4), heure(5), minutes(6), secondes(7);
+const byte alarm_1 (1); // alarme 1
+const byte alarm_2 (2); //alarme 2
 tmElements_t tm; // declaration de tm pour la lecture des informations date et heure
 HorlogeDS3232 rtc(adresseBoitier24C32, rtcINT, DEBUG);
 
@@ -363,7 +363,7 @@ void choixOuvFerm () {
         rtc.i2c_eeprom_write_byte( 0x14, lum.get_m_ouverture()); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
         affiChoixOuvFerm();
       }
-      if (decalage == 2*deplacement) {
+      if (decalage == 2 * deplacement) {
         if (!lum.get_m_fermeture()) {
           lum.set_m_fermeture(1); // fermeture 1 donc heure
           RTC.alarmInterrupt(alarm_2, true);// activation alarme 2 fermeture
@@ -390,16 +390,19 @@ void reglageHeureFermeture() {
       relache = false;
       //byte alarm2Hour =  bcdToDec(RTC.readRTC(0x0C) & 0x3f); // alarme 2 hours
       // byte alarm2Minute = bcdToDec(RTC.readRTC(0x0B)); // alarme 2 minutes
-      byte alarm2Hour =  rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
-      byte alarm2Minute = rtc.lectureRegistreEtConversion(ALM2_MINUTES); // alarme 2 minutes
+      //// rtc.lectureHoraireALARM2(); // lecture horaire de l'alarme2
+      //byte alarm2Hour =  rtc.lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
+      //byte alarm2Minute = rtc.lectureRegistreEtConversion(ALM2_MINUTES); // alarme 2 minutes
       if (decalage == deplacement) {
-        alarm2Hour = rtc.reglageHeure(touche, alarm2Hour, heure);
-        RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0); // écriture de l'heure alarme 2
+        rtc.reglageAlarme( touche, alarm_2, heure); // reglage de l'alarme 2 - heure
+        // alarm2Hour = rtc.reglageHeure(touche, alarm2Hour, heure);
+        //  RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0); // écriture de l'heure alarme 2
         closeTime(); // affichage de l'heure d'ouverture
       }
-      if (decalage == 2*deplacement) {
-        alarm2Minute = rtc.reglageHeure(touche, alarm2Minute, minutes);
-        RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0);  // écriture de l'heure alarme 2
+      if (decalage == 2 * deplacement) {
+        rtc.reglageAlarme( touche, alarm_2, minutes); // reglage de l'alarme 2 - minutes
+        // alarm2Minute = rtc.reglageHeure(touche, alarm2Minute, minutes);
+        //  RTC.setAlarm(ALM2_MATCH_HOURS, alarm2Minute, alarm2Hour, 0);  // écriture de l'heure alarme 2
         closeTime(); // affichage de l'heure d'ouverture
       }
     }
@@ -410,7 +413,7 @@ void reglageHeureFermeture() {
 //-----routine de reglage de l'heure d'ouverture-----
 void reglageHeureOuverture() {
   if (boitierOuvert) {
-     byte deplacement(4);
+    byte deplacement(4);
     if (incrementation == menuOuverture) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
     }
@@ -420,22 +423,26 @@ void reglageHeureOuverture() {
       // byte alarm1Hour =  bcdToDec(RTC.readRTC(0x09) & 0x3f); // alarme 1 hours
       //  byte alarm1Minute = bcdToDec(RTC.readRTC(0x08)); // alarme 1 minutes
       // byte alarm1Second =  bcdToDec(RTC.readRTC(0x07) & 0x7f); // alarme 1 seconds
-      byte alarm1Hour =  rtc.lectureRegistreEtConversion(ALM1_HOURS & 0x3f); // alarme 1 hours
-      byte alarm1Minute = rtc.lectureRegistreEtConversion(ALM1_MINUTES); // alarme 1 minutes
-      byte alarm1Second =  rtc.lectureRegistreEtConversion(ALM1_SECONDS & 0x7f); // alarme 1 seconds
+      //// rtc.lectureHoraireALARM1();// lecture horaire de l'alarme1
+      //  byte alarm1Hour =  rtc.lectureRegistreEtConversion(ALM1_HOURS & 0x3f); // alarme 1 hours
+      //  byte alarm1Minute = rtc.lectureRegistreEtConversion(ALM1_MINUTES); // alarme 1 minutes
+      // byte alarm1Second =  rtc.lectureRegistreEtConversion(ALM1_SECONDS & 0x7f); // alarme 1 seconds
       if (decalage == deplacement) {
-        alarm1Hour = rtc.reglageHeure(touche, alarm1Hour, heure);
-        RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
+        rtc.reglageAlarme( touche, alarm_1, heure); // reglage de l'alarme 1 - heure
+        // alarm1Hour = rtc.reglageHeure(touche, alarm1Hour, heure);
+        //  RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
-      if (decalage == 2*deplacement) {
-        alarm1Minute = rtc.reglageHeure(touche, alarm1Minute, minutes);
-        RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
+      if (decalage == 2 * deplacement) {
+        rtc.reglageAlarme( touche, alarm_1, minutes); // reglage de l'alarme 1 - minutes
+        //   alarm1Minute = rtc.reglageHeure(touche, alarm1Minute, minutes);
+        //  RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
-      if (decalage == 3*deplacement) {
-        alarm1Second = rtc.reglageHeure(touche, alarm1Second, secondes);
-        RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
+      if (decalage == 3 * deplacement) {
+        rtc.reglageAlarme( touche, alarm_1, secondes); // reglage de l'alarme 1 - secondes
+        // alarm1Second = rtc.reglageHeure(touche, alarm1Second, secondes);
+        // RTC.setAlarm(ALM1_MATCH_HOURS, alarm1Second, alarm1Minute, alarm1Hour, 0); // écriture alarm 1
         openTime(); // affichage de l'heure d'ouverture
       }
     }
@@ -446,7 +453,7 @@ void reglageHeureOuverture() {
 //----routine reglage jour semaine, jour, mois, annee-----
 void reglageDate () {
   if (boitierOuvert) {
-      byte deplacement(3);
+    byte deplacement(3);
     if (incrementation == menuDate) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
     }
@@ -456,15 +463,15 @@ void reglageDate () {
         tm.Wday = rtc.reglageHeure(touche, tm.Wday, jourSemaine);
         ecritureDateTime();
       }
-      if (decalage == 2*deplacement) {
+      if (decalage == 2 * deplacement) {
         tm.Day = rtc.reglageHeure(touche, tm.Day, jour);
         ecritureDateTime();
       }
-      if (decalage == 3*deplacement) {
+      if (decalage == 3 * deplacement) {
         tm.Month = rtc.reglageHeure(touche, tm.Month, mois);
         ecritureDateTime();
       }
-      if (decalage == 4*deplacement ) {
+      if (decalage == 4 * deplacement ) {
         tm.Year = rtc.reglageHeure(touche, tm.Year, annee);
         ecritureDateTime();
       }
@@ -544,7 +551,7 @@ void choixLumSoir() {
 //-----routine reglage heure , minute , seconde-----
 void reglageTime () {
   if (boitierOuvert) {
-      byte deplacement(4);
+    byte deplacement(4);
     if (incrementation == menuHeure) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
     }
@@ -554,11 +561,11 @@ void reglageTime () {
         tm.Hour = rtc.reglageHeure(touche, tm.Hour, heure);
         ecritureDateTime(); // routine écriture date and time
       }
-      if (decalage == 2*deplacement) {
+      if (decalage == 2 * deplacement) {
         tm.Minute = rtc.reglageHeure(touche, tm.Minute, minutes);
         ecritureDateTime();
       }
-      if (decalage == 3*deplacement) {
+      if (decalage == 3 * deplacement) {
         tm.Second = rtc.reglageHeure(touche, tm.Second, secondes);
         ecritureDateTime();
       }
@@ -592,7 +599,7 @@ void affiFinDeCourseOuverture() {
 //------reglage fin de course Fermeture------
 void regFinDeCourseFermeture() {
   if (boitierOuvert) {
-     byte deplacement(8);
+    byte deplacement(8);
     if (incrementation == menuFinDeCourseFermeture) {
       mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 12);// position du cuseur pendant les reglages
     }
@@ -798,12 +805,12 @@ void myInterruptINT0() {
 void myInterruptINT1() {
   rtc.testInterruptRTC(interruptRTC);// test de l'entree 5 - interruption du rtc
   /*
-  if (!digitalRead(rtcINT)) { // entree 5 pour interruption RTC
+    if (!digitalRead(rtcINT)) { // entree 5 pour interruption RTC
     interruptRTC = true;
-  }
+    }
   */
- // clav.testInterruptionBp (interruptBp, tempoDebounce);
- clav.testInterruptionBp (interruptBp);
+  // clav.testInterruptionBp (interruptBp, tempoDebounce);
+  clav.testInterruptionBp (interruptBp);
   clav.testInterruptionBoitier (interruptOuvBoi);
 }
 
@@ -811,8 +818,8 @@ void myInterruptINT1() {
 void routineInterruptionBp() {
   if (interruptBp) { // test de l'appui sur bouton bp
     // If the switch changed, due to noise or pressing
-   // if (clav.testToucheBp (tempoDebounce)) {
-       if (clav.testToucheBp ()) {
+    // if (clav.testToucheBp (tempoDebounce)) {
+    if (clav.testToucheBp ()) {
       if (monServo.get_m_ouvFerm())  monServo.set_m_ouvFerm(false); else  monServo.set_m_ouvFerm(true);
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
@@ -1101,7 +1108,8 @@ void setup() {
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
 
   //RTC.writeRTC(0x0E,0x06); // registre control rtc
-  RTC.writeRTC(0x0F, 0x00); // registre status rtc
+  //RTC.writeRTC(0x0F, 0x00); // registre status rtc
+  rtc.init();// initialisation de l'horloge
 
   //Optimisation de la consommation
   //power_adc_disable(); // Convertisseur Analog / Digital pour les entrées analogiques
@@ -1114,7 +1122,7 @@ void setup() {
   //power_timer1_disable();
   //power_timer2_disable();
 
-  setup_watchdog(9); // maxi de 8 secondes
+  setup_watchdog(9); // maxi de 8 secondes pour l'it du watchdog
 
   radio.init();//initialisation radio
 

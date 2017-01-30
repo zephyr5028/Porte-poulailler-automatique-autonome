@@ -5,13 +5,16 @@
 
 #include "HorlogeDS3232.h"
 
-HorlogeDS3232::HorlogeDS3232() : DS3232RTC(), m_deviceAddress(0x57), m_rtcINT(5), m_debug(false)
+HorlogeDS3232::HorlogeDS3232() : DS3232RTC(), m_deviceAddress(0x57), m_rtcINT(5), m_debug(false),
+  m_alarm1Hour(0), m_alarm1Minute(0), m_alarm1Second(0), m_alarm2Hour(0), m_alarm2Minute(0)
 {
 
 }
+
 /* sucharge du constructeur avec le nombre de lignes du menu */
 HorlogeDS3232::HorlogeDS3232 ( const byte adresseMemoireI2C, const byte rtcINT, const boolean debug) : DS3232RTC(),
-  m_deviceAddress(adresseMemoireI2C), m_rtcINT(rtcINT), m_debug(debug)
+  m_deviceAddress(adresseMemoireI2C), m_rtcINT(rtcINT), m_debug(debug),
+  m_alarm1Hour(0), m_alarm1Minute(0), m_alarm1Second(0), m_alarm2Hour(0), m_alarm2Minute(0)
 {
 
 }
@@ -23,6 +26,10 @@ HorlogeDS3232::~HorlogeDS3232() {
 //-----initialisation-----
 void HorlogeDS3232::init() {
   //Wire.begin();
+  //RTC.writeRTC(0x0E,0x06); // registre control rtc
+  RTC.writeRTC(0x0F, 0x00); // registre status rtc
+  lectureHoraireALARM1();
+  lectureHoraireALARM2();
 }
 
 //-----test IT RTC-----
@@ -105,4 +112,45 @@ byte HorlogeDS3232::reglageHeure(const byte touche, byte tmDateTime, const byte 
   return (tmDateTime);
 }
 
+//-----lecture horaire ALARM1-----
+void HorlogeDS3232::lectureHoraireALARM1() {
+  m_alarm1Hour =  lectureRegistreEtConversion(ALM1_HOURS & 0x3f); // alarme 1 hours
+  m_alarm1Minute = lectureRegistreEtConversion(ALM1_MINUTES); // alarme 1 minutes
+  m_alarm1Second =  lectureRegistreEtConversion(ALM1_SECONDS & 0x7f); // alarme 1 seconds
+}
+
+//-----lecture horaire ALARM2-----
+void HorlogeDS3232::lectureHoraireALARM2() {
+  m_alarm2Hour =  lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
+  m_alarm2Minute = lectureRegistreEtConversion(ALM2_MINUTES); // alarme 2 minutes
+}
+
+//-----reglage de l'alarme-----
+void HorlogeDS3232::reglageAlarme( const byte touche, const byte alarme, const byte type) {
+  if (alarme == 1) {
+    switch (type) { // test de type date time
+      case 5: // heure
+        m_alarm1Hour = reglageHeure(touche, m_alarm1Hour, type);
+        break;
+      case 6: // minute
+        m_alarm1Minute = reglageHeure(touche, m_alarm1Minute, type);
+        break;
+      case 7: // secondes
+        m_alarm1Second = reglageHeure(touche, m_alarm1Second, type);
+        break;
+    }
+    RTC.setAlarm(ALM1_MATCH_HOURS, m_alarm1Second, m_alarm1Minute, m_alarm1Hour, 0); // écriture alarm 1
+  }
+  if (alarme == 2) {
+    switch (type) { // test de type date time
+      case 5: // heure
+        m_alarm2Hour = reglageHeure(touche, m_alarm2Hour, type);
+        break;
+      case 6: // minute
+        m_alarm2Minute = reglageHeure(touche, m_alarm2Minute, type);
+        break;
+    }
+    RTC.setAlarm(ALM2_MATCH_HOURS, m_alarm2Minute, m_alarm2Hour, 0);  // écriture de l'heure alarme 2
+  }
+}
 
