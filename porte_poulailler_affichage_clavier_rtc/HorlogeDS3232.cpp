@@ -142,6 +142,7 @@ void HorlogeDS3232::reglageAlarme( const byte touche, const byte alarme, const b
     RTC.setAlarm(ALM1_MATCH_HOURS, m_alarm1Second, m_alarm1Minute, m_alarm1Hour, 0); // écriture alarm 1
   }
   if (alarme == 2) {
+    Serial.println(alarme);
     switch (type) { // test de type date time
       case 5: // heure
         m_alarm2Hour = reglageHeure(touche, m_alarm2Hour, type);
@@ -171,11 +172,11 @@ byte HorlogeDS3232::get_m_alarm1Second() {
 
 //-----accesseur - getter-----
 byte HorlogeDS3232::get_m_alarm2Hour() {
-  return m_alarm1Hour;
+  return m_alarm2Hour;
 }
 
 //-----accesseur - getter-----
 byte HorlogeDS3232::get_m_alarm2Minute() {
-  return m_alarm1Minute;
+  return m_alarm2Minute;
 }
 
