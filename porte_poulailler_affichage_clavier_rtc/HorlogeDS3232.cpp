@@ -182,6 +182,43 @@ float HorlogeDS3232::calculTemperature (const bool typeTemperature) {
   }
 }
 
+//-----mise à jour du choix du type d'ouverture / fermeture-----
+bool HorlogeDS3232::choixTypeOuvertureFermeture(bool choixOuvertureFermeture, const byte alarme) {
+  byte adresse(0);
+  if (alarme == 1)  adresse = 0x14; else adresse = 0x15;
+   if (choixOuvertureFermeture)  choixOuvertureFermeture = false; else choixOuvertureFermeture = true;
+  RTC.alarmInterrupt(alarme, choixOuvertureFermeture); // activation 1 / desactivation 0 : alarme
+  i2c_eeprom_write_byte( adresse, choixOuvertureFermeture); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
+  return choixOuvertureFermeture;
+}
+/*
+  //-----mise à jour du choix du type d'ouverture-----
+  bool HorlogeDS3232::choixTypeOuverture(bool choixOuverture, const byte alarme) {
+  if (choixOuverture) {
+    choixOuverture = false; // ouverture 0 donc lumière
+    // RTC.alarmInterrupt(alarme, false);     //disable Alarm1
+  } else {
+    choixOuverture = true; // ouverture 1 donc heure
+    //  RTC.alarmInterrupt(alarme, true); // activation alarme 1 ouverture
+  }
+  RTC.alarmInterrupt(alarme, choixOuverture); // activation 1 / desactivation 0 : alarme1
+  i2c_eeprom_write_byte( 0x14, choixOuverture); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
+  return choixOuverture;
+  }
+
+  //-----mise à jour du choix du type de fermeture----
+  bool HorlogeDS3232::choixTypeFermeture(bool choixFermeture, const byte alarme) {
+  if (!choixFermeture) {
+    choixFermeture = true; // fermeture 1 donc heure
+    // RTC.alarmInterrupt(alarme, true);// activation alarme 2 fermeture
+  } else {
+    choixFermeture = false; // fermeture 0 donc lumiere
+    // RTC.alarmInterrupt(alarme, false);     //disable Alarm2
+  }
+  RTC.alarmInterrupt(alarme, choixFermeture); // activation 1 / desactivation 0 : alarme2
+  i2c_eeprom_write_byte( 0x15, choixFermeture); // écriture du type de fermeture @15 de l'eeprom de la carte rtc (i2c @ 0x57)
+  }
+*/
 //-----accesseur - getter-----
 byte HorlogeDS3232::get_m_alarm1Hour() {
   return m_alarm1Hour;

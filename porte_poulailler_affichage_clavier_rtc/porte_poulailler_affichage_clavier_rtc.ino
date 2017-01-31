@@ -349,25 +349,31 @@ void choixOuvFerm () {
     if ((touche == 2 or touche == 3) and incrementation == menuChoix and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
       if (decalage == deplacement) {
-        if (lum.get_m_ouverture()) {
+        lum.set_m_ouverture(rtc.choixTypeOuvertureFermeture(lum.get_m_ouverture(), alarm_1));//
+        /*
+          if (lum.get_m_ouverture()) {
           lum.set_m_ouverture(0); // ouverture 0 donc lumière
           RTC.alarmInterrupt(alarm_1, false);     //disable Alarm1
-        } else {
+          } else {
           lum.set_m_ouverture(1); // ouverture 1 donc heure
           RTC.alarmInterrupt(alarm_1, true); // activation alarme 1 ouverture
-        }
-        rtc.i2c_eeprom_write_byte( 0x14, lum.get_m_ouverture()); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
+          }
+          rtc.i2c_eeprom_write_byte( 0x14, lum.get_m_ouverture()); // écriture du type d'ouverture @14 de l'eeprom de la carte rtc (i2c @ 0x57)
+        */
         affiChoixOuvFerm();
       }
       if (decalage == 2 * deplacement) {
-        if (!lum.get_m_fermeture()) {
+        lum.set_m_fermeture(rtc.choixTypeOuvertureFermeture(lum.get_m_fermeture(), alarm_2));//
+        /*
+          if (!lum.get_m_fermeture()) {
           lum.set_m_fermeture(1); // fermeture 1 donc heure
           RTC.alarmInterrupt(alarm_2, true);// activation alarme 2 fermeture
-        } else {
+          } else {
           lum.set_m_fermeture(0); // fermeture 0 donc lumiere
           RTC.alarmInterrupt(alarm_2, false);     //disable Alarm2
-        }
-        rtc.i2c_eeprom_write_byte( 0x15, lum.get_m_fermeture()); // écriture du type de fermeture @15 de l'eeprom de la carte rtc (i2c @ 0x57)
+          }
+          rtc.i2c_eeprom_write_byte( 0x15, lum.get_m_fermeture()); // écriture du type de fermeture @15 de l'eeprom de la carte rtc (i2c @ 0x57)
+        */
         affiChoixOuvFerm();
       }
     }
@@ -479,12 +485,12 @@ void choixLumMatin() {
         unsigned int lumMatin = lum.reglageLumiere(matin, touche);// reglage de la lumiere du matin
         rtc.sauvEepromChoix ( lumMatin, matin, lumiere);// sauvegarde dans l'eeprom I2C le choix de la lumiere du matin @0x16 et 0x17
         /*
-        byte val1 = lumMatin & 0xFF; // ou    byte val1= lowByte(sensorValue);// pf
-        byte val2 = (lumMatin >> 8) & 0xFF; // ou  //byte val1= highByte(sensorValue); // Pf
-        rtc.i2c_eeprom_write_byte( 0x16, val1); // écriture de la valeur du reglage de la lumiere du matin low @16  de l'eeprom de la carte rtc (i2c @ 0x57)
-        delay(10);
-        rtc.i2c_eeprom_write_byte( 0x17, val2); // écriture de la valeur du reglage de la lumiere du matin high @17 de l'eeprom de la carte rtc (i2c @ 0x57)
-        delay(10);
+          byte val1 = lumMatin & 0xFF; // ou    byte val1= lowByte(sensorValue);// pf
+          byte val2 = (lumMatin >> 8) & 0xFF; // ou  //byte val1= highByte(sensorValue); // Pf
+          rtc.i2c_eeprom_write_byte( 0x16, val1); // écriture de la valeur du reglage de la lumiere du matin low @16  de l'eeprom de la carte rtc (i2c @ 0x57)
+          delay(10);
+          rtc.i2c_eeprom_write_byte( 0x17, val2); // écriture de la valeur du reglage de la lumiere du matin high @17 de l'eeprom de la carte rtc (i2c @ 0x57)
+          delay(10);
         */
         affiLumMatin();
       }
@@ -515,14 +521,14 @@ void choixLumSoir() {
         bool soir(0);
         bool lumiere(1);
         unsigned int lumSoir = lum.reglageLumiere(soir, touche); // reglage de la lumiere du soir
-         rtc.sauvEepromChoix ( lumSoir, soir, lumiere);// sauvegarde dans l'eeprom I2C le choix de la lumiere du soir  @0x18 et 0x19
-         /*
-        byte val1 = lumSoir & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
-        byte val2 = (lumSoir >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
-        rtc.i2c_eeprom_write_byte( 0x18, val1); // écriture de la valeur du reglage de la lumiere du soir low @18  de l'eeprom de la carte rtc (i2c @ 0x57)
-        delay(10);
-        rtc.i2c_eeprom_write_byte( 0x19, val2); // écriture de la valeur du reglage de la lumiere du soir high @19 de l'eeprom de la carte rtc (i2c @ 0x57)
-        delay(10);
+        rtc.sauvEepromChoix ( lumSoir, soir, lumiere);// sauvegarde dans l'eeprom I2C le choix de la lumiere du soir  @0x18 et 0x19
+        /*
+          byte val1 = lumSoir & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
+          byte val2 = (lumSoir >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
+          rtc.i2c_eeprom_write_byte( 0x18, val1); // écriture de la valeur du reglage de la lumiere du soir low @18  de l'eeprom de la carte rtc (i2c @ 0x57)
+          delay(10);
+          rtc.i2c_eeprom_write_byte( 0x19, val2); // écriture de la valeur du reglage de la lumiere du soir high @19 de l'eeprom de la carte rtc (i2c @ 0x57)
+          delay(10);
         */
         affiLumSoir();
       }
@@ -594,12 +600,12 @@ void regFinDeCourseFermeture() {
         unsigned int finDeCourseFermeture = codOpt.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
         rtc.sauvEepromChoix ( finDeCourseFermeture, fermeture, finDeCourse);// sauvegarde dans l'eeprom I2C de la valeur de fin de course fermeture @0x20 et 0x21
         /*
-        byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
-        byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
-        rtc.i2c_eeprom_write_byte( 0x20, val1); // écriture de la valeur du reglage de la fin de course haut low @20  de l'eeprom de la carte rtc (i2c @ 0x57)
-        delay(10);
-        rtc.i2c_eeprom_write_byte( 0x21, val2); // écriture de la valeur du reglage de la fin de course haut  high @21 de l'eeprom de la carte rtc (i2c @ 0x57)
-        delay(10);
+          byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
+          byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
+          rtc.i2c_eeprom_write_byte( 0x20, val1); // écriture de la valeur du reglage de la fin de course haut low @20  de l'eeprom de la carte rtc (i2c @ 0x57)
+          delay(10);
+          rtc.i2c_eeprom_write_byte( 0x21, val2); // écriture de la valeur du reglage de la fin de course haut  high @21 de l'eeprom de la carte rtc (i2c @ 0x57)
+          delay(10);
         */
         affiFinDeCourseFermeture();
       }
@@ -622,12 +628,12 @@ void regFinDeCourseOuverture() {
         unsigned int finDeCourseOuverture = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
         rtc.sauvEepromChoix ( finDeCourseOuverture, ouverture, finDeCourse);// sauvegarde dans l'eeprom I2C de la valeur de fin de course ouverture @0x22 et 0x23
         /*
-        byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
-        byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
-        rtc.i2c_eeprom_write_byte( 0x22, val1); // écriture de la valeur du reglage de la fin de course bas low @22  de l'eeprom de la carte rtc (i2c @ 0x57)
-        delay(10);
-        rtc.i2c_eeprom_write_byte( 0x23, val2); // écriture de la valeur du reglage de la fin de course bas  high @23 de l'eeprom de la carte rtc (i2c @ 0x57)
-        delay(10);
+          byte val1 = finDeCourse & 0xFF; // ou    byte val1= lowByte(sensorValue); // pf
+          byte val2 = (finDeCourse >> 8) & 0xFF; // ou  byte val1= highByte(sensorValue); // Pf
+          rtc.i2c_eeprom_write_byte( 0x22, val1); // écriture de la valeur du reglage de la fin de course bas low @22  de l'eeprom de la carte rtc (i2c @ 0x57)
+          delay(10);
+          rtc.i2c_eeprom_write_byte( 0x23, val2); // écriture de la valeur du reglage de la fin de course bas  high @23 de l'eeprom de la carte rtc (i2c @ 0x57)
+          delay(10);
         */
         affiFinDeCourseOuverture();
       }
@@ -717,21 +723,21 @@ void testServo() {
 /* temperature */
 //-----routine lecture température sur ds3231 rtc type celsius=true ,fahrenheit=false------
 void read_temp(const boolean typeTemperature) {
- // int t = RTC.temperature();
- // float celsius = t / 4.0;
- // float fahrenheit = celsius * 9.0 / 5.0 + 32.0;
+  // int t = RTC.temperature();
+  // float celsius = t / 4.0;
+  // float fahrenheit = celsius * 9.0 / 5.0 + 32.0;
   float t = rtc.calculTemperature (typeTemperature);//valeur de la temperature en fonction du type
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     String texte = "";
-    if (typeTemperature) texte = "C"; else texte = "F"; 
-     mydisp.affichageVoltage(t, texte, decalage, ligne);
-  /*  
-    if (typeTemperature) {
-      mydisp.affichageVoltage(t, "C", decalage, ligne);
-    } else {
-      mydisp.affichageVoltage(t, "F", decalage, ligne);
-    }
+    if (typeTemperature) texte = "C"; else texte = "F";
+    mydisp.affichageVoltage(t, texte, decalage, ligne);
+    /*
+      if (typeTemperature) {
+        mydisp.affichageVoltage(t, "C", decalage, ligne);
+      } else {
+        mydisp.affichageVoltage(t, "F", decalage, ligne);
+      }
     */
   } else   if (RADIO) {
     char txt[3] = "";
