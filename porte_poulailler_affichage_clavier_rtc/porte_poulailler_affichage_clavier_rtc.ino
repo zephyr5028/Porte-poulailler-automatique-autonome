@@ -716,21 +716,27 @@ void testServo() {
 
 /* temperature */
 //-----routine lecture température sur ds3231 rtc type celsius=true ,fahrenheit=false------
-void read_temp(boolean typeTemperature) {
-  int t = RTC.temperature();
-  float celsius = t / 4.0;
-  float fahrenheit = celsius * 9.0 / 5.0 + 32.0;
+void read_temp(const boolean typeTemperature) {
+ // int t = RTC.temperature();
+ // float celsius = t / 4.0;
+ // float fahrenheit = celsius * 9.0 / 5.0 + 32.0;
+  float t = rtc.calculTemperature (typeTemperature);//valeur de la temperature en fonction du type
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
+    String texte = "";
+    if (typeTemperature) texte = "C"; else texte = "F"; 
+     mydisp.affichageVoltage(t, texte, decalage, ligne);
+  /*  
     if (typeTemperature) {
-      mydisp.affichageVoltage(celsius, "C", decalage, ligne);
+      mydisp.affichageVoltage(t, "C", decalage, ligne);
     } else {
-      mydisp.affichageVoltage(fahrenheit, "F", decalage, ligne);
+      mydisp.affichageVoltage(t, "F", decalage, ligne);
     }
+    */
   } else   if (RADIO) {
-    char temp[3] = "";
-    if (typeTemperature)  strcat(temp, "C;"); else strcat(temp, "F;");
-    radio.envoiFloat(celsius, boitierOuvert, temp);
+    char txt[3] = "";
+    if (typeTemperature)  strcat(txt, "C;"); else strcat(txt, "F;");
+    radio.envoiFloat( t, boitierOuvert, txt);
   }
 }
 

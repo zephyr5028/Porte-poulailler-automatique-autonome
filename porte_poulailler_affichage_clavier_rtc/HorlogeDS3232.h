@@ -31,7 +31,9 @@ class HorlogeDS3232 : public DS3232RTC
     byte reglageHeure(const byte touche, byte tmDateTime, const byte type);// reglage date time
     void testInterruptRTC (volatile bool &interruptRTC); //test IT RTC
     void reglageAlarme( const byte touche, const byte alarme, const byte type); //reglage de l'alarme
-    void sauvEepromChoix ( unsigned int valeurChoix, const bool matinSoirOuvFerm, const bool lumiereFinDeCourse);// sauvegarde dans l'eeprom I2C le choix de la lumiere ou de la valeur de fin de course
+    // sauvegarde dans l'eeprom I2C le choix de la lumiere ou de la valeur de fin de course
+    void sauvEepromChoix ( unsigned int valeurChoix, const bool matinSoirOuvFerm, const bool lumiereFinDeCourse);
+    float calculTemperature (const bool typeTemperature);//valeur de la temperature en fonction du type
     byte get_m_alarm1Hour();//accesseur - getter
     byte get_m_alarm1Minute();//accesseur - getter
     byte get_m_alarm1Second();//accesseur - getter

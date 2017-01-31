@@ -170,6 +170,18 @@ void HorlogeDS3232::sauvEepromChoix ( unsigned int valeurChoix, const bool matin
   delay(10);
 }
 
+//------valeur de la temperature en fonction du type------
+float HorlogeDS3232::calculTemperature (const bool typeTemperature) {
+  int t = RTC.temperature();
+  float celsius = t / 4.0;
+  if (typeTemperature) {
+    return celsius;
+  } else {
+    float fahrenheit = celsius * 9.0 / 5.0 + 32.0;
+    return fahrenheit;
+  }
+}
+
 //-----accesseur - getter-----
 byte HorlogeDS3232::get_m_alarm1Hour() {
   return m_alarm1Hour;
