@@ -14,7 +14,8 @@ class Lumiere
   public:
 
     // constructeur avec debug
-    Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir,  const byte heureFenetre = 17 , const float rapportConvertion = 5, boolean debug = false );
+    Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir,  const byte heureFenetreSoir = 17 , const float rapportConvertion = 5,
+             const byte tempsLum = 2,  boolean debug = false );
     ~Lumiere(); // destructeur
 
     unsigned int  reglageLumiere (bool matinSoir, byte touche);// reglage de la lumiere du matin ou du soir
@@ -51,7 +52,7 @@ class Lumiere
     // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V)
     const float m_rapportConvertion; // 5 pour convertion
     const int m_maxCAD; // maximum du convertisseur analogique numérique 1023
-    const byte m_heureFenetre; // horaire de la fenetre de non declenchement : 17h
+    const byte m_heureFenetreSoir; // horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
     const byte m_tempsLum; // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
     const boolean m_debug ; // pour affichage console si nécessaire
 

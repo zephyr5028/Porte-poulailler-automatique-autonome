@@ -107,14 +107,11 @@ boolean reglage = false; // menu=false ou reglage=true
 #include "Lumiere.h"
 const byte lumierePin(0); //analog pin A0 : luminosite
 const float convertion(5);// rapport de convertion CAD float
-/***************************************************************************/
-
-const heureFenetre(17); //horaire de la fenetre de non declenchement : 17h
-
-/***************************************************************************/
+const byte heureFenetreSoir(17); //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
+const byte boucleLumiere(2); // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 const unsigned int lumMatin(300); // valeur de la lumière du matin
 const unsigned int lumSoir(900); // valeur de la lumiere du soir
-Lumiere lum(lumierePin, lumMatin, lumSoir, heureFenetre, convertion, DEBUG); // objet lumiere
+Lumiere lum(lumierePin, lumMatin, lumSoir, heureFenetreSoir, convertion, boucleLumiere, DEBUG); // objet lumiere
 
 /* interruptions */
 volatile boolean interruptBp(false); // etat interruption entree 9
@@ -906,7 +903,7 @@ void deroulementMenu (byte increment) {
   }
 }
 
-/* watchdog */
+/* interruption du watchdog */
 //----Watchdog Interrupt Service est exécité lors d'un timeout du WDT----
 ISR(WDT_vect) {
   if (f_wdt == 0) {
@@ -914,7 +911,7 @@ ISR(WDT_vect) {
   }
 }
 
-//-----paramètre : 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms, 6=1 sec,7=2 sec, 8=4 sec, 9=8 secondes-----
+//-----initialisation du watchdog - paramètre : 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms, 6=1 sec,7=2 sec, 8=4 sec, 9=8 secondes-----
 void setup_watchdog(int ii) {
   byte bb;
   int ww;
@@ -952,8 +949,8 @@ void routineGestionWatchdog() {
         delay(10);
         digitalWrite(LED_PIN, LOW);
         if (batterieFaible) { // affichage si la batterie est faible
-          char chaine[26] = "";
-          for (byte i = 0; i < 26 ; i++) {
+          char chaine[27] = "";
+          for (byte i = 0; i < 27 ; i++) {
             chaine[i] = pgm_read_byte(affichageBatterieFaible + i);
           }
           radio.messageRadio(chaine);// on envoie le message
@@ -970,18 +967,6 @@ void routineGestionWatchdog() {
           lumiere();
           radio.chaineVide();
         }
-        if (DEBUG) {
-          Serial.print(F("compt watchdog lum : x * 8s  = ")); Serial.println(lum.get_m_compteurWatchdogLumiere());
-          Serial.print(F("Batterie faible ! "));
-          if (batterieFaible) {
-            Serial.println(F("oui"));// F() pour mise en mèmoire flash
-          } else {
-            Serial.println(F("non"));
-          }
-          Serial.println(F("Sommeil"));
-          Serial.println(F("* * * *"));
-          delay(100);
-        }
         tempsWatchdog = bouclesWatchdog ; // initialisation du nombre de boucles
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
@@ -989,6 +974,20 @@ void routineGestionWatchdog() {
       enterSleep(); //Revenir en mode veille
     }
   }
+}
+
+//-----initialisation power-----
+void  setupPower() {
+  //Optimisation de la consommation
+  //power_adc_disable(); // Convertisseur Analog / Digital pour les entrées analogiques
+  power_spi_disable();
+  //power_twi_disable();
+  //Si pas besoin de communiquer par l'usb
+  //power_usart0_disable();
+  //Extinction des timers, attention timer0 utilisé par millis ou delay
+  //power_timer0_disable();
+  //power_timer1_disable();
+  //power_timer2_disable();
 }
 
 /* setup */
@@ -1037,18 +1036,9 @@ void setup() {
 
   rtc.init();// initialisation de l'horloge
 
-  //Optimisation de la consommation
-  //power_adc_disable(); // Convertisseur Analog / Digital pour les entrées analogiques
-  power_spi_disable();
-  //power_twi_disable();
-  //Si pas besoin de communiquer par l'usb
-  //power_usart0_disable();
-  //Extinction des timers, attention timer0 utilisé par millis ou delay
-  //power_timer0_disable();
-  //power_timer1_disable();
-  //power_timer2_disable();
+  setupPower(); // initialisation power de l'arduino
 
-  setup_watchdog(9); // maxi de 8 secondes pour l'it du watchdog
+  setup_watchdog(9); // initialisation : maxi de 8 secondes pour l'it du watchdog
 
   radio.init();//initialisation radio
 

@@ -6,11 +6,11 @@
 #include "Lumiere.h"
 
 //constructeur avec debug
-Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetre, const float rapportConvertion, const boolean debug) :
+Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const float rapportConvertion, const byte tempsLum, const boolean debug) :
   m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir),
   m_rapportConvertion(rapportConvertion), m_debug(debug), m_ouverture(1), m_fermeture(0),
   m_lumiereMax(1020), m_incrementation(10), m_maxCAD(1023), m_compteurWatchdogLumiere(0),
-  m_heureFenetre(heureFenetre), m_tempsLum(2)
+  m_heureFenetreSoir(heureFenetreSoir), m_tempsLum(tempsLum)
 {
 }
 
@@ -70,10 +70,10 @@ void Lumiere::testLuminosite() {
 }
 
 //-----fenetre de non declenchement et mise à jour du compteur watchdog lumiere------
+// fenetre de non declenchement avec la lumiere si utilisation horaire : jour 17h00 nuit  9h00 jour (25 décembre)
 void Lumiere::fenetreNonDeclenchement(byte horaire) {
-  // pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 si utilisation de l'heure
-  if ((m_ouverture and horaire < m_heureFenetre) or (m_fermeture and horaire > m_heureFenetre)) {
-    m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
+  if ((m_ouverture and horaire < m_heureFenetreSoir) or (m_fermeture and horaire >= m_heureFenetreSoir)) {
+    m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre ou un eclairage
   }
 }
 
