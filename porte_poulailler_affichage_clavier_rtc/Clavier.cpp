@@ -40,7 +40,7 @@ int Clavier::read_key(const int &sensor) {
   int  adc_key_in = analogRead(sensor); // read the value from the sensor A1
   byte key = get_key(adc_key_in); // convert into key press
   if (key != m_oldKey) { // if keypress is detected
-    delay(100); // wait for debounce time
+    delay(50); // wait for debounce time
     adc_key_in = analogRead(sensor); // read the value from the sensor
     key = get_key(adc_key_in); // convert into key press
     if (key != m_oldKey)  {
