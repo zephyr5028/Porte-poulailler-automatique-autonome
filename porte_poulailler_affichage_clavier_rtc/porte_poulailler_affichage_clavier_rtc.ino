@@ -92,18 +92,19 @@ Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRo
 /* watchdog - Optimisation de la consommation */
 #include "PowerTools.h"
 unsigned int memoireLibre(0); // variable pour calcul de la memoire libre
-#include <avr/power.h>
-#include <avr/sleep.h>
-#include <avr/wdt.h>
+//#include <avr/power.h>
+//#include <avr/sleep.h>
+//#include <avr/wdt.h>
 volatile int f_wdt = 1; // flag watchdog
 /************************************************************/
 // nombre de boucles du watchdog : environ 64s pour 8 boucles
 
-const byte bouclesWatchdog(2);
+const byte bouclesWatchdog(32);
 
 /************************************************************/
-byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
-boolean reglage = false; // menu=false ou reglage=true
+byte tempsWatchdog ( bouclesWatchdog) ; // boucle temps du chien de garde
+boolean reglage (false); // menu=false ou reglage=true
+PowerTools tools (DEBUG); // objet tools et power
 
 /*** lumiere ***/
 #include "Lumiere.h"
@@ -170,7 +171,7 @@ LcdPCF8574  mydisp(0x27, 16, 2);
 /* RTC_DS3231 */
 #include "HorlogeDS3232.h"
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
-const byte adresseBoitier24C32(0x57);
+const byte adresseBoitier24C32(0x57);// adresse du boitier memoire eeprom 24c32
 const byte jourSemaine(1), jour(2), mois(3), annee(4), heure(5), minutes(6), secondes(7);
 const byte alarm_1 (1); // alarme 1
 const byte alarm_2 (2); //alarme 2
@@ -683,13 +684,6 @@ void read_temp(const boolean typeTemperature) {
   }
 }
 
-//-----taille d'une chaine de caractères-----
-byte tailleChaine (char * chaine) {
-  byte i(1);
-  while (chaine[i] != '\0') i++;
-  return i;
-}
-
 /* servomoteur :
     -montée
     -descente
@@ -913,24 +907,6 @@ ISR(WDT_vect) {
   }
 }
 
-//-----initialisation du watchdog - paramètre : 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms, 6=1 sec,7=2 sec, 8=4 sec, 9=8 secondes-----
-void setup_watchdog(int ii) {
-  byte bb;
-  int ww;
-  if (ii > 9 ) ii = 9;
-  bb = ii & 7;
-  if (ii > 7) bb |= (1 << 5);
-  bb |= (1 << WDCE);
-  ww = bb;
-  // Clear the reset flag
-  MCUSR &= ~(1 << WDRF);
-  // start timed sequence
-  WDTCSR |= (1 << WDCE) | (1 << WDE);
-  // set new watchdog timeout value
-  WDTCSR = bb;
-  WDTCSR |= _BV(WDIE);
-}
-
 //-----entree dans le mode sleep-----
 void enterSleep(void) {
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
@@ -979,20 +955,6 @@ void routineGestionWatchdog() {
   }
 }
 
-//-----initialisation power-----
-void  setupPower() {
-  //Optimisation de la consommation
-  //power_adc_disable(); // Convertisseur Analog / Digital pour les entrées analogiques
-  power_spi_disable();
-  //power_twi_disable();
-  //Si pas besoin de communiquer par l'usb
-  //power_usart0_disable();
-  //Extinction des timers, attention timer0 utilisé par millis ou delay
-  //power_timer0_disable();
-  //power_timer1_disable();
-  //power_timer2_disable();
-}
-
 /* setup */
 void setup() {
 
@@ -1039,9 +1001,9 @@ void setup() {
 
   rtc.init();// initialisation de l'horloge
 
-  setupPower(); // initialisation power de l'arduino
+  tools.setupPower(); // initialisation power de l'arduino
 
-  setup_watchdog(9); // initialisation : maxi de 8 secondes pour l'it du watchdog
+  tools.setup_watchdog(9); // initialisation : maxi de 8 secondes pour l'it du watchdog
 
   radio.init();//initialisation radio
 
