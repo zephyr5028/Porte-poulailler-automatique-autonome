@@ -32,6 +32,7 @@ bool Bouton::testToucheBp() {
 //-----test relache Bp-----
 void Bouton::testRelacheBp (volatile bool &interruptBp) {
   if (m_relacheBp == false and digitalRead(m_pinBp) ) {
+    delay (50);
     interruptBp = false; // autorisation de la prise en compte de l'IT
     m_relacheBp = true;
   }

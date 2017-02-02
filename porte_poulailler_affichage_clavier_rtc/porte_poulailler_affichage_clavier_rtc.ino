@@ -143,7 +143,7 @@ const byte oldkey(-1);
 const byte sensorClavier(1); //pin A1 pour le clavier
 const byte pinBp(9); // pin D9 bouton poussoir ouverture / fermeture
 const byte pinBoitier(6); //pin D6 interrupteur ouverture boitier
-const int debounce(250); // debounce latency in ms
+const int debounce(150); // debounce latency in ms
 byte incrementation(0); // incrementation verticale
 boolean relache(false); // relache de la touche
 byte touche(-1); // valeur de la touche appuyee

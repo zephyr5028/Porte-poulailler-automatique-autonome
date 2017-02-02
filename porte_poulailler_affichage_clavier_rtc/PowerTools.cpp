@@ -64,5 +64,3 @@ byte PowerTools::tailleChaine (char * chaine) {
   return i;
 }
 
-
-
