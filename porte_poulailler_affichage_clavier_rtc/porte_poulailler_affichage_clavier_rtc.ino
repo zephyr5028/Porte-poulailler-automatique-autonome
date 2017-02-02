@@ -47,7 +47,7 @@ const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
 const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
 
 
-/*------Bibliothèque Flash pour mise en mémoire flash  F()--------*/
+/*------Bibliothèque Flash pour mise en mémoire flash de l'arduino F()--------*/
 #include <Flash.h>
 #include <avr/pgmspace.h> // non nécessaire maintenant
 
@@ -80,7 +80,6 @@ boolean batterieFaible = false; // si batterie < 4,8v = true
 Accus accusCde (accusPinCde, tensionMiniAccus, rapportConvertion, DEBUG); // objet accus commande mini 4.8v, convertion 7.5
 Accus accusServo (accusPinServo); // objet accus servo moteur mini 4.8v, convertion 7.5
 
-
 /*** roue codeuse ***/
 #include "Codeur.h"
 const byte roueCodeuse(7);//digital pin D7 pour entrée roue codeuse
@@ -89,7 +88,10 @@ const unsigned int finDeCourseFermeture(250); // initialisation de la valeur de 
 const unsigned int finDeCourseOuverture(150); // initialisation de la valeur de la fin de course ouverture
 Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRoueCodeuse, DEBUG); // objet codeur optique
 
+/* power and tools */
 /* watchdog - Optimisation de la consommation */
+#include "PowerTools.h"
+unsigned int memoireLibre(0); // variable pour calcul de la memoire libre
 #include <avr/power.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
@@ -97,7 +99,7 @@ volatile int f_wdt = 1; // flag watchdog
 /************************************************************/
 // nombre de boucles du watchdog : environ 64s pour 8 boucles
 
-const byte bouclesWatchdog(32);
+const byte bouclesWatchdog(2);
 
 /************************************************************/
 byte tempsWatchdog = bouclesWatchdog; // boucle temps du chien de garde
@@ -681,13 +683,6 @@ void read_temp(const boolean typeTemperature) {
   }
 }
 
-//-----free memory sram-----
-int freeRam () {
-  extern int __heap_start, *__brkval;
-  int v;
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
-}
-
 //-----taille d'une chaine de caractères-----
 byte tailleChaine (char * chaine) {
   byte i(1);
@@ -972,6 +967,7 @@ void routineGestionWatchdog() {
           affiFinDeCourseFermeture();
           affiFinDeCourseOuverture();
           lumiere();
+          radio.envoiUnsignedInt( memoireLibre, boitierOuvert, ";"); // envoi message radio : memoire sram restante
           radio.chaineVide();
         }
         tempsWatchdog = bouclesWatchdog ; // initialisation du nombre de boucles
@@ -1080,6 +1076,8 @@ void loop() {
     testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
   }
 
+  memoireLibre = freeMemory(); // calcul de la  memoire sram libre
+  
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
   batterieFaible = accusCde.accusFaible(); // test de la batterie commande < 4.8v
@@ -1097,4 +1095,5 @@ void loop() {
 
   routineGestionWatchdog(); // routine de gestion du watchdog
 }
+
 
