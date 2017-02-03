@@ -41,61 +41,16 @@
 
 /**********************************************************************************/
 
-const boolean DEBUG = false; // positionner debug pour l'utiliser ou pas
-const boolean RADIO = true; // positionner radio pour l'utiliser ou pas
-const bool TESTSERVO = false; // pour utiliser ou non le test du servomoteur
-const bool TEMPERATURE = true; // true = celsius , false = fahrenheit
-
-
 /*------Bibliothèque Flash pour mise en mémoire flash de l'arduino F()--------*/
 #include <Flash.h>
 #include <avr/pgmspace.h> // non nécessaire maintenant
 
-/*** radio 433MHz ***/
-#include "Radio.h"
-const byte pinEmRadio = 10; // pin D10 emetteur radio
-const int vitesseTransmission(600);//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
-Radio radio(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, RADIO, DEBUG); // classe Radio
-
-/*** led broche 13 ***/
-#define LED_PIN 13
-
-/*** servo - montée et descente de la porte ***/
-#include "ServoMoteur.h"
-const byte servoCde (8); // pin D8 cde du servo
-const byte servoPin (4); // pin D4 relais du servo
-const byte securiteHaute(12); // pin 12 pour la securite d'ouverture de porte
-const int pulseStop (1500); // value should usually be 750 to 2200 (1500 = stop)
-bool reduit(false); // vitesse du servo, normal ou reduit(false)
-// pulse stop, ouverture/fermeture , reduit et debug si nécessaire
-ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 70, DEBUG);
-
-/*** Accus ***/
-#include "Accus.h"
-const byte accusPinCde(2); //analog pin A2 : tension batterie commandes
-const byte accusPinServo(3); //analog pin A3 : tension batterie servo moteur
-const float tensionMiniAccus(4.8); //valeur minimum de l'accu 4.8v
-const float rapportConvertion(7.5);// rapport de convertion CAD float
-boolean batterieFaible = false; // si batterie < 4,8v = true
-Accus accusCde (accusPinCde, tensionMiniAccus, rapportConvertion, DEBUG); // objet accus commande mini 4.8v, convertion 7.5
-Accus accusServo (accusPinServo); // objet accus servo moteur mini 4.8v, convertion 7.5
-
-/*** roue codeuse ***/
-#include "Codeur.h"
-const byte roueCodeuse(7);//digital pin D7 pour entrée roue codeuse
-const unsigned int compteRoueCodeuse(150);  // un compteur de position
-const unsigned int finDeCourseFermeture(250); // initialisation de la valeur de la fin de course fermeture
-const unsigned int finDeCourseOuverture(150); // initialisation de la valeur de la fin de course ouverture
-Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRoueCodeuse, DEBUG); // objet codeur optique
-
 /* power and tools */
 /* watchdog - Optimisation de la consommation */
 #include "PowerTools.h"
+const boolean debug ( false ); // positionner debug pour l'utiliser ou pas
 unsigned int memoireLibre(0); // variable pour calcul de la memoire libre
-//#include <avr/power.h>
-//#include <avr/sleep.h>
-//#include <avr/wdt.h>
-volatile int f_wdt = 1; // flag watchdog
+volatile int f_wdt ( 1 ); // flag watchdog
 /************************************************************/
 // nombre de boucles du watchdog : environ 64s pour 8 boucles
 
@@ -104,7 +59,46 @@ const byte bouclesWatchdog(32);
 /************************************************************/
 byte tempsWatchdog ( bouclesWatchdog) ; // boucle temps du chien de garde
 boolean reglage (false); // menu=false ou reglage=true
-PowerTools tools (DEBUG); // objet tools et power
+PowerTools tools (debug); // objet tools et power
+
+/*** radio 433MHz ***/
+#include "Radio.h"
+const boolean utilisationRadio (true) ; // positionner radio pour l'utiliser ou pas
+const byte pinEmRadio = 10; // pin D10 emetteur radio
+const int vitesseTransmission(600);//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
+Radio radio(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, utilisationRadio, debug); // classe Radio
+
+/*** led broche 13 ***/
+#define LED_PIN 13
+
+/*** servo - montée et descente de la porte ***/
+#include "ServoMoteur.h"
+const bool testServoMoteur (false); // pour utiliser ou non le test du servomoteur
+const byte servoCde (8); // pin D8 cde du servo
+const byte servoPin (4); // pin D4 relais du servo
+const byte securiteHaute(12); // pin 12 pour la securite d'ouverture de porte
+const int pulseStop (1500); // value should usually be 750 to 2200 (1500 = stop)
+bool reduit(false); // vitesse du servo, normal ou reduit(false)
+// pulse stop, ouverture/fermeture , reduit et debug si nécessaire
+ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 70, debug);
+
+/*** Accus ***/
+#include "Accus.h"
+const byte accusPinCde(2); //analog pin A2 : tension batterie commandes
+const byte accusPinServo(3); //analog pin A3 : tension batterie servo moteur
+const float tensionMiniAccus(4.8); //valeur minimum de l'accu 4.8v
+const float rapportConvertion(7.5);// rapport de convertion CAD float
+boolean batterieFaible = false; // si batterie < 4,8v = true
+Accus accusCde (accusPinCde, tensionMiniAccus, rapportConvertion, debug); // objet accus commande mini 4.8v, convertion 7.5
+Accus accusServo (accusPinServo); // objet accus servo moteur mini 4.8v, convertion 7.5
+
+/*** roue codeuse ***/
+#include "Codeur.h"
+const byte roueCodeuse(7);//digital pin D7 pour entrée roue codeuse
+const unsigned int compteRoueCodeuse(150);  // un compteur de position
+const unsigned int finDeCourseFermeture(250); // initialisation de la valeur de la fin de course fermeture
+const unsigned int finDeCourseOuverture(150); // initialisation de la valeur de la fin de course ouverture
+Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRoueCodeuse, debug); // objet codeur optique
 
 /*** lumiere ***/
 #include "Lumiere.h"
@@ -114,7 +108,7 @@ const byte heureFenetreSoir(17); //horaire de la fenetre de non declenchement lu
 const byte boucleLumiere(2); // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 const unsigned int lumMatin(300); // valeur de la lumière du matin
 const unsigned int lumSoir(900); // valeur de la lumiere du soir
-Lumiere lum(lumierePin, lumMatin, lumSoir, heureFenetreSoir, convertion, boucleLumiere, DEBUG); // objet lumiere
+Lumiere lum(lumierePin, lumMatin, lumSoir, heureFenetreSoir, convertion, boucleLumiere, debug); // objet lumiere
 
 /* interruptions */
 volatile boolean interruptBp(false); // etat interruption entree 9
@@ -148,7 +142,7 @@ byte incrementation(0); // incrementation verticale
 boolean relache(false); // relache de la touche
 byte touche(-1); // valeur de la touche appuyee
 boolean  boitierOuvert(true); // le boitier est ouvert
-Clavier clav(menuManuel, pinBp, pinBoitier, debounce, DEBUG); // class Clavier avec le nombre de lignes du menu
+Clavier clav(menuManuel, pinBp, pinBoitier, debounce, debug); // class Clavier avec le nombre de lignes du menu
 
 /*** LCD DigoleSerialI2C ***/
 const int boucleTemps(100); // temps entre deux affichages
@@ -159,7 +153,7 @@ int temps(0);// pour calcul dans la fonction temporisationAffichage
 #ifdef  LCDDIGOLE
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
-LcdDigoleI2C mydisp( &Wire, '\x27', colonnes, DEBUG); // classe lcd digole i2c (lcd 2*16 caracteres)
+LcdDigoleI2C mydisp( &Wire, '\x27', colonnes, debug); // classe lcd digole i2c (lcd 2*16 caracteres)
 #endif
 
 #ifdef LCDLIQIDCRYSTAL
@@ -175,8 +169,9 @@ const byte adresseBoitier24C32(0x57);// adresse du boitier memoire eeprom 24c32
 const byte jourSemaine(1), jour(2), mois(3), annee(4), heure(5), minutes(6), secondes(7);
 const byte alarm_1 (1); // alarme 1
 const byte alarm_2 (2); //alarme 2
+const bool typeTemperature (true); // true = celsius , false = fahrenheit
 tmElements_t tm; // declaration de tm pour la lecture des informations date et heure
-HorlogeDS3232 rtc(adresseBoitier24C32, rtcINT, DEBUG);
+HorlogeDS3232 rtc(adresseBoitier24C32, rtcINT, debug);
 
 /* progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
@@ -239,7 +234,7 @@ void displayTime () {
   if ( boitierOuvert) { // si le boitier est ouvert
     RTC.read(tm); // lecture date et heure
     mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second, decalage);
-  } else   if (RADIO) {
+  } else   if (utilisationRadio) {
     int timeHour = rtc.lectureRegistreEtConversion (RTC_HOURS, 0x3f); // heure
     int timeMinute = rtc.lectureRegistreEtConversion( RTC_MINUTES ) ; // minutes
     radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure + etat  boitier
@@ -272,7 +267,7 @@ void affiPulsePlusCptRoue() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageServo(pulse, compteRoueCodeuse, decalage, ligne);
-  } else   if (RADIO and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
+  } else   if (utilisationRadio and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     switch (test) {
       case 1: // mise sous tension du servo pour l'ouverture de la porte
@@ -309,7 +304,7 @@ void affiTensionBatCdes() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
-  } else   if (RADIO) {
+  } else   if (utilisationRadio) {
     radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
   }
 }
@@ -322,7 +317,7 @@ void affiTensionBatServo() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
-  } else   if (RADIO) {
+  } else   if (utilisationRadio) {
     radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
   }
 }
@@ -533,7 +528,7 @@ void affiFinDeCourseFermeture() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageLumFinCourse(finDeCourseFermeture, decalage, ligne);
-  } else   if (RADIO) {
+  } else   if (utilisationRadio) {
     radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
   }
 }
@@ -544,7 +539,7 @@ void affiFinDeCourseOuverture() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
-  } else   if (RADIO) {
+  } else   if (utilisationRadio) {
     radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
   }
 }
@@ -606,7 +601,7 @@ void regFinDeCourseOuverture() {
 */
 // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
 void testServo() {
-  if (TESTSERVO) {
+  if (testServoMoteur) {
     int pulse = monServo.get_m_pulse();
     //des données sur la liaison série : (lorsque l'on appuie sur a, q, z, s, e, d )
     if (Serial.available())    {
@@ -677,7 +672,7 @@ void read_temp(const boolean typeTemperature) {
     String texte = "";
     if (typeTemperature) texte = "C"; else texte = "F";
     mydisp.affichageVoltage(t, texte, decalage, ligne);
-  } else   if (RADIO) {
+  } else   if (utilisationRadio) {
     char txt[3] = "";
     if (typeTemperature)  strcat(txt, "C;"); else strcat(txt, "F;");
     radio.envoiFloat( t, boitierOuvert, txt);
@@ -813,7 +808,7 @@ void lumiere() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);// première ligne car non reglable
     mydisp.affichageLumFinCourse(lumValue, decalage, ligne);
-  } else   if (RADIO) {
+  } else   if (utilisationRadio) {
     radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
     radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
   }
@@ -934,9 +929,9 @@ void routineGestionWatchdog() {
           radio.messageRadio(chaine);// on envoie le message
         }
         // informations à afficher
-        if (RADIO) {
+        if (utilisationRadio) {
           displayTime();
-          read_temp(TEMPERATURE); // read temperature celsius=true
+          read_temp(typeTemperature); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
           affiPulsePlusCptRoue();
@@ -1011,7 +1006,7 @@ void setup() {
 
   codOpt.init();// initialisation de la position de la roue codeuse
 
-  if (!TESTSERVO) {
+  if (!testServoMoteur) {
     monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
   }
 }
@@ -1034,7 +1029,7 @@ void loop() {
   regFinDeCourseOuverture(); // reglage fin de course ouverture
   eclairageAfficheur(); // retro eclairage de l'afficheur
 
-  if (TESTSERVO) {
+  if (testServoMoteur) {
     testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
   }
 
