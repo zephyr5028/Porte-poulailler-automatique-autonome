@@ -1,4 +1,4 @@
-v 20110115 2
+v 20130925 2
 C 40000 40000 0 0 0 title-B.sym
 C 50300 45300 1 0 0 EMBEDDEDarduino-nano-1.sym
 [
@@ -1322,9 +1322,9 @@ T 40300 45100 9 10 1 0 0 0 1
 T 52000 41000 9 10 1 0 0 0 1
 Porte du poulailler - arduino
 T 50800 40300 9 10 1 0 0 0 1
-septembre 2016
+février 2017
 T 54300 40200 9 10 1 0 0 0 1
-rev 1-4 arduino
+rev 1-5 arduino
 N 40500 44000 40500 43300 4
 N 45500 43500 45500 43600 4
 T 45900 41900 9 10 1 0 0 0 1
@@ -2293,3 +2293,74 @@ T 52000 48600 9 10 1 0 0 0 1
 tx
 T 52000 48400 9 10 1 0 0 0 1
 rx
+C 52100 45500 1 0 0 EMBEDDEDswitch_spco-1.sym
+[
+V 52760 45500 50 3 0 0 0 -1 -1 0 -1 -1 -1 -1 -1
+V 52760 45900 50 3 0 0 0 -1 -1 0 -1 -1 -1 -1 -1
+L 52410 45700 52760 45850 3 0 0 0 -1 -1
+P 52810 45500 53100 45500 1 0 1
+{
+T 53760 45650 5 10 0 0 0 0 1
+pinseq=3
+T 53600 45550 5 10 0 1 0 0 1
+pinnumber=3
+T 53810 45500 5 10 0 0 0 0 1
+pintype=passive
+T 52810 45500 5 10 0 0 0 0 1
+pinlabel=C
+}
+P 52810 45900 53100 45900 1 0 1
+{
+T 52860 46150 5 10 0 0 0 0 1
+pinseq=1
+T 52810 46000 5 10 0 1 0 0 1
+pinnumber=1
+T 52910 46000 5 10 0 0 0 0 1
+pintype=passive
+T 52810 45900 5 10 0 0 0 0 1
+pinlabel=A
+}
+P 52410 45700 52110 45700 1 0 1
+{
+T 52660 45750 5 10 0 0 0 0 1
+pinseq=2
+T 52210 45800 5 10 0 1 0 0 1
+pinnumber=2
+T 52110 45600 5 10 0 0 0 0 1
+pintype=passive
+T 52410 45700 5 10 0 0 0 0 1
+pinlabel=B
+}
+T 52100 45700 8 10 0 0 0 0 1
+comment=Suggested library: unknown
+T 53700 45500 8 10 0 0 0 0 1
+use-license=unlimited
+T 52100 45500 8 10 0 0 0 0 1
+dist-license=GPL
+T 55700 45500 8 10 0 0 0 0 1
+author=Wilbert Knol w.knolATniwa.co.nz
+T 52510 46650 8 10 0 0 0 0 1
+numslots=0
+T 52510 46500 8 10 0 0 0 0 1
+footprint=none
+T 52510 46100 8 10 0 1 0 0 1
+refdes=S?
+T 52510 46350 8 10 0 0 0 0 1
+device=switch_singlePole_changeOver
+]
+{
+T 52510 46350 5 10 0 0 0 0 1
+device=switch_singlePole_changeOver
+T 52510 46100 5 10 0 1 0 0 1
+refdes=S?
+T 52510 46500 5 10 0 0 0 0 1
+footprint=none
+}
+C 53500 45400 1 90 0 gnd-1.sym
+C 53200 45900 1 0 0 5V-plus-1.sym
+N 51900 46000 52110 46000 4
+N 52110 46000 52110 45700 4
+N 53100 45900 53400 45900 4
+N 53100 45500 53200 45500 4
+T 52800 45700 9 10 1 0 0 0 1
+radio on/off
