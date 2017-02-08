@@ -6,7 +6,8 @@
 #include "Radio.h"
 
 //constructeur avec debug et radio pour affichage si nécessaire
-Radio::Radio(byte pinEmRadio, int vitesseTransmission, byte taille, const boolean radio, const boolean debug) :  m_pinEmRadio(pinEmRadio),
+Radio::Radio(byte pinEmRadio, int vitesseTransmission, byte taille, bool radio, const boolean debug) :  m_pinEmRadio(pinEmRadio),
+//Radio::Radio(byte pinEmRadio, int vitesseTransmission, byte taille, const boolean radio, const boolean debug) :  m_pinEmRadio(pinEmRadio),
   m_vitesseTransmission(vitesseTransmission), m_taille(taille), m_radio(radio), m_debug(debug)
 {
   m_chaine[m_taille] = "";// initialisation du tableau
@@ -33,6 +34,18 @@ void Radio::messageRadio(char *chaine1) {
   delay(10);
 }
 
+//----message Radio sans parametre-----
+void Radio::messageSansParametre() {
+  //strcat(m_chaine, "\0");
+  byte leng = strlen(m_chaine);// longueur du tableau
+  m_chaine[leng + 1] = '\0';// fin de tableau
+  vw_send((uint8_t *)m_chaine, leng + 1); // On envoie le message
+  // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
+  vw_wait_tx(); // On attend la fin de l'envoi
+  delay(10);
+  for (byte i = 0; i < leng + 1; i++)   m_chaine[i] = {0};
+}
+
 //----routine construction message radio----
 //void Radio::envoiMessage(char chaine1[]) {
 void Radio::envoiMessage(char *chaine1) {
@@ -50,18 +63,6 @@ void Radio::envoiMessage(char *chaine1) {
   } else {
     messageSansParametre();// envoi du message contenu dans m_chaine[]
   }
-}
-
-//----message Radio sans parametre-----
-void Radio::messageSansParametre() {
-  //strcat(m_chaine, "\0");
-  byte leng = strlen(m_chaine);// longueur du tableau
-  m_chaine[leng + 1] = '\0';// fin de tableau
-  vw_send((uint8_t *)m_chaine, leng + 1); // On envoie le message
-  // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
-  vw_wait_tx(); // On attend la fin de l'envoi
-  delay(10);
-  for (byte i = 0; i < leng + 1; i++)   m_chaine[i] = {0};
 }
 
 //----chaine radio fin de ligne avant transmission-----
@@ -99,4 +100,13 @@ void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char *t
   }
 }
 
+//-----accesseur - getter-----
+bool Radio::get_m_radio() {
+  return m_radio;
+}
+
+//-----mutateur - setter-----
+void Radio::set_m_radio(bool radio) {
+  m_radio = radio;
+}
 

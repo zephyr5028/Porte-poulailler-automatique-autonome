@@ -63,8 +63,9 @@ PowerTools tools (debug); // objet tools et power
 
 /*** radio 433MHz ***/
 #include "Radio.h"
-const boolean utilisationRadio (true) ; // positionner radio pour l'utiliser ou pas
-const byte pinEmRadio = 10; // pin D10 emetteur radio
+//const boolean utilisationRadio (true) ; // positionner radio pour l'utiliser ou pas
+boolean utilisationRadio (true) ; // positionner radio pour l'utiliser (true) ou pas
+const byte pinEmRadio(10); // pin D10 emetteur radio
 const int vitesseTransmission(600);//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
 Radio radio(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, utilisationRadio, debug); // classe Radio
 
@@ -76,7 +77,7 @@ Radio radio(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, utilisationRadi
 const bool testServoMoteur (false); // pour utiliser ou non le test du servomoteur
 const byte servoCde (8); // pin D8 cde du servo
 const byte servoPin (4); // pin D4 relais du servo
-const byte securiteHaute(12); // pin 12 pour la securite d'ouverture de porte
+const byte securiteHaute(12); // pin D12 pour l'ouverture de porte
 const int pulseStop (1500); // value should usually be 750 to 2200 (1500 = stop)
 bool reduit(false); // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
@@ -84,8 +85,8 @@ ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 70, debu
 
 /*** Accus ***/
 #include "Accus.h"
-const byte accusPinCde(2); //analog pin A2 : tension batterie commandes
-const byte accusPinServo(3); //analog pin A3 : tension batterie servo moteur
+const byte accusPinCde(A6); //analog pin A6 : tension batterie commandes
+const byte accusPinServo(A7); //analog pin A7 : tension batterie servo moteur
 const float tensionMiniAccus(4.8); //valeur minimum de l'accu 4.8v
 const float rapportConvertion(7.5);// rapport de convertion CAD float
 boolean batterieFaible = false; // si batterie < 4,8v = true
@@ -102,7 +103,7 @@ Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRo
 
 /*** lumiere ***/
 #include "Lumiere.h"
-const byte lumierePin(0); //analog pin A0 : luminosite
+const byte lumierePin(A0); //analog pin A0 : luminosite
 const float convertion(5);// rapport de convertion CAD float
 const byte heureFenetreSoir(17); //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
 const byte boucleLumiere(2); // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
@@ -134,7 +135,7 @@ const byte menuTensionBatServo(13); // tension batterie servo
 const byte menuManuel(14); // nombre de lignes du  menu
 const byte colonnes(16); // colonnes de l'afficheur
 const byte oldkey(-1);
-const byte sensorClavier(1); //pin A1 pour le clavier
+const byte sensorClavier(A1); //pin A1 pour le clavier
 const byte pinBp(9); // pin D9 bouton poussoir ouverture / fermeture
 const byte pinBoitier(6); //pin D6 interrupteur ouverture boitier
 const int debounce(150); // debounce latency in ms
@@ -1032,9 +1033,21 @@ void loop() {
   if (testServoMoteur) {
     testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
   }
-
+ // Serial.println (digitalRead (A2));
+/*
+  if (radio.get_m_radio() and !digitalRead(A2)) {
+    delay(40);
+   // radio.chaineVide();
+    utilisationRadio = false;
+    radio.set_m_radio(utilisationRadio);
+  } else if (!radio.get_m_radio() and digitalRead(A2)) {
+    delay(40);
+    utilisationRadio = true;
+    radio.set_m_radio(utilisationRadio);
+  }
+*/
   memoireLibre = freeMemory(); // calcul de la  memoire sram libre
-  
+
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
   batterieFaible = accusCde.accusFaible(); // test de la batterie commande < 4.8v

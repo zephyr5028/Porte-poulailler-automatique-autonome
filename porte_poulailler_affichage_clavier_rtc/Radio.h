@@ -26,14 +26,17 @@ class Radio
     //envoi message float avec test de l'ouverture du boitier plus texte
     void envoiFloat(float valeur, boolean boitierOuvert = true, char *texte = "");
     // envoi du message unsigned int avec test de l'ouverture du boitier
-     void envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert = true, char *texte = "");
+    void envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert = true, char *texte = "");
+    bool get_m_radio(); //accesseur - getter
+    void set_m_radio(bool radio);//mutateur - setter
 
   protected:
 
     byte m_pinEmRadio; // pin D10 emetteur radio
     int m_vitesseTransmission;// vitese de la transmission radio
     const boolean m_debug ; // pour affichage console si nécessaire
-    const boolean m_radio; // pour envoi radio si necessaire
+    // const boolean m_radio; // pour envoi radio si necessaire
+    bool m_radio; // pour envoi radio si necessaire
     int const m_taille; // taille du tableau
     char m_chaine[]; // tableau de la chaine avant envoi
 
