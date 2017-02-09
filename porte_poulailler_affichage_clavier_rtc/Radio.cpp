@@ -6,8 +6,7 @@
 #include "Radio.h"
 
 //constructeur avec debug et radio pour affichage si nécessaire
-Radio::Radio(byte pinEmRadio, int vitesseTransmission, byte taille, bool radio, const boolean debug) :  m_pinEmRadio(pinEmRadio),
-//Radio::Radio(byte pinEmRadio, int vitesseTransmission, byte taille, const boolean radio, const boolean debug) :  m_pinEmRadio(pinEmRadio),
+Radio::Radio(byte pinEmRadio, byte pinSwitchEmissionRadio, int vitesseTransmission, byte taille, bool radio, const boolean debug) :  m_pinEmRadio(pinEmRadio), m_pinSwitchEmissionRadio(pinSwitchEmissionRadio),
   m_vitesseTransmission(vitesseTransmission), m_taille(taille), m_radio(radio), m_debug(debug)
 {
   m_chaine[m_taille] = "";// initialisation du tableau
@@ -24,8 +23,12 @@ void Radio::init () {
   vw_setup(m_vitesseTransmission); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
 }
 
+//-----raz de m_chaine-----
+void Radio::raz_m_chaine() {
+  m_chaine[0] = '\0'; // effacement du tableau
+}
+
 //----message Radio-----
-//void Radio::messageRadio(char chaine1[]) {
 void Radio::messageRadio(char *chaine1) {
   strcat(chaine1, "\0");
   vw_send((uint8_t *)chaine1, strlen(chaine1) + 1); // On envoie le message
@@ -47,7 +50,6 @@ void Radio::messageSansParametre() {
 }
 
 //----routine construction message radio----
-//void Radio::envoiMessage(char chaine1[]) {
 void Radio::envoiMessage(char *chaine1) {
   char chaineComp[] = "Fin";
   if (strcmp(chaineComp, chaine1) != 0) { // test de la dernière chaine
@@ -75,7 +77,6 @@ void Radio::chaineVide() {
 }
 
 //-----envoi message float avec test de l'ouverture du boitier plus texte-----
-//void Radio::envoiFloat(float valeur , boolean boitierOuvert, char texte[]) {
 void Radio::envoiFloat(float valeur, boolean boitierOuvert, char *texte ) {
   if (m_radio and !boitierOuvert) {
     char chaine[m_taille - 1] = "";
@@ -88,7 +89,6 @@ void Radio::envoiFloat(float valeur, boolean boitierOuvert, char *texte ) {
 }
 
 //-----envoi message unsigned int avec test de l'ouverture du boitier plus texte-----
-//void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char texte[]) {
 void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char *texte) {
   if (m_radio and !boitierOuvert) {
     char chaine1[m_taille - 1] = "";
@@ -97,6 +97,18 @@ void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char *t
     strcat(chaine1, valeur_temp);
     strcat(chaine1, texte);
     Radio::envoiMessage(chaine1);// on envoie le message
+  }
+}
+
+//-----test du switch emission radio on/off-----
+void Radio::testSwitchEmissionRadio() {
+ if (m_radio and !digitalRead(m_pinSwitchEmissionRadio)) {
+    delay(40);
+    raz_m_chaine();// effacement du tableau
+    m_radio = false;
+  } else if (!m_radio and digitalRead(m_pinSwitchEmissionRadio)) {
+    delay(40);
+    m_radio = true;
   }
 }
 

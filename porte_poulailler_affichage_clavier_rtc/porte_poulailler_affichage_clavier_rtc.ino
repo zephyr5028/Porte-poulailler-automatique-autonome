@@ -49,25 +49,22 @@
 /* watchdog - Optimisation de la consommation */
 #include "PowerTools.h"
 const boolean debug ( false ); // positionner debug pour l'utiliser ou pas
+/******************************/
+const byte bouclesWatchdog(32);// nombre de boucles du watchdog : environ 64s pour 8 boucles
+/******************************/
 unsigned int memoireLibre(0); // variable pour calcul de la memoire libre
 volatile int f_wdt ( 1 ); // flag watchdog
-/************************************************************/
-// nombre de boucles du watchdog : environ 64s pour 8 boucles
-
-const byte bouclesWatchdog(32);
-
-/************************************************************/
 byte tempsWatchdog ( bouclesWatchdog) ; // boucle temps du chien de garde
 boolean reglage (false); // menu=false ou reglage=true
 PowerTools tools (debug); // objet tools et power
 
 /*** radio 433MHz ***/
 #include "Radio.h"
-//const boolean utilisationRadio (true) ; // positionner radio pour l'utiliser ou pas
-boolean utilisationRadio (true) ; // positionner radio pour l'utiliser (true) ou pas
+const boolean emissionRadio (true) ; // positionner radio pour l'utiliser (true) ou pas
 const byte pinEmRadio(10); // pin D10 emetteur radio
 const int vitesseTransmission(600);//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
-Radio radio(pinEmRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, utilisationRadio, debug); // classe Radio
+const byte pinSwitchEmissionRadio (A2); // broche A2 en entree digitale pour le switch emission on/off
+Radio radio(pinEmRadio, pinSwitchEmissionRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, emissionRadio, debug); // classe Radio
 
 /*** led broche 13 ***/
 #define LED_PIN 13
@@ -150,13 +147,11 @@ const int boucleTemps(100); // temps entre deux affichages
 byte decalage(0); // position du curseur
 bool LcdCursor(true) ; //curseur du lcd if treu = enable
 int temps(0);// pour calcul dans la fonction temporisationAffichage
-
 #ifdef  LCDDIGOLE
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
 LcdDigoleI2C mydisp( &Wire, '\x27', colonnes, debug); // classe lcd digole i2c (lcd 2*16 caracteres)
 #endif
-
 #ifdef LCDLIQIDCRYSTAL
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display
@@ -235,7 +230,7 @@ void displayTime () {
   if ( boitierOuvert) { // si le boitier est ouvert
     RTC.read(tm); // lecture date et heure
     mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second, decalage);
-  } else   if (utilisationRadio) {
+  } else   if (radio.get_m_radio()) {
     int timeHour = rtc.lectureRegistreEtConversion (RTC_HOURS, 0x3f); // heure
     int timeMinute = rtc.lectureRegistreEtConversion( RTC_MINUTES ) ; // minutes
     radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure + etat  boitier
@@ -268,7 +263,7 @@ void affiPulsePlusCptRoue() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageServo(pulse, compteRoueCodeuse, decalage, ligne);
-  } else   if (utilisationRadio and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
+  } else   if (radio.get_m_radio() and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     switch (test) {
       case 1: // mise sous tension du servo pour l'ouverture de la porte
@@ -305,7 +300,7 @@ void affiTensionBatCdes() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
-  } else   if (utilisationRadio) {
+  } else   if (radio.get_m_radio()) {
     radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
   }
 }
@@ -318,7 +313,7 @@ void affiTensionBatServo() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
-  } else   if (utilisationRadio) {
+  } else   if (radio.get_m_radio()) {
     radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
   }
 }
@@ -529,7 +524,7 @@ void affiFinDeCourseFermeture() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageLumFinCourse(finDeCourseFermeture, decalage, ligne);
-  } else   if (utilisationRadio) {
+  } else   if (radio.get_m_radio()) {
     radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
   }
 }
@@ -540,7 +535,7 @@ void affiFinDeCourseOuverture() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
     mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
-  } else   if (utilisationRadio) {
+  } else   if (radio.get_m_radio()) {
     radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
   }
 }
@@ -673,7 +668,7 @@ void read_temp(const boolean typeTemperature) {
     String texte = "";
     if (typeTemperature) texte = "C"; else texte = "F";
     mydisp.affichageVoltage(t, texte, decalage, ligne);
-  } else   if (utilisationRadio) {
+  } else   if (radio.get_m_radio()) {
     char txt[3] = "";
     if (typeTemperature)  strcat(txt, "C;"); else strcat(txt, "F;");
     radio.envoiFloat( t, boitierOuvert, txt);
@@ -776,8 +771,10 @@ void routineTestOuvertureBoitier()  {
     for (byte i = 0; i < 22 ; i++) {
       chaine[i] = pgm_read_byte(ouvertureDuBoitier + i);
     }
-    radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
-    radio.chaineVide();
+    if (radio.get_m_radio()) {
+      radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
+      radio.chaineVide();
+    }
     boitierOuvert = true; // boitier ouvert
     mydisp.gestionCurseur(1); // activation du curseur
   }
@@ -794,9 +791,11 @@ void  routineTestFermetureBoitier() {
     for (byte i = 0; i < 22 ; i++) {
       chaine[i] = pgm_read_byte(fermetureDuBoitier + i);
     }
-    radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
-    displayTime();// avec affichage de l'heure de fermeture
-    radio.chaineVide();
+    if (radio.get_m_radio()) {
+      radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
+      displayTime();// avec affichage de l'heure de fermeture
+      radio.chaineVide();
+    }
   }
 }
 
@@ -809,7 +808,7 @@ void lumiere() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(0);// première ligne car non reglable
     mydisp.affichageLumFinCourse(lumValue, decalage, ligne);
-  } else   if (utilisationRadio) {
+  } else   if (radio.get_m_radio())  {
     radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
     radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
   }
@@ -930,7 +929,7 @@ void routineGestionWatchdog() {
           radio.messageRadio(chaine);// on envoie le message
         }
         // informations à afficher
-        if (utilisationRadio) {
+        if (radio.get_m_radio()) {
           displayTime();
           read_temp(typeTemperature); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
@@ -1033,19 +1032,9 @@ void loop() {
   if (testServoMoteur) {
     testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
   }
- // Serial.println (digitalRead (A2));
-/*
-  if (radio.get_m_radio() and !digitalRead(A2)) {
-    delay(40);
-   // radio.chaineVide();
-    utilisationRadio = false;
-    radio.set_m_radio(utilisationRadio);
-  } else if (!radio.get_m_radio() and digitalRead(A2)) {
-    delay(40);
-    utilisationRadio = true;
-    radio.set_m_radio(utilisationRadio);
-  }
-*/
+
+  radio.testSwitchEmissionRadio(); // test du switch emission radio on/off
+ 
   memoireLibre = freeMemory(); // calcul de la  memoire sram libre
 
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
