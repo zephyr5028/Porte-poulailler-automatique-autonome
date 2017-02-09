@@ -30,14 +30,16 @@ void LcdPCF8574::init () {
   delay(10); //delay
 }
 
-//-----remise à zero du lcd-----
-void LcdPCF8574::razLcd() {
-  clear();
+//-----effacement de l'afficheur----
+void LcdPCF8574::effacementAfficheur() {
+  clear(); // CLear screen
 }
 
-//------activation / desactivation du curseur-----
-void LcdPCF8574::gestionCurseur (bool curseur) {
-  if (curseur) blink(); else noBlink();
+//-----remise à zero du lcd-----
+void LcdPCF8574::razLcd() {
+  noBacklight();
+  clear();
+  noBlink();
 }
 
 //-----activation / desactivation du retro eclairage------
@@ -64,7 +66,7 @@ void LcdPCF8574::choixRetroEclairage (bool choix) {
 
 //----affichage une ligne-----
 void LcdPCF8574::affichageUneLigne(String chaine) {
-  resetPos(1);// efface la ligne 1
+  resetPos(m_ligne);// efface la ligne
   // Serial.println(chaine.length());
   for (byte i = 0; i < chaine.length(); i++)  {  //move string to right
     print(chaine[i]);
@@ -130,7 +132,7 @@ String LcdPCF8574::transformation (String texte, byte dateHeure ) {
 }
 
 //-----affichage lumiere et fin de course-----
-void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte decalage, byte ligne)
+void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte decalage, byte ligne, bool siNonReglable)
 {
   m_ligne = ligne;
   m_decalage = decalage;
@@ -138,6 +140,7 @@ void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte decalage
   chaineLigne += "    =  ";
   chaineLigne += LumFinCourse;
   affichageUneLigne(chaineLigne);// affichage sur lcd
+  if (siNonReglable)  cursorPosition(0, 0, "");
 }
 
 //-----affichage tensions-----
@@ -150,6 +153,7 @@ void LcdPCF8574::affichageVoltage( float voltage, String texte, byte decalage, b
   chaineLigne += voltage;
   chaineLigne += texte;
   affichageUneLigne(chaineLigne);// affichage sur lcd
+  cursorPosition(0, 0, "");// decalage, ligne, texte
 }
 
 //-----affichage choix ouverture fermeture-----
@@ -176,24 +180,30 @@ void LcdPCF8574::affichageServo(int pulse, int roueCodeuse, byte decalage, byte 
   chaineLigne += "   R:";
   chaineLigne += roueCodeuse;
   affichageUneLigne(chaineLigne);// affichage sur lcd
+  cursorPosition(0, 0, ""); // decalage, ligne, texte
 }
 
 //-----Bonjour-----
-void LcdPCF8574::bonjour() {
-  backlight();
-  for (byte j = 0; j < 1; j++)  {  //making "Hello" string moving
-    for (byte i = 0; i < 9; i++)  {  //move string to right
-      setCursor(i, 0);
-      print(F(" Bonjour"));// F() pour memoire flash
-      delay(200); //delay
-    }
-    for (byte i = 0; i < 9; i++) {  //move string to left
-      setCursor(8 - i, 0);
-      print(F("Bonjour "));
-      delay(200);
-    }
+void LcdPCF8574::bonjour(String chaine1, String chaine2) {
+  gestionCurseur (false);
+  choixRetroEclairage(true);
+  for (byte j = 0; j < 5; j++)  {  //texte clignotant
+    effacementAfficheur(); // CLear screen
+    delay(400);
+    m_ligne = 0;
+    affichageUneLigne(chaine1);// affichage sur lcd
+    m_ligne = 1;
+    affichageUneLigne(chaine2);// affichage sur lcd
+    delay (700);
   }
-  noBacklight();
+  gestionCurseur (true);
+  cursorPosition(0, 0, ""); // decalage, ligne, texte
+  choixRetroEclairage(false);
+}
+
+//------activation / desactivation du curseur-----
+void LcdPCF8574::gestionCurseur (bool curseur) {
+  if (curseur) blink(); else noBlink();
 }
 
 // -----position du curseur : decalage, ligne, texte-----

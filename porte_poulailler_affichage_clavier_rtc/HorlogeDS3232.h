@@ -23,6 +23,7 @@ class HorlogeDS3232 : public DS3232RTC
     ~HorlogeDS3232(); // destructeur
 
     void init();// initialisation
+    bool testPresenceCarteRTC(); //verification de la presence de la carte RTC / memoire 24C32
     byte decToBcd(byte val); //routine decToBcd : Convert normal decimal numbers to binary coded decimal
     byte bcdToDec(byte val);//routine bcdToDec : Convert binary coded decimal to normal decimal numbers
     void i2c_eeprom_write_byte(  unsigned int eeaddress, byte data );//ecriture dans l'eeprom at24c32 de la carte rtc
@@ -56,6 +57,7 @@ class HorlogeDS3232 : public DS3232RTC
     byte m_alarm1Second ; // alarme 1 seconds
     byte m_alarm2Hour ; // alarme 2 hours
     byte m_alarm2Minute ; // alarme 2 minutes
+   
 
 };
 

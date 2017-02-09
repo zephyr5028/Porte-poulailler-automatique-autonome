@@ -25,11 +25,20 @@ HorlogeDS3232::~HorlogeDS3232() {
 
 //-----initialisation-----
 void HorlogeDS3232::init() {
-  //Wire.begin();
   //RTC.writeRTC(0x0E,0x06); // registre control rtc
   RTC.writeRTC(0x0F, 0x00); // registre status rtc
   lectureHoraireALARM1();
   lectureHoraireALARM2();
+}
+
+//-----verification de la presence de la carte RTC / memoire 24C32-----
+bool HorlogeDS3232::testPresenceCarteRTC() {
+  setSyncProvider(RTC.get);   // the function to get the time from the RTC
+  if (timeStatus() != timeSet) {
+     return false;
+  } else {
+      return true;
+  }
 }
 
 //-----test IT RTC-----
@@ -187,7 +196,7 @@ bool HorlogeDS3232::choixTypeOuvertureFermeture(bool choixOuvertureFermeture, co
   byte adresse(0);
   if (alarme == 1)  adresse = 0x14; else adresse = 0x15; // 0x14 alarm1 / 0x15 alarm2
   if (choixOuvertureFermeture)  choixOuvertureFermeture = false; else choixOuvertureFermeture = true; // o lumiere, 1 horloge
-  RTC.alarmInterrupt(alarme, choixOuvertureFermeture); // alarme : activation 1 / desactivation 0 
+  RTC.alarmInterrupt(alarme, choixOuvertureFermeture); // alarme : activation 1 / desactivation 0
   i2c_eeprom_write_byte( adresse, choixOuvertureFermeture); // écriture du type d'ouverture/ fermeture @14 ou 15 de l'eeprom de la carte rtc (i2c @ 0x57)
   return choixOuvertureFermeture;
 }

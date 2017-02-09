@@ -175,6 +175,7 @@ const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure O
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 const char ouvertureDuBoitier[] PROGMEM = "Ouverture du boitier.";
 const char fermetureDuBoitier[] PROGMEM = "Fermeture du boitier.";
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte Poulailler.Manque carte RTC";
 
 /* clavier */
 //-----lecture clavier------
@@ -261,7 +262,7 @@ void affiPulsePlusCptRoue() {
   test = codOpt.testCompteurRoueCodeuse (5); // tolerance de 5
   unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
   if ( boitierOuvert) { // si le boitier est ouvert
-    byte ligne(0);
+    byte ligne(1);
     mydisp.affichageServo(pulse, compteRoueCodeuse, decalage, ligne);
   } else   if (radio.get_m_radio() and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
@@ -298,7 +299,7 @@ void affiTensionBatCdes() {
   float voltage = accusCde.tensionAccus(valBatCdes);// read the input on analog pin A2 : tension batterie commandes
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
-    byte ligne(0);
+    byte ligne(1);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
   } else   if (radio.get_m_radio()) {
     radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
@@ -311,7 +312,7 @@ void affiTensionBatServo() {
   float voltage = accusServo.tensionAccus(valBatServo);// read the input on analog pin A3 : tension batterie servo moteur
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
-    byte ligne(0);
+    byte ligne(1);
     mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
   } else   if (radio.get_m_radio()) {
     radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
@@ -664,7 +665,7 @@ void testServo() {
 void read_temp(const boolean typeTemperature) {
   float t = rtc.calculTemperature (typeTemperature);//valeur de la temperature en fonction du type
   if ( boitierOuvert) { // si le boitier est ouvert
-    byte ligne(0);
+    byte ligne(1);
     String texte = "";
     if (typeTemperature) texte = "C"; else texte = "F";
     mydisp.affichageVoltage(t, texte, decalage, ligne);
@@ -806,8 +807,9 @@ void  routineTestFermetureBoitier() {
 void lumiere() {
   int lumValue = lum.luminositeCAD(); // luminosite CAD sur pin A0
   if ( boitierOuvert) { // si le boitier est ouvert
-    byte ligne(0);// première ligne car non reglable
-    mydisp.affichageLumFinCourse(lumValue, decalage, ligne);
+    byte ligne(1);// première ligne car non reglable
+    bool nonReglable(1); // pour afficher le curseur sur la premiere ligne car non reglable
+    mydisp.affichageLumFinCourse(lumValue, decalage, ligne, nonReglable);
   } else   if (radio.get_m_radio())  {
     radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
     radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
@@ -950,14 +952,38 @@ void routineGestionWatchdog() {
   }
 }
 
+//-----routine affichage au demarrage-----
+void affichageDemarrage (byte colonne) {
+  char temp[16] = {0};
+  char temp1[16] = {0};
+  for (byte i = colonne; i < 16 + colonne; i++) { // boucle pour afficher 16 caractères sur le lcd
+    temp[i - colonne] = pgm_read_byte(affichageBonjour + i); // utilisation du texte présent en mèmoire flash
+  }
+  colonne += 17;
+  for (byte i = colonne; i < 16 + colonne; i++) { // boucle pour afficher 16 caractères sur le lcd
+    temp1[i - colonne] = pgm_read_byte(affichageBonjour + i); // utilisation du texte présent en mèmoire flash
+  }
+  mydisp.bonjour(temp, temp1); // affichage version sur les deux lignes
+}
+
 /* setup */
 void setup() {
 
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT); // led broche 13
 
+  rtc.init();// initialisation de l'horloge etverification de la presence de la carte RTC / memoire 24C32
+
   mydisp.init(); // initialisation for text LCD adapter
-  mydisp.bonjour(); // affichage bonjour au demarrage
+
+  byte colonne(0);
+  // affichage version au demarrage ou  defaut RTC
+  if (rtc.testPresenceCarteRTC()) {
+    affichageDemarrage (colonne);
+  } else {
+    colonne = 34;
+    affichageDemarrage(colonne);
+  }
 
   incrementation = menuManuel; // pour affichage menu
   deroulementMenu (incrementation); // affichage du menu
@@ -993,8 +1019,6 @@ void setup() {
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
-
-  rtc.init();// initialisation de l'horloge
 
   tools.setupPower(); // initialisation power de l'arduino
 
@@ -1034,7 +1058,7 @@ void loop() {
   }
 
   radio.testSwitchEmissionRadio(); // test du switch emission radio on/off
- 
+
   memoireLibre = freeMemory(); // calcul de la  memoire sram libre
 
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
