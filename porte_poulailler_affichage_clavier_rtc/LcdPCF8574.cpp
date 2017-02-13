@@ -5,6 +5,7 @@
 */
 
 #include "LcdPCF8574.h"
+using namespace std;
 
 //constructeur avec debug
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
@@ -87,9 +88,9 @@ void LcdPCF8574::resetPos(byte ligne)
 }
 
 //-----affichage de la date ou de l'heure-----
-void LcdPCF8574::affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde, byte decalage) {
+void LcdPCF8574::affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde)
+{
   m_ligne = 1;
-  m_decalage = decalage;
   String chaineLigne = "";
   if (jourSemaine == "H") {
     chaineLigne += "   ";
@@ -105,9 +106,6 @@ void LcdPCF8574::affichageDateHeure(String jourSemaine, byte jourHeure, byte moi
     chaineLigne.concat(transformation( " ", moisMinute));// print mois
     chaineLigne += " ";
     chaineLigne += anneeSeconde + 1970; // année depuis 1970
-  }
-  if (m_debug) {
-    Serial.println(chaineLigne);
   }
   affichageUneLigne(chaineLigne);// affichage sur lcd
 }
@@ -132,10 +130,9 @@ String LcdPCF8574::transformation (String texte, byte dateHeure ) {
 }
 
 //-----affichage lumiere et fin de course-----
-void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte decalage, byte ligne, bool siNonReglable)
+void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte ligne, bool siNonReglable)
 {
   m_ligne = ligne;
-  m_decalage = decalage;
   String chaineLigne = "";
   chaineLigne += "    =  ";
   chaineLigne += LumFinCourse;
@@ -144,10 +141,9 @@ void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte decalage
 }
 
 //-----affichage tensions-----
-void LcdPCF8574::affichageVoltage( float voltage, String texte, byte decalage, byte ligne)
+void LcdPCF8574::affichageVoltage( float voltage, String texte, byte ligne)
 {
   m_ligne = ligne;
-  m_decalage = decalage;
   String chaineLigne = "";
   chaineLigne += "    =  ";
   chaineLigne += voltage;
@@ -157,10 +153,9 @@ void LcdPCF8574::affichageVoltage( float voltage, String texte, byte decalage, b
 }
 
 //-----affichage choix ouverture fermeture-----
-void LcdPCF8574::affichageChoix( bool ouverture, bool fermeture, byte decalage, byte ligne)
+void LcdPCF8574::affichageChoix( bool ouverture, bool fermeture, byte ligne)
 {
   m_ligne = ligne;
-  m_decalage = decalage;
   String chaineLigne = "";
   chaineLigne += " ouv:";
   if (ouverture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
@@ -170,10 +165,9 @@ void LcdPCF8574::affichageChoix( bool ouverture, bool fermeture, byte decalage, 
 }
 
 //-----affichage pulse et roue codeuse du servo-------
-void LcdPCF8574::affichageServo(int pulse, int roueCodeuse, byte decalage, byte ligne)
+void LcdPCF8574::affichageServo(int pulse, int roueCodeuse, byte ligne)
 {
   m_ligne = ligne;
-  m_decalage = decalage;
   String chaineLigne = "";
   chaineLigne += " P:";
   chaineLigne += pulse;
@@ -208,24 +202,32 @@ void LcdPCF8574::gestionCurseur (bool curseur) {
 
 // -----position du curseur : decalage, ligne, texte-----
 void LcdPCF8574::cursorPosition(byte decalage, byte ligne, char *texte) {
-  m_decalage = decalage;
   m_ligne = ligne;
-  setCursor(m_decalage, m_ligne);
+  setCursor(decalage, m_ligne);
 }
 
 //-----position du cuseur pendant les reglages-----
-void LcdPCF8574::cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, byte &decalage, const byte decalageSup, const byte deplacement, const byte decalageInf) {
+void LcdPCF8574::cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, const byte decalageSup, const byte deplacement, const byte decalageInf) {
   if (touche == 4 and relache == true ) {
     relache = false;
-    if (decalage < decalageSup ) { // boucle de reglage
-      decalage = decalage + deplacement;   // incrementation decalage
+    if (m_decalage < decalageSup ) { // boucle de reglage
+      m_decalage += deplacement;   // incrementation decalage
       reglage = true; // reglages
     }
-    if (decalage > decalageInf ) { // fin de la ligne d'affichage si > decalageInf
-      decalage = 0;
+    if (m_decalage > decalageInf ) { // fin de la ligne d'affichage si > decalageInf
+      m_decalage = 0;
       reglage = false;
     }
-    m_decalage = decalage;
   }
+}
+
+//-----accesseur - getter-----
+byte LcdPCF8574::get_m_decalage() {
+  return m_decalage;
+}
+
+//-----mutateur - setter-----
+void LcdPCF8574::set_m_decalage(byte decalage) {
+  m_decalage = decalage;
 }
 

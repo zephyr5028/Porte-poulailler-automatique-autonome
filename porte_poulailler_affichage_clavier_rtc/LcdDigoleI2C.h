@@ -34,12 +34,13 @@ class LcdDigoleI2C  : public DigoleSerialDisp  {
     void effacementAfficheur(); //effacement de l'afficheur
     void affichageUneLigne(String chaine); // affichage une ligne
     void resetPos(byte ligne);//reset display position and clean the line
-    void affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde, byte decalage);//affichage de la date ou de l'heure
+    void affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde);//affichage de la date ou de l'heure
     String transformation (String chaine, byte dateHeure); // transformation donnees date et heure
-    void affichageLumFinCourse( unsigned int lum, byte decalage, byte ligne, bool siNonReglable = 0); //affichage lumiere et fin de course
-    void affichageVoltage( float voltage, String texte, byte decalage, byte ligne); //affichage tensions
-    void affichageChoix( bool ouverture, bool fermeture, byte decalage, byte ligne);//affichage choix ouverture fermeture
-    void affichageServo(int pulse, int compteRoueCodeuse, byte decalage, byte ligne) ; //affichage pulse et roue codeuse du servo
+
+    void affichageLumFinCourse( unsigned int lum,  byte ligne, bool siNonReglable = 0); //affichage lumiere et fin de course
+    void affichageVoltage( float voltage, String texte,  byte ligne); //affichage tensions
+    void affichageChoix( bool ouverture, bool fermeture,  byte ligne);//affichage choix ouverture fermeture
+    void affichageServo(int pulse, int compteRoueCodeuse,  byte ligne) ; //affichage pulse et roue codeuse du servo
     void razLcd(); //remise à zero du lcd
     void bonjour(String chaine1, String chaine2); //affichage au demarrage
     void cursorPosition(byte decalage, byte ligne, char *texte); // position du curseur
@@ -47,7 +48,9 @@ class LcdDigoleI2C  : public DigoleSerialDisp  {
     void retroEclairage ();//activation / desactivation du retro eclairage (bascule)
     void choixRetroEclairage (bool choix);//choix activation / desactivation du retro eclairage
     //position du cuseur pendant les reglages
-    void cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, byte &decalage, const byte decalageSup, const byte deplacement, const byte decalageInf);
+    void cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, const byte decalageSup, const byte deplacement, const byte decalageInf);
+    byte get_m_decalage();//accesseur - getter
+    void set_m_decalage(byte decalage);//mutateur - setter
 
   protected:
 

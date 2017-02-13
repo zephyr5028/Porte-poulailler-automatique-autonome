@@ -88,9 +88,8 @@ void LcdDigoleI2C::resetPos(byte ligne)
 }
 
 //-----affichage de la date ou de l'heure-----
-void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde, byte decalage) {
+void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde) {
   m_ligne = 1;
-  m_decalage = decalage;
   String chaineLigne = "";
   if (jourSemaine == "H") {
     chaineLigne += "   ";
@@ -108,7 +107,6 @@ void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte m
     chaineLigne += anneeSeconde + 1970; // année depuis 1970
   }
   affichageUneLigne(chaineLigne);// affichage sur lcd
-
 }
 
 // transformation donnees date et heure
@@ -129,12 +127,10 @@ String LcdDigoleI2C::transformation (String texte, byte dateHeure ) {
   }
   return chaine;
 }
-
 //-----affichage lumiere et fin de course-----
-void LcdDigoleI2C::affichageLumFinCourse( unsigned int LumFinCourse, byte decalage, byte ligne, bool siNonReglable)
+void LcdDigoleI2C::affichageLumFinCourse( unsigned int LumFinCourse, byte ligne, bool siNonReglable)
 {
   m_ligne = ligne;
-  m_decalage = decalage;
   String chaineLigne = "";
   chaineLigne += "    =  ";
   chaineLigne += LumFinCourse;
@@ -143,10 +139,9 @@ void LcdDigoleI2C::affichageLumFinCourse( unsigned int LumFinCourse, byte decala
 }
 
 //-----affichage tensions-----
-void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte decalage, byte ligne)
+void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte ligne)
 {
   m_ligne = ligne;
-  m_decalage = decalage;
   String chaineLigne = "";
   chaineLigne += "    =  ";
   chaineLigne += voltage;
@@ -156,10 +151,9 @@ void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte decalage,
 }
 
 //-----affichage choix ouverture fermeture-----
-void LcdDigoleI2C::affichageChoix( bool ouverture, bool fermeture, byte decalage, byte ligne)
+void LcdDigoleI2C::affichageChoix( bool ouverture, bool fermeture,  byte ligne)
 {
   m_ligne = ligne;
-  m_decalage = decalage;
   String chaineLigne = "";
   chaineLigne += " ouv:";
   if (ouverture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
@@ -169,10 +163,9 @@ void LcdDigoleI2C::affichageChoix( bool ouverture, bool fermeture, byte decalage
 }
 
 //-----affichage pulse et roue codeuse du servo-------
-void LcdDigoleI2C::affichageServo(int pulse, int roueCodeuse, byte decalage, byte ligne)
+void LcdDigoleI2C::affichageServo(int pulse, int roueCodeuse,  byte ligne)
 {
   m_ligne = ligne;
-  m_decalage = decalage;
   String chaineLigne = "";
   chaineLigne += " P:";
   chaineLigne += pulse;
@@ -207,24 +200,32 @@ void LcdDigoleI2C::gestionCurseur (bool curseur) {
 
 // -----position du curseur : decalage, ligne, texte-----
 void LcdDigoleI2C::cursorPosition(byte decalage, byte ligne, char *texte) {
-  m_decalage = decalage;
   m_ligne = ligne;
-  drawStr(m_decalage, m_ligne, texte);
+  drawStr(decalage, m_ligne, texte);
 }
 
 //-----position du cuseur pendant les reglages-----
-void LcdDigoleI2C::cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, byte &decalage, const byte decalageSup, const byte deplacement, const byte decalageInf) {
+void LcdDigoleI2C::cursorPositionReglages (const byte &touche, bool &relache, bool &reglage,  const byte decalageSup, const byte deplacement, const byte decalageInf) {
   if (touche == 4 and relache == true ) {
     relache = false;
-    if (decalage < decalageSup ) { // boucle de reglage
-      decalage = decalage + deplacement;   // incrementation decalage
+    if (m_decalage < decalageSup ) { // boucle de reglage
+      m_decalage += deplacement;   // incrementation decalage
       reglage = true; // reglages
     }
-    if (decalage > decalageInf ) { // fin de la ligne d'affichage si > decalageInf
-      decalage = 0;
+    if (m_decalage > decalageInf ) { // fin de la ligne d'affichage si > decalageInf
+      m_decalage = 0;
       reglage = false;
     }
-    m_decalage = decalage;
   }
+}
+
+//-----accesseur - getter-----
+byte LcdDigoleI2C::get_m_decalage() {
+  return m_decalage;
+}
+
+//-----mutateur - setter-----
+void LcdDigoleI2C::set_m_decalage(byte decalage) {
+  m_decalage = decalage;
 }
 

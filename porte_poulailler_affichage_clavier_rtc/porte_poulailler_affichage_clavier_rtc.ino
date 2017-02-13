@@ -35,9 +35,9 @@
 /*********************************************************************************/
 // choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 
-#define LCDDIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
+#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
 
-//#define LCDLIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
+//#define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
 
 /**********************************************************************************/
 
@@ -144,15 +144,14 @@ Clavier clav(menuManuel, pinBp, pinBoitier, debounce, debug); // class Clavier a
 
 /*** LCD DigoleSerialI2C ***/
 const int boucleTemps(100); // temps entre deux affichages
-byte decalage(0); // position du curseur
-bool LcdCursor(true) ; //curseur du lcd if treu = enable
+bool LcdCursor(true) ; //curseur du lcd if true = enable
 int temps(0);// pour calcul dans la fonction temporisationAffichage
-#ifdef  LCDDIGOLE
+#ifdef  LCD_DIGOLE
 // I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
 LcdDigoleI2C mydisp( &Wire, '\x27', colonnes, debug); // classe lcd digole i2c (lcd 2*16 caracteres)
 #endif
-#ifdef LCDLIQIDCRYSTAL
+#ifdef LCD_LIQIDCRYSTAL
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display
 LcdPCF8574  mydisp(0x27, 16, 2);
@@ -224,7 +223,7 @@ void displayDate() {
     for (byte i = j; i < j + 3; i++) {
       semaine[i - j] = pgm_read_byte(listeDayWeek + i);
     }
-    mydisp.affichageDateHeure(semaine, tm.Day, tm.Month, tm.Year, decalage);
+    mydisp.affichageDateHeure(semaine, tm.Day, tm.Month, tm.Year);
   }
 }
 
@@ -232,7 +231,7 @@ void displayDate() {
 void displayTime () {
   if ( boitierOuvert) { // si le boitier est ouvert
     RTC.read(tm); // lecture date et heure
-    mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second, decalage);
+    mydisp.affichageDateHeure("H", tm.Hour, tm.Minute, tm.Second);
   } else   if (radio.get_m_radio()) {
     int timeHour = rtc.lectureRegistreEtConversion (RTC_HOURS, 0x3f); // heure
     int timeMinute = rtc.lectureRegistreEtConversion( RTC_MINUTES ) ; // minutes
@@ -245,7 +244,7 @@ void displayTime () {
 void openTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
     // affichage de l'horaire de l'alarme 1
-    mydisp.affichageDateHeure("H", rtc.get_m_alarm1Hour(), rtc.get_m_alarm1Minute() , rtc.get_m_alarm1Second(), decalage);
+    mydisp.affichageDateHeure("H", rtc.get_m_alarm1Hour(), rtc.get_m_alarm1Minute() , rtc.get_m_alarm1Second());
   }
 }
 
@@ -253,7 +252,7 @@ void openTime() {
 void closeTime() {
   if ( boitierOuvert) { // si le boitier est ouvert
     // affichage de l'horaire de l'alarme 2 - 61 pour ne pas afficher les secondes
-    mydisp.affichageDateHeure("H", rtc.get_m_alarm2Hour(), rtc.get_m_alarm2Minute(), 61, decalage);
+    mydisp.affichageDateHeure("H", rtc.get_m_alarm2Hour(), rtc.get_m_alarm2Minute(), 61);
   }
 }
 
@@ -265,7 +264,7 @@ void affiPulsePlusCptRoue() {
   unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
-    mydisp.affichageServo(pulse, compteRoueCodeuse, decalage, ligne);
+    mydisp.affichageServo(pulse, compteRoueCodeuse, ligne);
   } else   if (radio.get_m_radio() and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     switch (test) {
@@ -302,7 +301,7 @@ void affiTensionBatCdes() {
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
-    mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
+    mydisp.affichageVoltage(  voltage, "V",  ligne);
   } else   if (radio.get_m_radio()) {
     radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
   }
@@ -315,7 +314,7 @@ void affiTensionBatServo() {
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
-    mydisp.affichageVoltage(  voltage, "V", decalage, ligne);
+    mydisp.affichageVoltage(  voltage, "V",  ligne);
   } else   if (radio.get_m_radio()) {
     radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
   }
@@ -329,7 +328,7 @@ void affiTensionBatServo() {
 void affiChoixOuvFerm() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
-    mydisp.affichageChoix(lum.get_m_ouverture(), lum.get_m_fermeture(), decalage, ligne);
+    mydisp.affichageChoix(lum.get_m_ouverture(), lum.get_m_fermeture(), ligne);
   }
 }
 
@@ -338,15 +337,15 @@ void choixOuvFerm () {
   if (boitierOuvert) {
     byte deplacement(7);
     if (incrementation == menuChoix) {
-      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 14);// position du cuseur pendant les reglages
+      mydisp.cursorPositionReglages (touche, relache, reglage, 15, deplacement, 14);// position du cuseur pendant les reglages
     }
     if ((touche == 2 or touche == 3) and incrementation == menuChoix and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == deplacement) {
+      if (mydisp.get_m_decalage() == deplacement) {
         lum.set_m_ouverture(rtc.choixTypeOuvertureFermeture(lum.get_m_ouverture(), alarm_1));//choix du type d'ouverture / fermeture
         affiChoixOuvFerm();
       }
-      if (decalage == 2 * deplacement) {
+      if (mydisp.get_m_decalage() == 2 * deplacement) {
         lum.set_m_fermeture(rtc.choixTypeOuvertureFermeture(lum.get_m_fermeture(), alarm_2));//choix du type d'ouverture / fermeture
         affiChoixOuvFerm();
       }
@@ -360,16 +359,16 @@ void reglageHeureFermeture() {
   if (boitierOuvert) {
     byte deplacement(4);
     if (incrementation == menuFermeture) {
-      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 10, deplacement, 10);// position du cuseur pendant les reglages
+      mydisp.cursorPositionReglages (touche, relache, reglage, 10, deplacement, 10);// position du cuseur pendant les reglages
     }
     // Set Alarm2
     if ((touche == 2 or touche == 3) and incrementation == menuFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == deplacement) {
+      if (mydisp.get_m_decalage() == deplacement) {
         rtc.reglageAlarme( touche, alarm_2, heure); // reglage de l'alarme 2 - heure
         closeTime(); // affichage de l'heure de fermeture
       }
-      if (decalage == 2 * deplacement) {
+      if (mydisp.get_m_decalage() == 2 * deplacement) {
         rtc.reglageAlarme( touche, alarm_2, minutes); // reglage de l'alarme 2 - minutes
         closeTime(); // affichage de l'heure de fermeture
       }
@@ -383,20 +382,20 @@ void reglageHeureOuverture() {
   if (boitierOuvert) {
     byte deplacement(4);
     if (incrementation == menuOuverture) {
-      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
+      mydisp.cursorPositionReglages (touche, relache, reglage, 14, deplacement, 14);// position du cuseur pendant les reglages
     }
     // Set Alarm1
     if ((touche == 2 or touche == 3) and incrementation == menuOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == deplacement) {
+      if (mydisp.get_m_decalage() == deplacement) {
         rtc.reglageAlarme( touche, alarm_1, heure); // reglage de l'alarme 1 - heure
         openTime(); // affichage de l'heure d'ouverture
       }
-      if (decalage == 2 * deplacement) {
+      if (mydisp.get_m_decalage() == 2 * deplacement) {
         rtc.reglageAlarme( touche, alarm_1, minutes); // reglage de l'alarme 1 - minutes
         openTime(); // affichage de l'heure d'ouverture
       }
-      if (decalage == 3 * deplacement) {
+      if (mydisp.get_m_decalage() == 3 * deplacement) {
         rtc.reglageAlarme( touche, alarm_1, secondes); // reglage de l'alarme 1 - secondes
         openTime(); // affichage de l'heure d'ouverture
       }
@@ -410,23 +409,23 @@ void reglageDate () {
   if (boitierOuvert) {
     byte deplacement(3);
     if (incrementation == menuDate) {
-      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
+      mydisp.cursorPositionReglages (touche, relache, reglage, 14, deplacement, 14);// position du cuseur pendant les reglages
     }
     if ((touche == 2 or touche == 3) and incrementation == menuDate and relache == true and reglage == true) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == deplacement) {
+      if (mydisp.get_m_decalage() == deplacement) {
         tm.Wday = rtc.reglageHeure(touche, tm.Wday, jourSemaine);
         ecritureDateTime();
       }
-      if (decalage == 2 * deplacement) {
+      if (mydisp.get_m_decalage() == 2 * deplacement) {
         tm.Day = rtc.reglageHeure(touche, tm.Day, jour);
         ecritureDateTime();
       }
-      if (decalage == 3 * deplacement) {
+      if (mydisp.get_m_decalage() == 3 * deplacement) {
         tm.Month = rtc.reglageHeure(touche, tm.Month, mois);
         ecritureDateTime();
       }
-      if (decalage == 4 * deplacement ) {
+      if (mydisp.get_m_decalage() == 4 * deplacement) {
         tm.Year = rtc.reglageHeure(touche, tm.Year, annee);
         ecritureDateTime();
       }
@@ -440,7 +439,7 @@ void affiLumMatin() {
   if (boitierOuvert) {
     unsigned int lumMatin = lum.get_m_lumMatin();
     byte ligne(1);
-    mydisp.affichageLumFinCourse(lumMatin, decalage, ligne);
+    mydisp.affichageLumFinCourse(lumMatin,  ligne);
   }
 }
 
@@ -449,11 +448,11 @@ void choixLumMatin() {
   if (boitierOuvert) {
     byte deplacement(8);
     if (incrementation == menuLumiereMatin) {
-      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 14);// position du cuseur pendant les reglages
+      mydisp.cursorPositionReglages (touche, relache, reglage, 15, deplacement, 14);// position du cuseur pendant les reglages
     }
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereMatin and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == deplacement) {
+      if (mydisp.get_m_decalage() == deplacement) {
         bool matin(1);
         bool lumiere(1);
         unsigned int lumMatin = lum.reglageLumiere(matin, touche);// reglage de la lumiere du matin
@@ -470,7 +469,7 @@ void affiLumSoir() {
   if (boitierOuvert) {
     unsigned int lumSoir = lum.get_m_lumSoir();
     byte ligne(1);
-    mydisp.affichageLumFinCourse(lumSoir, decalage, ligne);
+    mydisp.affichageLumFinCourse(lumSoir, ligne);
   }
 }
 
@@ -479,11 +478,11 @@ void choixLumSoir() {
   if (boitierOuvert) {
     byte deplacement(8);
     if (incrementation == menuLumiereSoir) {
-      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 14);// position du cuseur pendant les reglages
+      mydisp.cursorPositionReglages (touche, relache, reglage, 15, deplacement, 14);// position du cuseur pendant les reglages
     }
     if ((touche == 2 or touche == 3) and incrementation == menuLumiereSoir and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == deplacement) {
+      if (mydisp.get_m_decalage() == deplacement) {
         bool soir(0);
         bool lumiere(1);
         unsigned int lumSoir = lum.reglageLumiere(soir, touche); // reglage de la lumiere du soir
@@ -500,19 +499,19 @@ void reglageTime () {
   if (boitierOuvert) {
     byte deplacement(4);
     if (incrementation == menuHeure) {
-      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 14, deplacement, 14);// position du cuseur pendant les reglages
+      mydisp.cursorPositionReglages (touche, relache, reglage, 14, deplacement, 14);// position du cuseur pendant les reglages
     }
     if ((touche == 2 or touche == 3) and incrementation == menuHeure and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == deplacement) {
+      if (mydisp.get_m_decalage() == deplacement) {
         tm.Hour = rtc.reglageHeure(touche, tm.Hour, heure);
         ecritureDateTime(); // routine écriture date and time
       }
-      if (decalage == 2 * deplacement) {
+      if (mydisp.get_m_decalage() == 2 * deplacement) {
         tm.Minute = rtc.reglageHeure(touche, tm.Minute, minutes);
         ecritureDateTime();
       }
-      if (decalage == 3 * deplacement) {
+      if (mydisp.get_m_decalage() == 3 * deplacement) {
         tm.Second = rtc.reglageHeure(touche, tm.Second, secondes);
         ecritureDateTime();
       }
@@ -526,7 +525,7 @@ void affiFinDeCourseFermeture() {
   unsigned int finDeCourseFermeture = codOpt.get_m_finDeCourseFermeture();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
-    mydisp.affichageLumFinCourse(finDeCourseFermeture, decalage, ligne);
+    mydisp.affichageLumFinCourse(finDeCourseFermeture, ligne);
   } else   if (radio.get_m_radio()) {
     radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
   }
@@ -537,7 +536,7 @@ void affiFinDeCourseOuverture() {
   unsigned int finDeCourseOuverture = codOpt.get_m_finDeCourseOuverture();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);
-    mydisp.affichageLumFinCourse(finDeCourseOuverture, decalage, ligne);
+    mydisp.affichageLumFinCourse(finDeCourseOuverture, ligne);
   } else   if (radio.get_m_radio()) {
     radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
   }
@@ -548,11 +547,11 @@ void regFinDeCourseFermeture() {
   if (boitierOuvert) {
     byte deplacement(8);
     if (incrementation == menuFinDeCourseFermeture) {
-      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 12);// position du cuseur pendant les reglages
+      mydisp.cursorPositionReglages (touche, relache, reglage, 15, deplacement, 12);// position du cuseur pendant les reglages
     }
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseFermeture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == deplacement) {
+      if (mydisp.get_m_decalage() == deplacement) {
         bool fermeture(0);
         bool finDeCourse(0);
         unsigned int finDeCourseFermeture = codOpt.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
@@ -568,11 +567,11 @@ void regFinDeCourseOuverture() {
   if (boitierOuvert) {
     byte deplacement(8);
     if (incrementation == menuFinDeCourseOuverture) {
-      mydisp.cursorPositionReglages (touche, relache, reglage, decalage, 15, deplacement, 12);// position du cuseur pendant les reglages
+      mydisp.cursorPositionReglages (touche, relache, reglage, 15, deplacement, 12);// position du cuseur pendant les reglages
     }
     if ((touche == 2 or touche == 3) and incrementation == menuFinDeCourseOuverture and relache == true and reglage == true ) { // si appui sur les touches 2 ou 3 pour reglage des valeurs
       relache = false;
-      if (decalage == deplacement) {
+      if (mydisp.get_m_decalage() == deplacement) {
         bool ouverture(1);
         bool finDeCourse(0);
         unsigned int finDeCourseOuverture = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
@@ -670,7 +669,7 @@ void read_temp(const boolean typeTemperature) {
     byte ligne(1);
     String texte = "";
     if (typeTemperature) texte = "C"; else texte = "F";
-    mydisp.affichageVoltage(t, texte, decalage, ligne);
+    mydisp.affichageVoltage(t, texte, ligne);
   } else   if (radio.get_m_radio()) {
     char txt[3] = "";
     if (typeTemperature)  strcat(txt, "C;"); else strcat(txt, "F;");
@@ -811,7 +810,7 @@ void lumiere() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne(1);// première ligne car non reglable
     bool nonReglable(1); // pour afficher le curseur sur la premiere ligne car non reglable
-    mydisp.affichageLumFinCourse(lumValue, decalage, ligne, nonReglable);
+    mydisp.affichageLumFinCourse(lumValue, ligne, nonReglable);
   } else   if (radio.get_m_radio())  {
     radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
     radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
@@ -983,7 +982,7 @@ void setup() {
   if (rtc.testPresenceCarteRTC()) {
     affichageDemarrage (colonne);
   } else {
-    colonne = 34;
+    colonne = 34;// position dans la mèmoire flash
     affichageDemarrage(colonne);
   }
 
