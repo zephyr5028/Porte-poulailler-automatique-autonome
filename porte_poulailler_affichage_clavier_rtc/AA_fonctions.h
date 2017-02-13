@@ -4,8 +4,8 @@
  *  
  */
  
-#ifndef aa_fonctions_h
-#define aa_fonctions_h
+#ifndef AA_fonctions_h
+#define AA_fonctions_h
 
 /* clavier */
 //-----lecture clavier------

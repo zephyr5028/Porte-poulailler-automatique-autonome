@@ -177,7 +177,7 @@ const char ouvertureDuBoitier[] PROGMEM = "Ouverture du boitier.";
 const char fermetureDuBoitier[] PROGMEM = "Fermeture du boitier.";
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte Poulailler.Manque carte RTC";
 
-#include "aa_fonctions.h" // prototypes des fonctions du programme
+#include "AA_fonctions.h" // prototypes des fonctions du programme
 
 /* clavier */
 //-----lecture clavier------
