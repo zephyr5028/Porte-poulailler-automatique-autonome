@@ -1,4 +1,4 @@
-/* ServoMoteur.h
+/** ServoMoteur.h
   prototype de la classe ServoMoteur
   gestion du servo moteur au travers de la bibliothèque ServoTimer2
 */

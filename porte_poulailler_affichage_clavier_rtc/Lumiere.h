@@ -1,4 +1,4 @@
-/* Lumiere.h
+/** Lumiere.h
   prototype de la classe Lumiere
   ldr
 */

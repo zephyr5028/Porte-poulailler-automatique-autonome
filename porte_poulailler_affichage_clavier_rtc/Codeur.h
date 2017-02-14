@@ -1,4 +1,4 @@
-/* Codeur.h
+/** Codeur.h
   prototype de la classe Codeur
   codeur optique de 20 pas
 */

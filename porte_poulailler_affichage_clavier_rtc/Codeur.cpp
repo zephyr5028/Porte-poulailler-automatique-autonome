@@ -1,4 +1,4 @@
-/* Codeur.cpp
+/** Codeur.cpp
   définitions de la classe Codeur
   Codeur optqie de 20 pas
 */
@@ -16,13 +16,13 @@ Codeur::~Codeur()
 {
 }
 
-//-----initialisation-----
+///-----initialisation-----
 void Codeur::init () {
   pinMode(m_roueCodeusePin, INPUT); // make the roueCodeuse's pin 7 an input
   m_positionRoueCodeuse = digitalRead(m_roueCodeusePin);
 }
 
-//-----test du compteur roue codeuse pour affichage ouvert ou ferme-----
+///-----test du compteur roue codeuse pour affichage ouvert ou ferme-----
 byte Codeur::testCompteurRoueCodeuse (byte tolerance) {
   byte resultat;
   if ( m_compteRoueCodeuse > (m_finDeCourseFermeture - 5) and m_compteRoueCodeuse < (m_finDeCourseFermeture + 5)) {
@@ -35,7 +35,7 @@ byte Codeur::testCompteurRoueCodeuse (byte tolerance) {
   return resultat;
 }
 
-//-----reglage de la fin de course-----
+///-----reglage de la fin de course-----
 unsigned int  Codeur::reglageFinDeCourse (bool ouvFerm, byte touche) {
   if (touche == 2 or touche == 3) {
     unsigned int finDeCourse;
@@ -59,7 +59,7 @@ unsigned int  Codeur::reglageFinDeCourse (bool ouvFerm, byte touche) {
   if ( ouvFerm) return m_finDeCourseOuverture; else return m_finDeCourseFermeture;
 }
 
-//-----compteur roue codeuse-----
+///-----compteur roue codeuse-----
 void Codeur::compteurRoueCodeuse(bool ouvFerm) {
   // debounce
   m_interruptRoueCodeuse = true; //activation de l'anti-rebond

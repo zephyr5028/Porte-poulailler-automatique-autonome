@@ -1,4 +1,4 @@
-/* LcdPCF8574.h
+/** LcdPCF8574.h
     /* LcdPCF8574.h
   définitions de la classe LCD circuit PCF8574 I2C
   afficheur lcd 2*16 caractères  avec liaison serie i2c LiquidCrystal_I2C
@@ -20,7 +20,7 @@ LcdPCF8574::~LcdPCF8574()
 {
 }
 
-//-----initialisation for text LCD adapter-----
+///-----initialisation for text LCD adapter-----
 void LcdPCF8574::init () {
   Wire.begin();
   begin();
@@ -31,19 +31,19 @@ void LcdPCF8574::init () {
   delay(10); //delay
 }
 
-//-----effacement de l'afficheur----
+///-----effacement de l'afficheur----
 void LcdPCF8574::effacementAfficheur() {
   clear(); // CLear screen
 }
 
-//-----remise à zero du lcd-----
+///-----remise à zero du lcd-----
 void LcdPCF8574::razLcd() {
   noBacklight();
   clear();
   noBlink();
 }
 
-//-----activation / desactivation du retro eclairage------
+///-----activation / desactivation du retro eclairage------
 void LcdPCF8574::retroEclairage () {
   if (m_retroEclairage)   {
     backlight();
@@ -54,7 +54,7 @@ void LcdPCF8574::retroEclairage () {
   }
 }
 
-//-----choix activation / desactivation du retro eclairage------
+///-----choix activation / desactivation du retro eclairage------
 void LcdPCF8574::choixRetroEclairage (bool choix) {
   if (choix)   {
     backlight();
@@ -65,7 +65,7 @@ void LcdPCF8574::choixRetroEclairage (bool choix) {
   }
 }
 
-//----affichage une ligne-----
+///----affichage une ligne-----
 void LcdPCF8574::affichageUneLigne(String chaine) {
   resetPos(m_ligne);// efface la ligne
   // Serial.println(chaine.length());
@@ -75,7 +75,7 @@ void LcdPCF8574::affichageUneLigne(String chaine) {
   setCursor(m_decalage, m_ligne);
 }
 
-//-----reset display position and clean the line-----
+///-----reset display position and clean the line-----
 void LcdPCF8574::resetPos(byte ligne)
 {
   setCursor(0, ligne);
@@ -87,7 +87,7 @@ void LcdPCF8574::resetPos(byte ligne)
   setCursor(0, ligne);
 }
 
-//-----affichage de la date ou de l'heure-----
+///-----affichage de la date ou de l'heure-----
 void LcdPCF8574::affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde)
 {
   m_ligne = 1;
@@ -110,7 +110,7 @@ void LcdPCF8574::affichageDateHeure(String jourSemaine, byte jourHeure, byte moi
   affichageUneLigne(chaineLigne);// affichage sur lcd
 }
 
-// transformation donnees date et heure
+///-----transformation donnees date et heure-----
 String LcdPCF8574::transformation (String texte, byte dateHeure ) {
   String chaine = "";
   if (texte == "h " or texte == "m " or texte == "s ") {
@@ -129,7 +129,7 @@ String LcdPCF8574::transformation (String texte, byte dateHeure ) {
   return chaine;
 }
 
-//-----affichage lumiere et fin de course-----
+///-----affichage lumiere et fin de course-----
 void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte ligne, bool siNonReglable)
 {
   m_ligne = ligne;
@@ -140,7 +140,7 @@ void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte ligne, b
   if (siNonReglable)  cursorPosition(0, 0, "");
 }
 
-//-----affichage tensions-----
+///-----affichage tensions-----
 void LcdPCF8574::affichageVoltage( float voltage, String texte, byte ligne)
 {
   m_ligne = ligne;
@@ -152,7 +152,7 @@ void LcdPCF8574::affichageVoltage( float voltage, String texte, byte ligne)
   cursorPosition(0, 0, "");// decalage, ligne, texte
 }
 
-//-----affichage choix ouverture fermeture-----
+///-----affichage choix ouverture fermeture-----
 void LcdPCF8574::affichageChoix( bool ouverture, bool fermeture, byte ligne)
 {
   m_ligne = ligne;
@@ -164,7 +164,7 @@ void LcdPCF8574::affichageChoix( bool ouverture, bool fermeture, byte ligne)
   affichageUneLigne(chaineLigne);// affichage sur lcd
 }
 
-//-----affichage pulse et roue codeuse du servo-------
+///-----affichage pulse et roue codeuse du servo-------
 void LcdPCF8574::affichageServo(int pulse, int roueCodeuse, byte ligne)
 {
   m_ligne = ligne;
@@ -177,7 +177,7 @@ void LcdPCF8574::affichageServo(int pulse, int roueCodeuse, byte ligne)
   cursorPosition(0, 0, ""); // decalage, ligne, texte
 }
 
-//-----Bonjour-----
+///-----Bonjour-----
 void LcdPCF8574::bonjour(String chaine1, String chaine2) {
   gestionCurseur (false);
   choixRetroEclairage(true);
@@ -195,18 +195,18 @@ void LcdPCF8574::bonjour(String chaine1, String chaine2) {
   choixRetroEclairage(false);
 }
 
-//------activation / desactivation du curseur-----
+///------activation / desactivation du curseur-----
 void LcdPCF8574::gestionCurseur (bool curseur) {
   if (curseur) blink(); else noBlink();
 }
 
-// -----position du curseur : decalage, ligne, texte-----
+///-----position du curseur : decalage, ligne, texte-----
 void LcdPCF8574::cursorPosition(byte decalage, byte ligne, char *texte) {
   m_ligne = ligne;
   setCursor(decalage, m_ligne);
 }
 
-//-----position du cuseur pendant les reglages-----
+///-----position du cuseur pendant les reglages-----
 void LcdPCF8574::cursorPositionReglages (const byte &touche, bool &relache, bool &reglage, const byte decalageSup, const byte deplacement, const byte decalageInf) {
   if (touche == 4 and relache == true ) {
     relache = false;

@@ -1,4 +1,4 @@
-/* Clavier.cpp
+/** Clavier.cpp
   définitions de la classe Clavier
 */
 
@@ -21,7 +21,7 @@ Clavier::~Clavier() {
 
 }
 
-//------routine get_key : Convert ADC value to key number------
+///------routine get_key : Convert ADC value to key number------
 int Clavier::get_key(int &input) {
   int k;
   for (k = 1; k < m_NumKeys; k++ ) {
@@ -35,7 +35,7 @@ int Clavier::get_key(int &input) {
   }
 }
 
-//-----routine read_key : lecture du clavier-----
+///-----routine read_key : lecture du clavier-----
 int Clavier::read_key(const int &sensor) {
   int  adc_key_in = analogRead(sensor); // read the value from the sensor A1
   byte key = get_key(adc_key_in); // convert into key press
@@ -50,7 +50,7 @@ int Clavier::read_key(const int &sensor) {
   return m_oldKey;
 }
 
-//-----position du menu pour l'affichage - touches 2 et 3 -----
+///-----position du menu pour l'affichage - touches 2 et 3 -----
 void Clavier::positionMenu(byte &positionMenu, const byte &toucheClavier) {
   if (toucheClavier == 3 ) {
     if (positionMenu < m_MenuManuel) {
@@ -68,14 +68,14 @@ void Clavier::positionMenu(byte &positionMenu, const byte &toucheClavier) {
   }
 }
 
-//-----relache touche-----
+///-----relache touche-----
 void Clavier::relacheTouche(const int &touche, bool &relache) {
   if (touche == m_oldKey ) { // si touche == -1, donc  relache=true
     relache = true;
   }
 }
 
-//-----deplacement dans le menu-----
+///-----deplacement dans le menu-----
 bool Clavier::deplacementDansMenu(const &touche, bool &relache, const bool &reglage) {
   if ((touche == 2 or touche == 3) and relache and !reglage) { // si appui sur les touches 2 ou 3 , la touche relache et le mode reglage
     relache = false;
@@ -85,7 +85,7 @@ bool Clavier::deplacementDansMenu(const &touche, bool &relache, const bool &regl
   }
 }
 
-//-----test touche 5-----
+///-----test touche 5-----
 bool Clavier::testTouche5(const &touche, bool &relache) {
   if (touche == 5 and relache == true ) { // retro eclairage si appuis sur la touche 5
     relache = false;

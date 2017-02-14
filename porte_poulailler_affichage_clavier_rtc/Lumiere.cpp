@@ -1,4 +1,4 @@
-/* Lumiere.cpp
+/** Lumiere.cpp
   définitions de la classe Lumiere
   LDR
 */
@@ -18,7 +18,7 @@ Lumiere::~Lumiere()
 {
 }
 
-//-----reglage de la lumiere du matin ou du soir-----
+///-----reglage de la lumiere du matin ou du soir-----
 unsigned int  Lumiere::reglageLumiere (bool matinSoir, byte touche) {
   if (touche == 2 or touche == 3) {
     unsigned int lumiere;
@@ -42,26 +42,26 @@ unsigned int  Lumiere::reglageLumiere (bool matinSoir, byte touche) {
   if (matinSoir) return m_lumMatin ; else return m_lumSoir ;
 }
 
-//------- lecture luminosite CAD-----
+///------- lecture luminosite CAD-----
 int Lumiere::luminositeCAD() {
   int valLumiere = analogRead(m_lumierePin); //read the input on analog pin tension batterie
   return valLumiere;
 }
 
-//------- convertion CAD  vers tension luminosite -----
+///------- convertion CAD  vers tension luminosite -----
 float Lumiere::tensionLuminosite(int valLumiere) {
   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V)
   float voltage = valLumiere * (m_rapportConvertion / m_maxCAD);
   return voltage;
 }
 
-//-----lecture et convertion vers tension luminosite en float-----
+///-----lecture et convertion vers tension luminosite en float-----
 float Lumiere::tensionLuminositeCADversFloat() {
   float tension = tensionLuminosite(luminositeCAD());
   return tension;
 }
 
-//-----test luminosite et mise à jour du compteur watchdog lumiere-----
+///-----test luminosite et mise à jour du compteur watchdog lumiere-----
 void Lumiere::testLuminosite() {
   int sensorValue = luminositeCAD();
   if (sensorValue > m_lumMatin and sensorValue < m_lumSoir) {
@@ -69,7 +69,7 @@ void Lumiere::testLuminosite() {
   }
 }
 
-//-----fenetre de non declenchement et mise à jour du compteur watchdog lumiere------
+///-----fenetre de non declenchement et mise à jour du compteur watchdog lumiere------
 // fenetre de non declenchement avec la lumiere si utilisation horaire : jour 17h00 nuit  9h00 jour (25 décembre)
 void Lumiere::fenetreNonDeclenchement(byte horaire) {
   if ((m_ouverture and horaire < m_heureFenetreSoir) or (m_fermeture and horaire > m_heureFenetreSoir)) {
@@ -77,14 +77,14 @@ void Lumiere::fenetreNonDeclenchement(byte horaire) {
   }
 }
 
-//-----non Declenchement Position Servo et mise à jour du compteur watchdog lumiere-----
+///-----non Declenchement Position Servo et mise à jour du compteur watchdog lumiere-----
 void Lumiere::nonDeclenchementPositionServo (volatile unsigned int compteRoueCodeuse, unsigned int finDeCourseFermeture, unsigned int finDeCourseOuverture) {
   if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and !m_ouverture) or (( compteRoueCodeuse >= (finDeCourseFermeture - 2)) and !m_fermeture)) {
     m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
 }
 
-//-----declenchement servo par la luminosite-----
+///-----declenchement servo par la luminosite-----
 byte Lumiere::declenchementServoLuminosite() {
   if (m_compteurWatchdogLumiere >= m_tempsLum) {
     int sensorValue = luminositeCAD();
@@ -109,7 +109,7 @@ void Lumiere::set_m_ouverture(bool ouverture) {
   m_ouverture = ouverture;
 }
 
-//-----accesseur - getter-----
+///-----accesseur - getter-----
 bool Lumiere::get_m_fermeture() {
   return m_fermeture;
 }

@@ -1,4 +1,4 @@
-/* LcdDigoleI2C.h
+/** LcdDigoleI2C.h
   définitions de la classe LCD Digole I2C
   afficheur lcd 2*16 caractères  avec liaison serie i2c digoleSerial
 */
@@ -17,7 +17,7 @@ LcdDigoleI2C::~LcdDigoleI2C()
 {
 }
 
-//-----initialisation for text LCD adapter-----
+///-----initialisation for text LCD adapter-----
 void LcdDigoleI2C::init () {
   Wire.begin();
   begin();
@@ -32,19 +32,19 @@ void LcdDigoleI2C::init () {
   delay(10); //delay
 }
 
-//-----effacement de l'afficheur----
+///-----effacement de l'afficheur----
 void LcdDigoleI2C::effacementAfficheur() {
   clearScreen(); // CLear screen
 }
 
-//-----remise à zero du lcd-----
+///-----remise à zero du lcd-----
 void LcdDigoleI2C::razLcd() {
   clearScreen(); // CLear screen
   backLightOff(); // retro eclairage
   disableCursor();
 }
 
-//-----activation / desactivation du retro eclairage------
+///-----activation / desactivation du retro eclairage------
 void LcdDigoleI2C::retroEclairage () {
   if (m_retroEclairage)   {
     backLightOn();
@@ -55,7 +55,7 @@ void LcdDigoleI2C::retroEclairage () {
   }
 }
 
-//-----choix activation / desactivation du retro eclairage------
+///-----choix activation / desactivation du retro eclairage------
 void LcdDigoleI2C::choixRetroEclairage (bool choix) {
   if (choix)   {
     backLightOn();
@@ -66,7 +66,7 @@ void LcdDigoleI2C::choixRetroEclairage (bool choix) {
   }
 }
 
-//----affichage une ligne-----
+///----affichage une ligne-----
 void LcdDigoleI2C::affichageUneLigne(String chaine) {
   resetPos(m_ligne);// efface la ligne
   for (byte i = 0; i < chaine.length(); i++)  {  //move string to right
@@ -75,7 +75,7 @@ void LcdDigoleI2C::affichageUneLigne(String chaine) {
   cursorPosition(m_decalage, m_ligne, "");// decalage, ligne, texte
 }
 
-//-----reset display position and clean the line-----
+///-----reset display position and clean the line-----
 void LcdDigoleI2C::resetPos(byte ligne)
 {
   drawStr(0, ligne, "");// position du curseur en 0, ligne
@@ -87,7 +87,7 @@ void LcdDigoleI2C::resetPos(byte ligne)
   drawStr(0, ligne, "");// position du curseur en 0, ligne
 }
 
-//-----affichage de la date ou de l'heure-----
+///-----affichage de la date ou de l'heure-----
 void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde) {
   m_ligne = 1;
   String chaineLigne = "";
@@ -109,7 +109,7 @@ void LcdDigoleI2C::affichageDateHeure(String jourSemaine, byte jourHeure, byte m
   affichageUneLigne(chaineLigne);// affichage sur lcd
 }
 
-// transformation donnees date et heure
+///-----transformation donnees date et heure------
 String LcdDigoleI2C::transformation (String texte, byte dateHeure ) {
   String chaine = "";
   if (texte == "h " or texte == "m " or texte == "s ") {
@@ -127,7 +127,7 @@ String LcdDigoleI2C::transformation (String texte, byte dateHeure ) {
   }
   return chaine;
 }
-//-----affichage lumiere et fin de course-----
+///-----affichage lumiere et fin de course-----
 void LcdDigoleI2C::affichageLumFinCourse( unsigned int LumFinCourse, byte ligne, bool siNonReglable)
 {
   m_ligne = ligne;
@@ -138,7 +138,7 @@ void LcdDigoleI2C::affichageLumFinCourse( unsigned int LumFinCourse, byte ligne,
   if (siNonReglable)  cursorPosition(0, 0, "");
 }
 
-//-----affichage tensions-----
+///-----affichage tensions-----
 void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte ligne)
 {
   m_ligne = ligne;
@@ -150,7 +150,7 @@ void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte ligne)
   cursorPosition(0, 0, "");// decalage, ligne, texte
 }
 
-//-----affichage choix ouverture fermeture-----
+///-----affichage choix ouverture fermeture-----
 void LcdDigoleI2C::affichageChoix( bool ouverture, bool fermeture,  byte ligne)
 {
   m_ligne = ligne;
@@ -162,7 +162,7 @@ void LcdDigoleI2C::affichageChoix( bool ouverture, bool fermeture,  byte ligne)
   affichageUneLigne(chaineLigne);// affichage sur lcd
 }
 
-//-----affichage pulse et roue codeuse du servo-------
+///-----affichage pulse et roue codeuse du servo-------
 void LcdDigoleI2C::affichageServo(int pulse, int roueCodeuse,  byte ligne)
 {
   m_ligne = ligne;
@@ -175,7 +175,7 @@ void LcdDigoleI2C::affichageServo(int pulse, int roueCodeuse,  byte ligne)
   cursorPosition(0, 0, ""); // decalage, ligne, texte
 }
 
-//-----affichage au demarrage sur les deux lignes-----
+///-----affichage au demarrage sur les deux lignes-----
 void LcdDigoleI2C::bonjour(String chaine1, String chaine2) {
   gestionCurseur (false);
   choixRetroEclairage(true);
@@ -193,18 +193,18 @@ void LcdDigoleI2C::bonjour(String chaine1, String chaine2) {
   choixRetroEclairage(false);
 }
 
-//------activation / desactivation du curseur-----
+///------activation / desactivation du curseur-----
 void LcdDigoleI2C::gestionCurseur (bool curseur) {
   if (curseur) enableCursor(); else disableCursor();
 }
 
-// -----position du curseur : decalage, ligne, texte-----
+///-----position du curseur : decalage, ligne, texte-----
 void LcdDigoleI2C::cursorPosition(byte decalage, byte ligne, char *texte) {
   m_ligne = ligne;
   drawStr(decalage, m_ligne, texte);
 }
 
-//-----position du cuseur pendant les reglages-----
+///-----position du cuseur pendant les reglages-----
 void LcdDigoleI2C::cursorPositionReglages (const byte &touche, bool &relache, bool &reglage,  const byte decalageSup, const byte deplacement, const byte decalageInf) {
   if (touche == 4 and relache == true ) {
     relache = false;

@@ -1,4 +1,4 @@
-/* PowerTools.h
+/** PowerTools.h
   définitions de la classe PowerToos
     - Gestion de la consommation en courant
     - Watchdog
@@ -25,7 +25,7 @@ PowerTools::~PowerTools()
 
 }
 
-//-----initialisation power-----
+///-----initialisation power-----
 void  PowerTools::setupPower() {
   //Optimisation de la consommation
   //power_adc_disable(); // Convertisseur Analog / Digital pour les entrées analogiques
@@ -39,7 +39,7 @@ void  PowerTools::setupPower() {
   //power_timer2_disable();
 }
 
-//-----initialisation du watchdog - paramètre : 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms, 6=1 sec,7=2 sec, 8=4 sec, 9=8 secondes-----
+///-----initialisation du watchdog - paramètre : 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms, 6=1 sec,7=2 sec, 8=4 sec, 9=8 secondes-----
 void PowerTools::setup_watchdog(int parametreTemps) {
   byte bb;
   int ww;
@@ -57,7 +57,7 @@ void PowerTools::setup_watchdog(int parametreTemps) {
   WDTCSR |= _BV(WDIE);
 }
 
-//-----taille d'une chaine de caractères-----
+///-----taille d'une chaine de caractères-----
 byte PowerTools::tailleChaine (char * chaine) {
   byte i(1);
   while (chaine[i] != '\0') i++;

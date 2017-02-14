@@ -1,4 +1,4 @@
-/* Bouton.cpp
+/** Bouton.cpp
   définitions de la classe Bouton
 */
 
@@ -19,7 +19,7 @@ Bouton::~Bouton() {
 
 }
 
-//-----test touche Bp-----
+///-----test touche Bp-----
 bool Bouton::testToucheBp() {
   if (((millis() - m_tempoDebounce) > m_debounce)  and  m_relacheBp == true and !digitalRead(m_pinBp) ) {
     m_relacheBp = false;
@@ -29,7 +29,7 @@ bool Bouton::testToucheBp() {
   }
 }
 
-//-----test relache Bp-----
+///-----test relache Bp-----
 void Bouton::testRelacheBp (volatile bool &interruptBp) {
   if (m_relacheBp == false and digitalRead(m_pinBp) ) {
     delay (50);
@@ -38,7 +38,7 @@ void Bouton::testRelacheBp (volatile bool &interruptBp) {
   }
 }
 
-//-----test IT Bp-----
+///-----test IT Bp-----
 void Bouton::testInterruptionBp (volatile bool &interruptBp) {
   if (!digitalRead(m_pinBp) and !interruptBp) { // entree 9 pour interruption BP
     interruptBp = true;
@@ -46,14 +46,14 @@ void Bouton::testInterruptionBp (volatile bool &interruptBp) {
   }
 }
 
-//-----test IT ouverture boitier-----
+///-----test IT ouverture boitier-----
 void Bouton::testInterruptionBoitier (volatile bool &interruptOuvBoi) {
   if (!digitalRead(m_pinBoitier) and !interruptOuvBoi) { // entree 9 pour interruption BP
     interruptOuvBoi = true;
   }
 }
 
-//-----test boitier ouvert------
+///-----test boitier ouvert------
 bool  Bouton::testBoitierOuvert(const volatile bool &interruptOuvBoi, const bool &boitierOuvert) {
   if ( interruptOuvBoi and !digitalRead(m_pinBoitier) and !boitierOuvert) {    //  interruption ouverture boitier
     return true;
@@ -62,7 +62,7 @@ bool  Bouton::testBoitierOuvert(const volatile bool &interruptOuvBoi, const bool
   }
 }
 
-//-----test boitier ferme------
+///-----test boitier ferme------
 bool  Bouton::testBoitierFerme(const volatile bool &interruptOuvBoi, const bool &boitierOuvert) {
   if (digitalRead(m_pinBoitier) and boitierOuvert) { //  fermeture boitier
     return true;

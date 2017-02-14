@@ -1,4 +1,4 @@
-/* Clavier.h
+/** Clavier.h
   prototype de la classe Clavier
 */
 

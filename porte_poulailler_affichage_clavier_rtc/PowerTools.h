@@ -1,4 +1,4 @@
-/* PowerTools.h
+/** PowerTools.h
   prototype de la classe Power
     - Gestion de la consommation en courant
     - Watchdog

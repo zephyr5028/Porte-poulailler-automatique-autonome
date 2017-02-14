@@ -1,4 +1,4 @@
-/* LcdPCF8574.h
+/** LcdPCF8574.h
   prototype de la classe LCD circuit PCF8574 I2C
   afficheur lcd 2*16 caractères  avec liaison serie i2c LiquidCrystal_I2C
 */

@@ -1,4 +1,4 @@
-/* ServoMoteur.cpp
+/** ServoMoteur.cpp
   définitions de la classe ServoMoteur
   gestion du servo moteur au travers de la bibliothèque ServoTimer2
 */
@@ -17,7 +17,7 @@ ServoMoteur::~ServoMoteur()
 {
 }
 
-//-----initialisation-----
+///-----initialisation-----
 void ServoMoteur::init () {
   pinMode(m_pinRelais, OUTPUT); // relais servo's pin  an OUTPUT
   digitalWrite(m_pinRelais, LOW); // mise hors tension du relais du servo
@@ -27,7 +27,7 @@ void ServoMoteur::init () {
 
 }
 
-//------mise sous tension du servo et ouverture fermeture de la porte-------
+///------mise sous tension du servo et ouverture fermeture de la porte-------
 // value should usually be 500 to 2500 (1280 = stop)
 void ServoMoteur::servoOuvFerm(boolean batterieFaible, bool reduit)
 {
@@ -39,7 +39,7 @@ void ServoMoteur::servoOuvFerm(boolean batterieFaible, bool reduit)
   }
 }
 
-//------modificaton de la vitesse si le servo en action-------
+///------modificaton de la vitesse si le servo en action-------
 // value should usually be 500 to 2500 (1280 = stop)
 void ServoMoteur::servoVitesse( bool reduit)
 {
@@ -48,14 +48,14 @@ void ServoMoteur::servoVitesse( bool reduit)
   }
 }
 
-//-----modification de la vitesse-----
+///-----modification de la vitesse-----
 void ServoMoteur::modificationVitesse( bool reduit) {
   // modification vitesse ouverture : 1500 - (140 ou 70)  / fermeture : 1500 + (140 ou 70)
   if (reduit) m_pulse = m_pulseOuvFerm; else m_pulse = m_pulseReduit;
   if (m_ouvFerm) ServoTimer2:: write(m_pulse = m_pulseStop - m_pulse); else ServoTimer2:: write(m_pulse = m_pulseStop + m_pulse);
 }
 
-//-----mise hors tension relais du servo-----
+///-----mise hors tension relais du servo-----
 unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsigned int finDeCourseOuverture) {
   ServoMoteur::relaisHorsTension(); // relais hors tension
   if (!digitalRead(m_pinSecuriteHaute)) {
@@ -68,13 +68,13 @@ unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsi
   }
 }
 
-//-----relais hors tension-----
+///-----relais hors tension-----
 void ServoMoteur::relaisHorsTension () {
   digitalWrite(m_pinRelais, LOW);
   if (m_ouvFerm) !m_ouvFerm; else m_ouvFerm;
 }
 
-//-----relais sous tension-----
+///-----relais sous tension-----
 void ServoMoteur::relaisSousTension() {
   digitalWrite(m_pinRelais, HIGH);
 }

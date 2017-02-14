@@ -1,4 +1,4 @@
-/* Radio.cpp
+/** Radio.cpp
   définitions de la classe Radio
   radio 433MHz
 */
@@ -16,19 +16,19 @@ Radio::~Radio()
 {
 }
 
-//initialisation-----
+///-----initialisation-----
 void Radio::init () {
   m_chaine[0] = '\0'; // effacement du tableau
   vw_set_tx_pin(m_pinEmRadio); // broche d10 emetteur
   vw_setup(m_vitesseTransmission); // initialisation de la bibliothèque avec la vitesse (vitesse_bps)
 }
 
-//-----raz de m_chaine-----
+///-----raz de m_chaine-----
 void Radio::raz_m_chaine() {
   m_chaine[0] = '\0'; // effacement du tableau
 }
 
-//----message Radio-----
+///----message Radio-----
 void Radio::messageRadio(char *chaine1) {
   strcat(chaine1, "\0");
   vw_send((uint8_t *)chaine1, strlen(chaine1) + 1); // On envoie le message
@@ -37,7 +37,7 @@ void Radio::messageRadio(char *chaine1) {
   delay(10);
 }
 
-//----message Radio sans parametre-----
+///----message Radio sans parametre-----
 void Radio::messageSansParametre() {
   //strcat(m_chaine, "\0");
   byte leng = strlen(m_chaine);// longueur du tableau
@@ -49,7 +49,7 @@ void Radio::messageSansParametre() {
   for (byte i = 0; i < leng + 1; i++)   m_chaine[i] = {0};
 }
 
-//----routine construction message radio----
+///----routine construction message radio----
 void Radio::envoiMessage(char *chaine1) {
   char chaineComp[] = "Fin";
   if (strcmp(chaineComp, chaine1) != 0) { // test de la dernière chaine
@@ -67,7 +67,7 @@ void Radio::envoiMessage(char *chaine1) {
   }
 }
 
-//----chaine radio fin de ligne avant transmission-----
+///----chaine radio fin de ligne avant transmission-----
 void Radio::chaineVide() {
   if (m_radio) {
     char chaine1[m_taille - 1] = "";
@@ -76,7 +76,7 @@ void Radio::chaineVide() {
   }
 }
 
-//-----envoi message float avec test de l'ouverture du boitier plus texte-----
+///-----envoi message float avec test de l'ouverture du boitier plus texte-----
 void Radio::envoiFloat(float valeur, boolean boitierOuvert, char *texte ) {
   if (m_radio and !boitierOuvert) {
     char chaine[m_taille - 1] = "";
@@ -88,7 +88,7 @@ void Radio::envoiFloat(float valeur, boolean boitierOuvert, char *texte ) {
   }
 }
 
-//-----envoi message unsigned int avec test de l'ouverture du boitier plus texte-----
+///-----envoi message unsigned int avec test de l'ouverture du boitier plus texte-----
 void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char *texte) {
   if (m_radio and !boitierOuvert) {
     char chaine1[m_taille - 1] = "";
@@ -100,7 +100,7 @@ void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char *t
   }
 }
 
-//-----test du switch emission radio on/off-----
+///-----test du switch emission radio on/off-----
 void Radio::testSwitchEmissionRadio() {
  if (m_radio and !digitalRead(m_pinSwitchEmissionRadio)) {
     delay(40);

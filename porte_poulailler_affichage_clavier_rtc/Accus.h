@@ -1,6 +1,11 @@
-/* Accus.h
-  prototype de la classeAccus
-  bloc accus NIMH
+/**
+    \file Accus.h
+    \class Accus
+    \brief Gestion des blocs accumulateurs NIMH de 4,8v
+    \details Suivi de la tension et la valeur minimum
+    \author Zephyr5028
+    \date hiver 2017
+Prototype de la classe Accus
 */
 
 #ifndef Accus_h
@@ -20,7 +25,7 @@ class Accus
     int tensionAccusCAD(); // tension de l'accu CAD
     float tensionAccus(int valAccus); // convertion tension CAD tension de l'accu
     float tensionAccusCADversFloat();// lecture et convertion vers tension batterie en float
-    
+
 
 
   protected:

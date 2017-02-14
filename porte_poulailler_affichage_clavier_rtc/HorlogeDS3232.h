@@ -1,4 +1,4 @@
-/* HorlogeDS3232.h
+/** HorlogeDS3232.h
   prototype de la classe HorlogeDS3232
   RTC DS3232 avec temperature et circuit mémoire
 */

@@ -1,4 +1,4 @@
-/* LcdDigoleI2C.h
+/** LcdDigoleI2C.h
   prototype de la classe LCD Digole I2C
   afficheur lcd 2*16 caractères  avec liaison serie i2c digoleSerial
 */

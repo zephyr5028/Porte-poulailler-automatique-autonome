@@ -1,4 +1,4 @@
-/* Bouton.h
+/** Bouton.h
   prototype de la Bouton
 */
 
