@@ -29,7 +29,7 @@ void LcdDigoleI2C::init () {
   backLightOff(); // retro eclairage off
   enableCursor(); // enable cursor
   setPrintPos(0, 0); // position 0 ligne 0 pour débuter le clear screen
-  delay(10); //delay
+  //delay(10); //delay
 }
 
 ///-----effacement de l'afficheur----

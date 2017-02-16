@@ -34,7 +34,7 @@ void Radio::messageRadio(char *chaine1) {
   vw_send((uint8_t *)chaine1, strlen(chaine1) + 1); // On envoie le message
   // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
   vw_wait_tx(); // On attend la fin de l'envoi
-  delay(10);
+  //delay(10);
 }
 
 ///----message Radio sans parametre-----
@@ -45,7 +45,7 @@ void Radio::messageSansParametre() {
   vw_send((uint8_t *)m_chaine, leng + 1); // On envoie le message
   // strlen : Retourne le nombre de caractères de cs sans tenir compte du caractère de fin de chaîne.
   vw_wait_tx(); // On attend la fin de l'envoi
-  delay(10);
+  //delay(10);
   for (byte i = 0; i < leng + 1; i++)   m_chaine[i] = {0};
 }
 
@@ -103,11 +103,11 @@ void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char *t
 ///-----test du switch emission radio on/off-----
 void Radio::testSwitchEmissionRadio() {
  if (m_radio and !digitalRead(m_pinSwitchEmissionRadio)) {
-    delay(40);
+    //delay(40);
     raz_m_chaine();// effacement du tableau
     m_radio = false;
   } else if (!m_radio and digitalRead(m_pinSwitchEmissionRadio)) {
-    delay(40);
+    //delay(40);
     m_radio = true;
   }
 }

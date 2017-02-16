@@ -1,4 +1,4 @@
- /**@file*/
+/**@file*/
 /**
     \file porte_poulailler_affichage_clavier_rtc
     \brief Automatisation de la porte du poulailler en utilisant l'heure ou la lumière
@@ -6,8 +6,8 @@
     \author Zephyr5028
     \date hiver 2017
 */
-/** 
- *  porte-poulailler : affichage + clavier + rtc 
+/**
+    porte-poulailler : affichage + clavier + rtc
 */
 
 /**
@@ -153,9 +153,9 @@ boolean  boitierOuvert = true; // le boitier est ouvert
 Clavier clav(menuManuel, pinBp, pinBoitier, debounce, debug); // class Clavier avec le nombre de lignes du menu
 
 /** LCD DigoleSerialI2C */
-const int boucleTemps = 100; // temps entre deux affichages
+//const int boucleTemps = 100; // temps entre deux affichages
 bool LcdCursor = true; //curseur du lcd if true = enable
-int temps = 0;// pour calcul dans la fonction temporisationAffichage
+//int temps = 0;// pour calcul dans la fonction temporisationAffichage
 #ifdef  LCD_DIGOLE
 /// I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
@@ -194,22 +194,24 @@ void  lectureClavier() {
   if (boitierOuvert) {
     touche = clav.read_key(sensorClavier); /// read key sensor = A1
     clav.relacheTouche(touche, relache);
-    if (clav.deplacementDansMenu(touche, relache, reglage)) {
+    if (clav.deplacementDansMenu(touche, relache, reglage) or touche == 4) {
       clav.positionMenu(incrementation, touche); /// position du menu pour l'affichage
       deroulementMenu (incrementation); /// affichage du menu
     }
   }
 }
 
-///---- temporisation pour l'affichage: affichage du menu lorsque temps est > boucleTemps-----
-void temporisationAffichage(const int boucleTemps) {
+/*
+  ///---- temporisation pour l'affichage: affichage du menu lorsque temps est > boucleTemps-----
+  void temporisationAffichage(const int boucleTemps) {
   if (  temps > boucleTemps) {
-    deroulementMenu (incrementation); // affichage du menu en fonction de incrementation
+   //////// deroulementMenu (incrementation); // affichage du menu en fonction de incrementation
     temps = 0;
   } else {
     temps += 1;
   }
-}
+  }
+*/
 
 ///----routine lecture et ecriture date and time-----
 void ecritureDateTime() {
@@ -789,6 +791,7 @@ void routineTestOuvertureBoitier()  {
     }
     boitierOuvert = true; // boitier ouvert
     mydisp.gestionCurseur(1); // activation du curseur
+    deroulementMenu (incrementation); /// affichage du menu
   }
 }
 
@@ -943,6 +946,17 @@ void routineGestionWatchdog() {
         }
         // informations à afficher
         if (radio.get_m_radio()) {
+          
+          /*
+            nom macro  valeur de la macro                                forme syntaxique
+            __LINE__  numéro de la ligne courante du programme source   entier
+            __FILE__  nom du fichier source en cours de compilation     chaîne
+            __DATE__  la date de la compilation                         chaîne
+            __TIME__  l'heure de la compilation                         chaîne
+            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
+          */
+         // Serial.println(__TIME__);// heure de la compilation
+
           displayTime();
           read_temp(typeTemperature); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
@@ -1050,7 +1064,7 @@ void setup() {
 void loop() {
 
   lectureClavier(); // lecture du clavier
-  temporisationAffichage(boucleTemps) ; // temporisation pour l'affichage
+  // temporisationAffichage(boucleTemps) ; // temporisation pour l'affichage
 
   //reglages
   reglageTime(); // reglages de l'heure, minute, seconde si touche fleche droite

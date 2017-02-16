@@ -4,15 +4,19 @@
 
 #include "Clavier.h"
 
-Clavier::Clavier() : Bouton(  ), m_oldKey (-1), m_MenuManuel(14), m_NumKeys(6), 
-m_AdcKeyVal( {  50, 200, 400, 600, 800})
+Clavier::Clavier() : Bouton(  ), m_oldKey (-1), m_MenuManuel(14), m_NumKeys(6),
+  m_AdcKeyVal( {
+  50, 200, 400, 600, 800
+})
 {
 
 }
 /* sucharge du constructeur avec le nombre de lignes du menu */
-Clavier::Clavier(byte nbMenu, const byte pinBp, const byte pinBoitier, const int debounce, const boolean debug) :  
-Bouton(  pinBp, pinBoitier,  debounce,  debug ),
-m_oldKey (-1), m_MenuManuel(nbMenu), m_debug(debug), m_NumKeys(6), m_AdcKeyVal( {  50, 200, 400, 600, 800})
+Clavier::Clavier(byte nbMenu, const byte pinBp, const byte pinBoitier, const int debounce, const boolean debug) :
+  Bouton(  pinBp, pinBoitier,  debounce,  debug ),
+  m_oldKey (-1), m_MenuManuel(nbMenu), m_debug(debug), m_NumKeys(6), m_AdcKeyVal( {
+  50, 200, 400, 600, 800
+})
 {
 
 }
@@ -40,7 +44,7 @@ int Clavier::read_key(const int &sensor) {
   int  adc_key_in = analogRead(sensor); // read the value from the sensor A1
   byte key = get_key(adc_key_in); // convert into key press
   if (key != m_oldKey) { // if keypress is detected
-    delay(50); // wait for debounce time
+    delay(5); // wait for debounce time 50
     adc_key_in = analogRead(sensor); // read the value from the sensor
     key = get_key(adc_key_in); // convert into key press
     if (key != m_oldKey)  {

@@ -28,7 +28,7 @@ void LcdPCF8574::init () {
   noAutoscroll();
   clear();
   blink();
-  delay(10); //delay
+  //delay(10); //delay
 }
 
 ///-----effacement de l'afficheur----
@@ -39,7 +39,8 @@ void LcdPCF8574::effacementAfficheur() {
 ///-----remise à zero du lcd-----
 void LcdPCF8574::razLcd() {
   noBacklight();
-  clear();
+  clear();// efface aussi la mèmoire du lcd
+  //noDisplay();// pas d'affichage, mais la mèmoire du lcd reste pleine... à tester
   noBlink();
 }
 

@@ -12,7 +12,7 @@
 void  lectureClavier();
 
 //---- temporisation pour l'affichage: affichage du menu lorsque temps est > boucleTemps-----
-void temporisationAffichage(const int boucleTemps);
+//void temporisationAffichage(const int boucleTemps);
 
 //----routine lecture et ecriture date and time-----
 void ecritureDateTime();
