@@ -4,13 +4,13 @@
 
 #include "Bouton.h"
 
-Bouton::Bouton() :  m_pinBp(9), m_pinBoitier(6), m_debounce(350), m_relacheBp(true), m_tempoDebounce(0)
+Bouton::Bouton() :  m_pinBp(9), m_pinBoitier(6), m_debounce(350), m_relacheBp(true), m_tempoDebounce(0), m_debouncePret(false)
 {
 
 }
 /* sucharge du constructeur avec le nombre de lignes du menu */
 Bouton::Bouton( const byte pinBp, const byte pinBoitier, const int debounce, const boolean debug) : m_debug(debug), m_pinBp(pinBp),
-  m_pinBoitier(pinBoitier), m_relacheBp(true), m_debounce(debounce), m_tempoDebounce(0)
+  m_pinBoitier(pinBoitier), m_relacheBp(true), m_debounce(debounce), m_tempoDebounce(0), m_debouncePret(false)
 {
 
 }
@@ -21,20 +21,28 @@ Bouton::~Bouton() {
 
 ///-----test touche Bp-----
 bool Bouton::testToucheBp() {
-  if (((millis() - m_tempoDebounce) > m_debounce)  and  m_relacheBp == true and !digitalRead(m_pinBp) ) {
-    m_relacheBp = false;
-    return true;
-  } else {
-    return false;
+  if ( m_relacheBp == true and !digitalRead(m_pinBp)) {
+    if (((millis() - m_tempoDebounce) > m_debounce) ) {
+      m_relacheBp = false;
+      m_debouncePret = true;// pour le relache du bp
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
 ///-----test relache Bp-----
 void Bouton::testRelacheBp (volatile bool &interruptBp) {
   if (m_relacheBp == false and digitalRead(m_pinBp) ) {
-   // delay (50);
-    interruptBp = false; // autorisation de la prise en compte de l'IT
-    m_relacheBp = true;
+    if (m_debouncePret)  {
+      m_tempoDebounce = millis();// pour eviter des declenchements intempestifs
+      m_debouncePret = false;
+    }
+    if ((millis() - m_tempoDebounce) > m_debounce ) {
+      interruptBp = false; // autorisation de la prise en compte de l'IT
+      m_relacheBp = true;
+    }
   }
 }
 

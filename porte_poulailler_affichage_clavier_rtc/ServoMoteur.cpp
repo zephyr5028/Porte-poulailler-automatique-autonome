@@ -34,7 +34,7 @@ void ServoMoteur::servoOuvFerm(boolean batterieFaible, bool reduit)
   if (!batterieFaible and  !m_servoAction) { // si la batterie n'est pas faible et le servo non en action
     ServoMoteur::relaisSousTension(); // relais sous tension
     modificationVitesse(reduit);
-    delay(150);// attente mise sous tension
+    delay(200);// attente mise sous tension
     m_servoAction = true; // servo en action
   }
 }

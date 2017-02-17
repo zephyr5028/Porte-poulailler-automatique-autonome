@@ -12,7 +12,7 @@ class Bouton
   public:
 
     Bouton(); // constructeur
-    Bouton( const byte pinBp, const byte pinBoitier, const int debounce = 350, const boolean debug = false ); // surcharge du constructeur
+    Bouton( const byte pinBp, const byte pinBoitier, const int debounce = 50, const boolean debug = false ); // surcharge du constructeur
     ~Bouton(); // destructeur
 
     bool testToucheBp();  //test touche Bp
@@ -27,9 +27,10 @@ class Bouton
     const boolean m_debug ; // pour affichage console si nécessaire
     const byte m_pinBp; // pin D9 bouton poussoir ouverture / fermeture
     const byte m_pinBoitier; //pin D6 interrupteur ouverture boitier
-    const int m_debounce; // debounce latency in ms (350)
-    int m_tempoDebounce; // variable pour le calcul de l'anti-rebond
+    const int m_debounce; // debounce latency in ms (50)
+    unsigned int m_tempoDebounce; // variable pour le calcul de l'anti-rebond
     bool m_relacheBp; // relache du Bp
+    bool m_debouncePret;// pour le relache du bp
 
 };
 

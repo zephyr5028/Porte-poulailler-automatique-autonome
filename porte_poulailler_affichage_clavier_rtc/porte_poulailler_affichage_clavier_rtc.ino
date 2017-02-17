@@ -41,6 +41,15 @@
     -with ServoTimer2 et VirtualWire.
     -il faut commenter typedef dans la bibliothèque servotimer2.
 */
+/*
+           nom macro  valeur de la macro                                forme syntaxique
+           __LINE__  numéro de la ligne courante du programme source   entier
+           __FILE__  nom du fichier source en cours de compilation     chaîne
+           __DATE__  la date de la compilation                         chaîne
+           __TIME__  l'heure de la compilation                         chaîne
+           __STDC__  1 si le compilateur est ISO, 0 sinon              entier
+*/
+
 
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
@@ -145,7 +154,7 @@ const byte oldkey = -1;
 const byte sensorClavier = A1; //pin A1 pour le clavier
 const byte pinBp = 9; // pin D9 bouton poussoir ouverture / fermeture
 const byte pinBoitier = 6; //pin D6 interrupteur ouverture boitier
-const int debounce = 200; // debounce latency in ms
+const int debounce = 50; // debounce latency in ms
 byte incrementation = 0; // incrementation verticale
 boolean relache = false; // relache de la touche
 byte touche = -1; // valeur de la touche appuyee
@@ -747,12 +756,12 @@ void myInterruptINT1() {
 ///-----routine interruption Bp-----
 void routineInterruptionBp() {
   if (interruptBp) { // test de l'appui sur bouton bp
-    if (clav.testToucheBp ()) {
+    if (clav.testToucheBp ()) { //debounce pour le bp
       if (monServo.get_m_ouvFerm())  monServo.set_m_ouvFerm(false); else  monServo.set_m_ouvFerm(true);
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
     }
-    clav.testRelacheBp(interruptBp);// tst du relache du bp
+    clav.testRelacheBp(interruptBp);// test du relache du bp
   }
 }
 
@@ -946,17 +955,6 @@ void routineGestionWatchdog() {
         }
         // informations à afficher
         if (radio.get_m_radio()) {
-          
-          /*
-            nom macro  valeur de la macro                                forme syntaxique
-            __LINE__  numéro de la ligne courante du programme source   entier
-            __FILE__  nom du fichier source en cours de compilation     chaîne
-            __DATE__  la date de la compilation                         chaîne
-            __TIME__  l'heure de la compilation                         chaîne
-            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
-          */
-         // Serial.println(__TIME__);// heure de la compilation
-
           displayTime();
           read_temp(typeTemperature); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal

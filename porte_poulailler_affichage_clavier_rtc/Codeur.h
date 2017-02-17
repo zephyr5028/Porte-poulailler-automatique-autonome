@@ -35,7 +35,7 @@ class Codeur
     const unsigned int m_finDeCourseMax; // valeur maxi de la fin de course 500
     const boolean m_debug ; // pour affichage console si nécessaire
     volatile unsigned int m_compteRoueCodeuse;  // un compteur de position 150 au départ
-    volatile boolean m_interruptRoueCodeuse;    // gestion de l'anti-rebonds
+  //  volatile boolean m_interruptRoueCodeuse;    // gestion de l'anti-rebonds
     volatile boolean m_positionRoueCodeuse;// gestion de l'anti-rebonds
     unsigned int m_finDeCourseFermeture; // initialisation de la valeur de la fin de course fermeture 250 au depart
     unsigned int m_finDeCourseOuverture; // initialisation de la valeur de la fin de course ouverture 150 au depart
