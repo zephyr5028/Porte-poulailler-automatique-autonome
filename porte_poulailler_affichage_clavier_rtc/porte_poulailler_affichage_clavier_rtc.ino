@@ -162,9 +162,11 @@ boolean  boitierOuvert = true; // le boitier est ouvert
 Clavier clav(menuManuel, pinBp, pinBoitier, debounce, debug); // class Clavier avec le nombre de lignes du menu
 
 /** LCD DigoleSerialI2C */
-//const int boucleTemps = 100; // temps entre deux affichages
+
+const int boucleTemps = 100; // temps entre deux affichages
+int temps = 0;// pour calcul dans la fonction temporisationAffichage
+
 bool LcdCursor = true; //curseur du lcd if true = enable
-//int temps = 0;// pour calcul dans la fonction temporisationAffichage
 #ifdef  LCD_DIGOLE
 /// I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
@@ -210,17 +212,17 @@ void  lectureClavier() {
   }
 }
 
-/*
+
   ///---- temporisation pour l'affichage: affichage du menu lorsque temps est > boucleTemps-----
   void temporisationAffichage(const int boucleTemps) {
   if (  temps > boucleTemps) {
-   //////// deroulementMenu (incrementation); // affichage du menu en fonction de incrementation
+   deroulementMenu (incrementation); // affichage du menu en fonction de incrementation
     temps = 0;
   } else {
     temps += 1;
   }
   }
-*/
+
 
 ///----routine lecture et ecriture date and time-----
 void ecritureDateTime() {
@@ -1062,7 +1064,7 @@ void setup() {
 void loop() {
 
   lectureClavier(); // lecture du clavier
-  // temporisationAffichage(boucleTemps) ; // temporisation pour l'affichage
+   temporisationAffichage(boucleTemps) ; // temporisation pour l'affichage
 
   //reglages
   reglageTime(); // reglages de l'heure, minute, seconde si touche fleche droite

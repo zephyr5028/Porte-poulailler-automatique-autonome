@@ -8,7 +8,7 @@
 //constructeur avec debug
 Codeur::Codeur( const byte roueCodeusePin, unsigned int finDeCourseFermeture, unsigned int finDeCourseOuverture, unsigned int compteRoueCodeuse, const boolean debug) :
   m_roueCodeusePin(roueCodeusePin), m_finDeCourseFermeture(finDeCourseFermeture), m_finDeCourseOuverture(finDeCourseOuverture),
-  m_compteRoueCodeuse(compteRoueCodeuse), m_debug(debug), m_finDeCourseMax(500)//, m_interruptRoueCodeuse(false)
+  m_compteRoueCodeuse(compteRoueCodeuse), m_debug(debug), m_finDeCourseMax(500), m_interruptRoueCodeuse(false)
 {
 }
 
@@ -61,14 +61,30 @@ unsigned int  Codeur::reglageFinDeCourse (bool ouvFerm, byte touche) {
 
 ///-----compteur roue codeuse-----
 void Codeur::compteurRoueCodeuse(bool ouvFerm) {
-  // m_interruptRoueCodeuse = true; //activation de l'anti-rebond
+
+// debounce
+  m_interruptRoueCodeuse = true; //activation de l'anti-rebond
+  bool pos = digitalRead(m_roueCodeusePin);
+  // Confirmation du changement
+  if (pos != m_positionRoueCodeuse) {
+    m_positionRoueCodeuse = !m_positionRoueCodeuse;
+    //  if (pulse >= pulseStop) {
+    if (!ouvFerm) {
+      m_compteRoueCodeuse++;
+    } else {
+      m_compteRoueCodeuse--;
+    }
+    m_interruptRoueCodeuse = false; //libération de l'anti-rebond
+}
+  
+ /* // m_interruptRoueCodeuse = true; //activation de l'anti-rebond
   bool pos = digitalRead(m_roueCodeusePin);
   // Confirmation du changement
   if (pos != m_positionRoueCodeuse) {
     m_positionRoueCodeuse = !m_positionRoueCodeuse;
     if (!ouvFerm)  m_compteRoueCodeuse++; else  m_compteRoueCodeuse--;
     //   m_interruptRoueCodeuse = false; //libération de l'anti-rebond
-  }
+  }*/
 }
 
 //-----accesseur - getter-----
