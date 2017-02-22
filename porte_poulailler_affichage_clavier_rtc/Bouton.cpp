@@ -21,44 +21,25 @@ Bouton::~Bouton() {
 
 ///-----test touche Bp-----
 bool Bouton::testToucheBp() {
-
-  if (((millis() - m_tempoDebounce) > m_debounce)  and  m_relacheBp == true and !digitalRead(m_pinBp) ) {
+  if (((millis() - m_tempoDebounce) > m_debounce)  and  m_relacheBp == true and !digitalRead(m_pinBp)) {
     m_relacheBp = false;
+    m_debouncePret = true;// pour le relache du bp
     return true;
   } else {
     return false;
   }
-  /*
-      if ( m_relacheBp == true and !digitalRead(m_pinBp)) {
-    if (((millis() - m_tempoDebounce) > m_debounce) ) {
-    m_relacheBp = false;
-    m_debouncePret = true;// pour le relache du bp
-    return true;
-    } else {
-    return false;
-    }
-    }*/
 }
 
 ///-----test relache Bp-----
 void Bouton::testRelacheBp (volatile bool & interruptBp) {
-
-  if (m_relacheBp == false and digitalRead(m_pinBp) ) {
-    delay (50);
+  if (m_relacheBp == false and digitalRead(m_pinBp) and m_debouncePret ) {
+    m_tempoDebounce = millis();// pour eviter des declenchements intempestifs
+    m_debouncePret = false;
+  }
+  if ((millis() - m_tempoDebounce) > m_debounce ) {
     interruptBp = false; // autorisation de la prise en compte de l'IT
     m_relacheBp = true;
   }
-  /*
-    if (m_relacheBp == false and digitalRead(m_pinBp) ) {
-    if (m_debouncePret)  {
-      m_tempoDebounce = millis();// pour eviter des declenchements intempestifs
-      m_debouncePret = false;
-    }
-    if ((millis() - m_tempoDebounce) > m_debounce ) {
-      interruptBp = false; // autorisation de la prise en compte de l'IT
-      m_relacheBp = true;
-    }
-    }*/
 }
 
 ///-----test IT Bp-----
