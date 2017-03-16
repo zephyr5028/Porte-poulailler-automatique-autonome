@@ -1,5 +1,6 @@
 /**@file*/
 /**
+    \porte du poulailler avec encodeur rotatif v2.0.0
     \file porte_poulailler_affichage_clavier_rtc
     \brief Automatisation de la porte du poulailler en utilisant l'heure ou la lumière
     \details Simplification d'utilisation. Electrinique avec microcontroleur alimentée par batterie, couplée à un capteur solaire
@@ -11,6 +12,7 @@
 */
 
 /**
+  03 2017 encodeur rotatif
   01 2017 classes radio, lcd (digole et liquidcrystal), horloge, bouton.
   29 12 2016 classe Codeur (optique).
   28 12 2016 classe Lumiere - ok.
@@ -54,9 +56,9 @@
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 
-#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
+//#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
 
-//#define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
+#define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
 
 /*--------------------------------------------------------------------------------*/
 
@@ -94,10 +96,10 @@ const bool testServoMoteur = false; // pour utiliser ou non le test du servomote
 const byte servoCde = 8; // pin D8 cde du servo
 const byte servoPin = 4; // pin D4 relais du servo
 const byte securiteHaute = 12; // pin D12 pour l'ouverture de porte
-const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
+const int pulseStop = 1445; // value should usually be 750 to 2200 (1500 = stop)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
-ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 70, debug);
+ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 120, 60, debug);
 
 /** Accus */
 #include "Accus.h"
@@ -109,13 +111,26 @@ boolean batterieFaible = false; // si batterie < 4,8v = true
 Accus accusCde (accusPinCde, tensionMiniAccus, rapportConvertion, debug); // objet accus commande mini 4.8v, convertion 7.5
 Accus accusServo (accusPinServo); // objet accus servo moteur mini 4.8v, convertion 7.5
 
-/** roue codeuse */
+/** roue codeuse 
 #include "Codeur.h"
 const byte roueCodeuse = 7;//digital pin D7 pour entrée roue codeuse
 const unsigned int compteRoueCodeuse = 150;  // un compteur de position
 const unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
 const unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
-Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRoueCodeuse, debug); // objet codeur optique
+Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRoueCodeuse, debug); // objet codeur optique */
+
+/** encodeur rotatif */
+// définition des pin pour le KY040
+enum PinAssignments {
+  encoderPinDT = 11,   // right (DT)
+  encoderPinCLK = 7,   // left (CLK)
+};
+// classe encodeur rotatif KY040
+#include "JlmRotaryEncoder.h"
+JlmRotaryEncoder rotary(encoderPinDT, encoderPinCLK); // clearButton si besoin
+const unsigned int compteRoueCodeuse = 150;  // un compteur de position
+const unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
+const unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
 
 /** lumiere */
 #include "Lumiere.h"
@@ -131,6 +146,7 @@ Lumiere lum(lumierePin, lumMatin, lumSoir, heureFenetreSoir, convertion, boucleL
 volatile boolean interruptBp = false; // etat interruption entree 9
 volatile boolean interruptRTC = false; // etat interruption entree 5
 volatile boolean interruptOuvBoi = false; // etat interruption entree 6
+volatile boolean itOuvFerm = false;
 
 /** Clavier */
 /* menus */
@@ -162,18 +178,20 @@ boolean  boitierOuvert = true; // le boitier est ouvert
 Clavier clav(menuManuel, pinBp, pinBoitier, debounce, debug); // class Clavier avec le nombre de lignes du menu
 
 /** LCD DigoleSerialI2C */
-const int boucleTemps = 100; // temps entre deux affichages
+const int boucleTemps = 1000; // temps entre deux affichages
 int temps = 0;// pour calcul dans la fonction temporisationAffichage
 bool LcdCursor = true; //curseur du lcd if true = enable
 #ifdef  LCD_DIGOLE
 /// I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
 LcdDigoleI2C mydisp( &Wire, '\x27', colonnes, debug); // classe lcd digole i2c (lcd 2*16 caracteres)
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte Poulailler.Manque carte RTC";
 #endif
 #ifdef LCD_LIQIDCRYSTAL
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display
 LcdPCF8574  mydisp(0x27, 16, 2);
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.0  .Porte Poulailler.Manque carte RTC";
 #endif
 
 /** RTC_DS3231 */
@@ -193,7 +211,7 @@ const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure O
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 const char ouvertureDuBoitier[] PROGMEM = "Ouverture du boitier.";
 const char fermetureDuBoitier[] PROGMEM = "Fermeture du boitier.";
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte Poulailler.Manque carte RTC";
+
 
 #include "AA_fonctions.h" // prototypes des fonctions du programme
 
@@ -281,8 +299,8 @@ void closeTime() {
 void affiPulsePlusCptRoue() {
   int pulse = monServo.get_m_pulse();
   byte test = 0;
-  test = codOpt.testCompteurRoueCodeuse (5); // tolerance de 5
-  unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
+  test = rotary.testCompteurRoueCodeuse (5); // tolerance de 5
+  unsigned int compteRoueCodeuse = rotary.get_m_compteRoueCodeuse();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
     mydisp.affichageServo(pulse, compteRoueCodeuse, ligne);
@@ -543,7 +561,7 @@ void reglageTime () {
 /* fins de course ouverture et fermeture */
 ///------affichage fin de course Fermeture-----
 void affiFinDeCourseFermeture() {
-  unsigned int finDeCourseFermeture = codOpt.get_m_finDeCourseFermeture();
+  unsigned int finDeCourseFermeture = rotary.get_m_finDeCourseFermeture();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
     mydisp.affichageLumFinCourse(finDeCourseFermeture, ligne);
@@ -554,7 +572,7 @@ void affiFinDeCourseFermeture() {
 
 ///------affichage fin de course Ouverture-------
 void affiFinDeCourseOuverture() {
-  unsigned int finDeCourseOuverture = codOpt.get_m_finDeCourseOuverture();
+  unsigned int finDeCourseOuverture = rotary.get_m_finDeCourseOuverture();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
     mydisp.affichageLumFinCourse(finDeCourseOuverture, ligne);
@@ -575,7 +593,7 @@ void regFinDeCourseFermeture() {
       if (mydisp.get_m_decalage() == deplacement) {
         bool fermeture = 0;
         bool finDeCourse = 0;
-        unsigned int finDeCourseFermeture = codOpt.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
+        unsigned int finDeCourseFermeture = rotary.reglageFinDeCourse(fermeture, touche);// reglage de la fin de course
         rtc.sauvEepromChoix ( finDeCourseFermeture, fermeture, finDeCourse);// sauvegarde dans l'eeprom I2C de la valeur de fin de course fermeture @0x20 et 0x21
         affiFinDeCourseFermeture();
       }
@@ -595,7 +613,7 @@ void regFinDeCourseOuverture() {
       if (mydisp.get_m_decalage() == deplacement) {
         bool ouverture = 1;
         bool finDeCourse = 0;
-        unsigned int finDeCourseOuverture = codOpt.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
+        unsigned int finDeCourseOuverture = rotary.reglageFinDeCourse(ouverture, touche);// reglage de la fin de course
         rtc.sauvEepromChoix ( finDeCourseOuverture, ouverture, finDeCourse);// sauvegarde dans l'eeprom I2C de la valeur de fin de course ouverture @0x22 et 0x23
         affiFinDeCourseOuverture();
       }
@@ -704,30 +722,30 @@ void read_temp(const boolean typeTemperature) {
 */
 ///------sequence ouverture de la porte------
 void ouverturePorte() {
-  unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
-  unsigned int finDeCourseOuverture = codOpt.get_m_finDeCourseOuverture();
+  unsigned int compteRoueCodeuse = rotary.get_m_compteRoueCodeuse();
+  unsigned int finDeCourseOuverture = rotary.get_m_finDeCourseOuverture();
   if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
-    if (compteRoueCodeuse <= finDeCourseOuverture + 20) {  // 100 + 20
+    if (compteRoueCodeuse <= finDeCourseOuverture + 5) {  // 100 + 20
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
-    if (!digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
-      codOpt.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, finDeCourseOuverture));
+    if ((compteRoueCodeuse <= finDeCourseOuverture) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
+      rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, finDeCourseOuverture));
     }
   }
 }
 
 ///-----sequence fermeture de la porte-----
 void  fermeturePorte() {
-  unsigned int compteRoueCodeuse = codOpt.get_m_compteRoueCodeuse();
-  unsigned int finDeCourseFermeture = codOpt.get_m_finDeCourseFermeture();
+  unsigned int compteRoueCodeuse = rotary.get_m_compteRoueCodeuse();
+  unsigned int finDeCourseFermeture = rotary.get_m_finDeCourseFermeture();
   if (monServo.get_m_servoAction() and !monServo.get_m_ouvFerm()) {
-    if (compteRoueCodeuse >= finDeCourseFermeture - 30) { // 195 - 30
+    if (compteRoueCodeuse >= finDeCourseFermeture - 5) { // 200 - 30
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
     if ((compteRoueCodeuse >= finDeCourseFermeture) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
-      codOpt.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, codOpt.get_m_finDeCourseOuverture()));
+      rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, rotary.get_m_finDeCourseOuverture()));
     }
   }
 }
@@ -743,7 +761,12 @@ void  fermeturePorte() {
 */
 ///-----routine interruption D2 INT0------
 void myInterruptINT0() {
-  codOpt.compteurRoueCodeuse(monServo.get_m_ouvFerm());
+  //rotary.compteurRoueCodeuse(monServo.get_m_ouvFerm());
+  if (itOuvFerm ) {
+   
+  rotary.compteurRoueCodeuse(itOuvFerm);
+   itOuvFerm = 0;// non autorisation it
+  }
 }
 
 //-----routine interruption D3 INT1-----
@@ -846,7 +869,7 @@ void ouvFermLum() {
   //fenetre de non declenchement pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 et mise à jour du compteur watchdog lumiere
   lum.fenetreNonDeclenchement(valHeure) ;
   //non eclenchement en fonction de la position du servo et mise à jour du compteur watchdog lumiere
-  lum.nonDeclenchementPositionServo (codOpt.get_m_compteRoueCodeuse(), codOpt.get_m_finDeCourseFermeture(), codOpt.get_m_finDeCourseOuverture());
+  lum.nonDeclenchementPositionServo (rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseFermeture(), rotary.get_m_finDeCourseOuverture());
   byte declenchementLuminosite = lum.declenchementServoLuminosite(); // test de la luninosite et declenchement du servo
   switch (declenchementLuminosite) {
     case 1: // mise sous tension du servo pour l'ouverture de la porte
@@ -995,7 +1018,7 @@ void setup() {
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT); // led broche 13
 
-  rtc.init();// initialisation de l'horloge etverification de la presence de la carte RTC / memoire 24C32
+  rtc.init();// initialisation de l'horloge et verification de la presence de la carte RTC / memoire 24C32
 
   mydisp.init(); // initialisation for text LCD adapter
 
@@ -1032,13 +1055,13 @@ void setup() {
   delay(10);
   val2 = rtc.i2c_eeprom_read_byte( 0x21); // lecture Pf fin de course haut (byte)
   delay(10);
-  codOpt.set_m_finDeCourseFermeture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseFermeture
+  rotary.set_m_finDeCourseFermeture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseFermeture
 
   val1 = rtc.i2c_eeprom_read_byte( 0x22); // lecture pf fin de course bas (byte)
   delay(10);
   val2 = rtc.i2c_eeprom_read_byte( 0x23); // lecture Pf fin de course bas (byte)
   delay(10);
-  codOpt.set_m_finDeCourseOuverture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseOuverture
+  rotary.set_m_finDeCourseOuverture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseOuverture
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
   attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
@@ -1051,10 +1074,10 @@ void setup() {
 
   monServo.init(); // initialisation du servo moteur et du relais
 
-  codOpt.init();// initialisation de la position de la roue codeuse
+  rotary.init();// initialisation de la position de la roue codeuse
 
   if (!testServoMoteur) {
-    monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
+   monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
   }
 }
 
@@ -1090,6 +1113,10 @@ void loop() {
 
   ouverturePorte();
   fermeturePorte();
+  
+    bool a_dt = digitalRead(encoderPinDT);
+    bool b_clk = digitalRead(encoderPinCLK);
+    if ((a_dt && b_clk) or (!a_dt && !b_clk)) itOuvFerm = 1 ; // autorisation it
 
   routineTestFermetureBoitier(); // test fermeture boitier
   routineTestOuvertureBoitier();// test ouvertuer boitier
