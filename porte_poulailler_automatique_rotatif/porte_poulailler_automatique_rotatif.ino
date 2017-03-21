@@ -96,10 +96,10 @@ const bool testServoMoteur = false; // pour utiliser ou non le test du servomote
 const byte servoCde = 8; // pin D8 cde du servo
 const byte servoPin = 4; // pin D4 relais du servo
 const byte securiteHaute = 12; // pin D12 pour l'ouverture de porte
-const int pulseStop = 1445; // value should usually be 750 to 2200 (1500 = stop)
+const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
-ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 120, 60, debug);
+ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 60, debug);
 
 /** Accus */
 #include "Accus.h"
@@ -111,14 +111,6 @@ boolean batterieFaible = false; // si batterie < 4,8v = true
 Accus accusCde (accusPinCde, tensionMiniAccus, rapportConvertion, debug); // objet accus commande mini 4.8v, convertion 7.5
 Accus accusServo (accusPinServo); // objet accus servo moteur mini 4.8v, convertion 7.5
 
-/** roue codeuse 
-#include "Codeur.h"
-const byte roueCodeuse = 7;//digital pin D7 pour entrée roue codeuse
-const unsigned int compteRoueCodeuse = 150;  // un compteur de position
-const unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
-const unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
-Codeur codOpt (roueCodeuse, finDeCourseFermeture, finDeCourseOuverture, compteRoueCodeuse, debug); // objet codeur optique */
-
 /** encodeur rotatif */
 // définition des pin pour le KY040
 enum PinAssignments {
@@ -128,9 +120,11 @@ enum PinAssignments {
 // classe encodeur rotatif KY040
 #include "JlmRotaryEncoder.h"
 JlmRotaryEncoder rotary(encoderPinDT, encoderPinCLK); // clearButton si besoin
-const unsigned int compteRoueCodeuse = 150;  // un compteur de position
-const unsigned int finDeCourseFermeture = 250; // initialisation de la valeur de la fin de course fermeture
-const unsigned int finDeCourseOuverture = 150; // initialisation de la valeur de la fin de course ouverture
+const unsigned int compteRoueCodeuse = 120;  // un compteur de position
+const unsigned int finDeCourseOuverture = 100; // initialisation de la valeur de la fin de course ouverture
+const unsigned int finDeCourseFermeture = 20; // initialisation de la valeur de la fin de course fermeture
+// définition des pin pour le KY040
+
 
 /** lumiere */
 #include "Lumiere.h"
@@ -207,7 +201,7 @@ HorlogeDS3232 rtc(adresseBoitier24C32, rtcINT, debug);
 
 /** progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
-const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm . Fin course fer . Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
+const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm .Course fermeture. Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 const char ouvertureDuBoitier[] PROGMEM = "Ouverture du boitier.";
 const char fermetureDuBoitier[] PROGMEM = "Fermeture du boitier.";
@@ -722,30 +716,29 @@ void read_temp(const boolean typeTemperature) {
 */
 ///------sequence ouverture de la porte------
 void ouverturePorte() {
-  unsigned int compteRoueCodeuse = rotary.get_m_compteRoueCodeuse();
-  unsigned int finDeCourseOuverture = rotary.get_m_finDeCourseOuverture();
-  if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
-    if (compteRoueCodeuse <= finDeCourseOuverture + 5) {  // 100 + 20
+  if (monServo.get_m_servoAction() and !monServo.get_m_ouvFerm()) {
+    if (rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() + 5) {
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
-    if ((compteRoueCodeuse <= finDeCourseOuverture) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
-      rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, finDeCourseOuverture));
+    // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
+    if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
+      rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
+    
   }
 }
 
 ///-----sequence fermeture de la porte-----
 void  fermeturePorte() {
-  unsigned int compteRoueCodeuse = rotary.get_m_compteRoueCodeuse();
-  unsigned int finDeCourseFermeture = rotary.get_m_finDeCourseFermeture();
-  if (monServo.get_m_servoAction() and !monServo.get_m_ouvFerm()) {
-    if (compteRoueCodeuse >= finDeCourseFermeture - 5) { // 200 - 30
+  if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
+    if (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + ( rotary.get_m_finDeCourseFermeture() - 5)) {
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
-    if ((compteRoueCodeuse >= finDeCourseFermeture) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
-      rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(compteRoueCodeuse, rotary.get_m_finDeCourseOuverture()));
+    //  if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
+    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
+      rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
   }
 }
@@ -761,11 +754,9 @@ void  fermeturePorte() {
 */
 ///-----routine interruption D2 INT0------
 void myInterruptINT0() {
-  //rotary.compteurRoueCodeuse(monServo.get_m_ouvFerm());
   if (itOuvFerm ) {
-   
-  rotary.compteurRoueCodeuse(itOuvFerm);
-   itOuvFerm = 0;// non autorisation it
+    rotary.compteurRoueCodeuse(itOuvFerm);
+    itOuvFerm = 0;// non autorisation it
   }
 }
 
@@ -783,6 +774,8 @@ void routineInterruptionBp() {
       if (monServo.get_m_ouvFerm())  monServo.set_m_ouvFerm(false); else  monServo.set_m_ouvFerm(true);
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
+     byte timerOuvFermPorte =  rtc.lectureRegistreEtConversion( RTC_SECONDS & 0x7f);
+     Serial.println (timerOuvFermPorte);
     }
     clav.testRelacheBp(interruptBp);// test du relache du bp
   }
@@ -1064,7 +1057,7 @@ void setup() {
   rotary.set_m_finDeCourseOuverture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseOuverture
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
-  attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
+  attachInterrupt(0, myInterruptINT0, FALLING); // validation de l'interruption sur int0 (d2)
 
   tools.setupPower(); // initialisation power de l'arduino
 
@@ -1077,7 +1070,8 @@ void setup() {
   rotary.init();// initialisation de la position de la roue codeuse
 
   if (!testServoMoteur) {
-   monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
+    reduit = 1;// vitesse normale
+    monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
   }
 }
 
@@ -1113,10 +1107,11 @@ void loop() {
 
   ouverturePorte();
   fermeturePorte();
-  
-    bool a_dt = digitalRead(encoderPinDT);
-    bool b_clk = digitalRead(encoderPinCLK);
-    if ((a_dt && b_clk) or (!a_dt && !b_clk)) itOuvFerm = 1 ; // autorisation it
+
+  if ((digitalRead(encoderPinDT) && digitalRead(encoderPinCLK))  &&  !itOuvFerm) {
+    delay(20);
+    itOuvFerm = 1 ; // autorisation it
+  }
 
   routineTestFermetureBoitier(); // test fermeture boitier
   routineTestOuvertureBoitier();// test ouvertuer boitier

@@ -30,13 +30,11 @@ int JlmRotaryEncoder::encoderA()
   // Confirmation du changement
   if ( digitalRead(m_encoderPinA) != m_A_set )  {
     m_A_set = !m_A_set;
-
     if (m_B_change) {
       m_encoderPos += 1;
       m_B_change = false;
     } else
       m_A_change = true;
-
     m_rotating = false;  //libération de l'anti-rebond
   }
   return m_encoderPos;
@@ -49,13 +47,12 @@ int JlmRotaryEncoder::encoderB()
   m_rotating = true;
   if ( digitalRead(m_encoderPinB) != m_B_set )  {
     m_B_set = !m_B_set;
-
     if (m_A_change) {
+      m_compteRoueCodeuse -= 1;
       m_encoderPos -= 1;
       m_A_change = false;
     } else
       m_B_change = true;
-
     m_rotating = false;
   }
   return m_encoderPos;
@@ -81,52 +78,18 @@ void JlmRotaryEncoder::compteurRoueCodeuse(bool itOuvFerm) {
   if (itOuvFerm) {
     bool a_dt = digitalRead(m_encoderPinA);
     bool b_clk = digitalRead(m_encoderPinB);
-    /*
-      if ( a_dt != m_A_set )  {
-        m_A_set = !m_A_set;
-
-        if (m_B_change) {
-          m_encoderPos += 1;
-          m_compteRoueCodeuse--;
-          m_B_change = false;
-        } else
-          m_A_change = true;
-
-      } else  if ( b_clk != m_B_set )  {
-        m_B_set = !m_B_set;
-
-        if (m_A_change) {
-          m_encoderPos -= 1;
-          m_compteRoueCodeuse++;
-          m_A_change = false;
-        } else
-          m_B_change = true;
-
-      }
-    */
-
     if (!a_dt && b_clk) {
-      m_compteRoueCodeuse--;
-    }
-    else if (!b_clk && a_dt) {
       m_compteRoueCodeuse++;
     }
+    else if (!b_clk && a_dt) {
+      m_compteRoueCodeuse--;
+    }
+    Serial.print (a_dt);
+    Serial.print("   ");
+    Serial.print (b_clk);
+    Serial.print("   ");
+    Serial.println (m_compteRoueCodeuse);
   }
-
-  /*
-    // debounce
-    m_interruptRoueCodeuse = true; //activation de l'anti-rebond
-    bool pos = digitalRead(m_roueCodeusePin);
-    // Confirmation du changement
-    if (pos != m_positionRoueCodeuse) {
-      m_positionRoueCodeuse = !m_positionRoueCodeuse;
-      //  if (pulse >= pulseStop) {
-      if (!ouvFerm) {
-        m_compteRoueCodeuse++;
-      } else {
-        m_compteRoueCodeuse--;
-      }
-      m_interruptRoueCodeuse = false; //libération de l'anti-rebond*/
 }
 
 ///-----reglage de la fin de course-----

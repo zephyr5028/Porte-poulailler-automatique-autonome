@@ -45,7 +45,7 @@ unsigned int  Lumiere::reglageLumiere (bool matinSoir, byte touche) {
 ///------- lecture luminosite CAD-----
 int Lumiere::luminositeCAD() {
   int valLumiere = analogRead(m_lumierePin); //read the input on analog pin tension batterie
-  return valLumiere;
+  return 1023 - valLumiere; // inversion
 }
 
 ///------- convertion CAD  vers tension luminosite -----

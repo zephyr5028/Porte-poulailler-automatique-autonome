@@ -9,7 +9,7 @@
 ServoMoteur::ServoMoteur( byte pinCde, byte pinRelais, const byte pinSecuriteHaute, const int pulseStop, const int pulseOuvFerm ,
                           const int pulseReduit, const boolean debug) :  m_pinCde(pinCde), m_pinRelais(pinRelais),
   m_pulseStop(pulseStop),  m_pulseOuvFerm(pulseOuvFerm), m_pinSecuriteHaute(pinSecuriteHaute),
-  m_pulseReduit(pulseReduit), m_debug(debug), m_pulse(pulseStop), m_ouvFerm(true), m_servoAction(false)
+  m_pulseReduit(pulseReduit), m_debug(debug), m_pulse(pulseStop), m_ouvFerm(false), m_servoAction(false)
 {
 }
 
@@ -56,12 +56,13 @@ void ServoMoteur::modificationVitesse( bool reduit) {
 }
 
 ///-----mise hors tension relais du servo-----
-unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsigned int finDeCourseOuverture) {
+unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsigned int finDeCourse) {
   ServoMoteur::relaisHorsTension(); // relais hors tension
   if (!digitalRead(m_pinSecuriteHaute)) {
     delay(200); // attente fin de l'arrêt complet du servo
     m_servoAction = false; // servo arrêt
-    return finDeCourseOuverture;
+   //  return compteRoueCodeuse;
+    return finDeCourse;
   } else {
     m_servoAction = false; // servo arrêt
     return compteRoueCodeuse;

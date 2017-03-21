@@ -182,7 +182,7 @@ void LcdPCF8574::affichageServo(int pulse, int roueCodeuse, byte ligne)
 void LcdPCF8574::bonjour(String chaine1, String chaine2) {
   gestionCurseur (false);
   choixRetroEclairage(true);
-  for (byte j = 0; j < 5; j++)  {  //texte clignotant
+  for (byte j = 0; j < 3; j++)  {  //texte clignotant
     effacementAfficheur(); // CLear screen
     delay(400);
     m_ligne = 0;

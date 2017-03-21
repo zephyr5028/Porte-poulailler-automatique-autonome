@@ -27,11 +27,11 @@ class JlmRotaryEncoder
     int encoderB(); // changement d'etat de B
     void switchClear(); // clear compteur avec le switch
 
- void compteurRoueCodeuse(bool ouvFerm);//compteur roue codeuse
+    void compteurRoueCodeuse(bool ouvFerm);//compteur roue codeuse
     byte testCompteurRoueCodeuse (byte tolerance);//test du compteur roue codeuse pour affichage ouvert ou ferme
-      unsigned int reglageFinDeCourse (bool ouvFerm, byte touche); //reglage de la fin de course
-      unsigned int get_m_compteRoueCodeuse();
-     void set_m_compteRoueCodeuse(unsigned int compteRoueCodeuse);
+    unsigned int reglageFinDeCourse (bool ouvFerm, byte touche); //reglage de la fin de course
+    unsigned int get_m_compteRoueCodeuse();
+    void set_m_compteRoueCodeuse(unsigned int compteRoueCodeuse);
     unsigned int get_m_finDeCourseFermeture();
     void set_m_finDeCourseFermeture(unsigned int finDeCourseFermeture);
     unsigned int get_m_finDeCourseOuverture();
@@ -55,9 +55,9 @@ class JlmRotaryEncoder
     boolean m_A_change;
     boolean m_B_change;
 
-  volatile boolean m_interruptRoueCodeuse;    // gestion de l'anti-rebonds
-     const unsigned int m_finDeCourseMax; // valeur maxi de la fin de course 500
-   volatile unsigned int m_compteRoueCodeuse;  // un compteur de position 150 au départ
+    volatile boolean m_interruptRoueCodeuse;    // gestion de l'anti-rebonds
+    const unsigned int m_finDeCourseMax; // valeur maxi de la fin de course 500
+    volatile unsigned int m_compteRoueCodeuse;  // un compteur de position 150 au départ
     unsigned int m_finDeCourseFermeture; // initialisation de la valeur de la fin de course fermeture 250 au depart
     unsigned int m_finDeCourseOuverture; // initialisation de la valeur de la fin de course ouverture 150 au depart
 

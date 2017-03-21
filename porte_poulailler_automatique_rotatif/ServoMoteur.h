@@ -47,7 +47,7 @@ class ServoMoteur : public ServoTimer2
     const int m_pulseOuvFerm; // vitesse ouverture -140, fermeture 140
     const int m_pulseReduit; // vitesse ouverture réduite -70 , fermeture réduite 70
     int m_pulse;// vitesse du servo à un instant donné
-    bool m_ouvFerm;// ouverture / fermeture - true ouverture
+    bool m_ouvFerm;// ouverture / fermeture
     bool m_servoAction; // servo en action - false servo à l'arrêt
 
 };
