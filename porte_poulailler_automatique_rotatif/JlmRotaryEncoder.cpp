@@ -75,21 +75,45 @@ void JlmRotaryEncoder::switchClear()
 
 ///-----compteur roue codeuse-----
 void JlmRotaryEncoder::compteurRoueCodeuse(bool itOuvFerm) {
-  if (itOuvFerm) {
-    bool a_dt = digitalRead(m_encoderPinA);
-    bool b_clk = digitalRead(m_encoderPinB);
-    if (!a_dt && b_clk) {
-      m_compteRoueCodeuse++;
+  /* if (!digitalRead(m_encoderPinA) && digitalRead(m_encoderPinB)) {
+     m_compteRoueCodeuse++;
     }
-    else if (!b_clk && a_dt) {
-      m_compteRoueCodeuse--;
-    }
-    Serial.print (a_dt);
-    Serial.print("   ");
-    Serial.print (b_clk);
-    Serial.print("   ");
-    Serial.println (m_compteRoueCodeuse);
+    else if (!digitalRead(m_encoderPinB) && digitalRead(m_encoderPinA)) {
+     m_compteRoueCodeuse--;
+    }*/
+ /* Serial.print (m_A_change);
+  Serial.print("  ");
+  Serial.print (m_B_change);
+
+  Serial.print("        ");*/
+
+  bool A = digitalRead(m_encoderPinA);
+  bool B = digitalRead(m_encoderPinB);
+  if ((!A && B && m_A_change && m_B_change) or
+      ( A && !B && !m_A_change && !m_B_change)) {
+    m_compteRoueCodeuse++;
+    //  m_A_change = A;
+    //  m_B_change = B;
   }
+  else if ((!B && A && m_A_change && m_B_change ) or
+           (B && !A && !m_A_change && !m_B_change)) {
+    m_compteRoueCodeuse--;
+    //  m_A_change = A;
+    //  m_B_change = B;
+  }
+  m_A_change = A;
+  m_B_change = B;
+ /* Serial.print (A);
+  Serial.print("  ");
+  Serial.print (B);
+  Serial.print("        ");
+  Serial.println (m_compteRoueCodeuse);*/
+}
+
+/// mise à jour de A et B change
+void JlmRotaryEncoder::writeRotaryDtClk() {
+  m_A_change = digitalRead(m_encoderPinA);
+  m_B_change = digitalRead(m_encoderPinB);
 }
 
 ///-----reglage de la fin de course-----
@@ -154,5 +178,23 @@ unsigned int JlmRotaryEncoder::get_m_finDeCourseOuverture() {
 //-----mutateur - setter-----
 void JlmRotaryEncoder::set_m_finDeCourseOuverture(unsigned int finDeCourseOuverture) {
   m_finDeCourseOuverture = finDeCourseOuverture;
+}
+
+//-----accesseur - getter-----
+bool JlmRotaryEncoder::get_m_A_change() {
+  return m_A_change;
+}
+//-----mutateur - setter-----
+void JlmRotaryEncoder::set_m_A_change(bool A_change) {
+  m_A_change = A_change;
+}
+
+//-----accesseur - getter-----
+bool JlmRotaryEncoder::get_m_B_change() {
+  return m_B_change;
+}
+//-----mutateur - setter-----
+void JlmRotaryEncoder::set_m_B_change(bool B_change) {
+  m_B_change = B_change;
 }
 

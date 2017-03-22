@@ -36,6 +36,11 @@ class JlmRotaryEncoder
     void set_m_finDeCourseFermeture(unsigned int finDeCourseFermeture);
     unsigned int get_m_finDeCourseOuverture();
     void set_m_finDeCourseOuverture(unsigned int finDeCourseOuverture);
+    bool get_m_A_change();
+    void set_m_A_change(bool A_change);
+    bool get_m_B_change();
+    void set_m_B_change(bool B_change);
+    void writeRotaryDtClk();
 
   protected:
 

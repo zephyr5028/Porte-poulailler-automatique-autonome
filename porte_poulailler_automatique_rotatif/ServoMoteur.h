@@ -49,6 +49,7 @@ class ServoMoteur : public ServoTimer2
     int m_pulse;// vitesse du servo à un instant donné
     bool m_ouvFerm;// ouverture / fermeture
     bool m_servoAction; // servo en action - false servo à l'arrêt
+    unsigned long m_debutDescente;// temps
 
 };
 

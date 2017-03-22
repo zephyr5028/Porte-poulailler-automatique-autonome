@@ -9,7 +9,7 @@
 ServoMoteur::ServoMoteur( byte pinCde, byte pinRelais, const byte pinSecuriteHaute, const int pulseStop, const int pulseOuvFerm ,
                           const int pulseReduit, const boolean debug) :  m_pinCde(pinCde), m_pinRelais(pinRelais),
   m_pulseStop(pulseStop),  m_pulseOuvFerm(pulseOuvFerm), m_pinSecuriteHaute(pinSecuriteHaute),
-  m_pulseReduit(pulseReduit), m_debug(debug), m_pulse(pulseStop), m_ouvFerm(false), m_servoAction(false)
+  m_pulseReduit(pulseReduit), m_debug(debug), m_pulse(pulseStop), m_ouvFerm(false), m_servoAction(false), m_debutDescente(0)
 {
 }
 
@@ -32,6 +32,9 @@ void ServoMoteur::init () {
 void ServoMoteur::servoOuvFerm(boolean batterieFaible, bool reduit)
 {
   if (!batterieFaible and  !m_servoAction) { // si la batterie n'est pas faible et le servo non en action
+    //if ((unsigned long)(millis() - previousMillis) >= interval)
+    m_debutDescente  = millis();
+    // Serial.println(m_debutDescente);
     ServoMoteur::relaisSousTension(); // relais sous tension
     modificationVitesse(reduit);
     delay(200);// attente mise sous tension
@@ -61,10 +64,12 @@ unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsi
   if (!digitalRead(m_pinSecuriteHaute)) {
     delay(200); // attente fin de l'arrêt complet du servo
     m_servoAction = false; // servo arrêt
-   //  return compteRoueCodeuse;
+    //  return compteRoueCodeuse;
+    Serial.println(millis() - m_debutDescente);
     return finDeCourse;
   } else {
     m_servoAction = false; // servo arrêt
+    Serial.println(millis() - m_debutDescente);
     return compteRoueCodeuse;
   }
 }

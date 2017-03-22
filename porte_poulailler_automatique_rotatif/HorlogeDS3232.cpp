@@ -123,14 +123,14 @@ byte HorlogeDS3232::reglageHeure(const byte touche, byte tmDateTime, const byte 
 
 ///-----lecture horaire ALARM1-----
 void HorlogeDS3232::lectureHoraireALARM1() {
-  m_alarm1Hour =  lectureRegistreEtConversion(ALM1_HOURS & 0x3f); // alarme 1 hours
+  m_alarm1Hour =  lectureRegistreEtConversion(ALM1_HOURS , 0x3f); // alarme 1 hours
   m_alarm1Minute = lectureRegistreEtConversion(ALM1_MINUTES); // alarme 1 minutes
-  m_alarm1Second =  lectureRegistreEtConversion(ALM1_SECONDS & 0x7f); // alarme 1 seconds
+  m_alarm1Second =  lectureRegistreEtConversion(ALM1_SECONDS , 0x7f); // alarme 1 seconds
 }
 
 ///-----lecture horaire ALARM2-----
 void HorlogeDS3232::lectureHoraireALARM2() {
-  m_alarm2Hour =  lectureRegistreEtConversion(ALM2_HOURS & 0x3f); // alarme 2 hours
+  m_alarm2Hour =  lectureRegistreEtConversion(ALM2_HOURS , 0x3f); // alarme 2 hours
   m_alarm2Minute = lectureRegistreEtConversion(ALM2_MINUTES); // alarme 2 minutes
 }
 
