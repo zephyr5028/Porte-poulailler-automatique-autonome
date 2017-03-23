@@ -64,12 +64,9 @@ unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsi
   if (!digitalRead(m_pinSecuriteHaute)) {
     delay(200); // attente fin de l'arrêt complet du servo
     m_servoAction = false; // servo arrêt
-    //  return compteRoueCodeuse;
-    Serial.println(millis() - m_debutDescente);
     return finDeCourse;
   } else {
     m_servoAction = false; // servo arrêt
-    Serial.println(millis() - m_debutDescente);
     return compteRoueCodeuse;
   }
 }

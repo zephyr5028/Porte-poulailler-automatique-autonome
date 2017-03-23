@@ -27,15 +27,15 @@ class JlmRotaryEncoder
     int encoderB(); // changement d'etat de B
     void switchClear(); // clear compteur avec le switch
 
-    void compteurRoueCodeuse(bool ouvFerm);//compteur roue codeuse
+    void compteurRoueCodeuse();//compteur roue codeuse
     byte testCompteurRoueCodeuse (byte tolerance);//test du compteur roue codeuse pour affichage ouvert ou ferme
-    unsigned int reglageFinDeCourse (bool ouvFerm, byte touche); //reglage de la fin de course
-    unsigned int get_m_compteRoueCodeuse();
-    void set_m_compteRoueCodeuse(unsigned int compteRoueCodeuse);
-    unsigned int get_m_finDeCourseFermeture();
-    void set_m_finDeCourseFermeture(unsigned int finDeCourseFermeture);
-    unsigned int get_m_finDeCourseOuverture();
-    void set_m_finDeCourseOuverture(unsigned int finDeCourseOuverture);
+    int reglageFinDeCourse (bool ouvFerm, byte touche); //reglage de la fin de course
+    int get_m_compteRoueCodeuse();
+    void set_m_compteRoueCodeuse(int compteRoueCodeuse);
+    int get_m_finDeCourseFermeture();
+    void set_m_finDeCourseFermeture(int finDeCourseFermeture);
+    int get_m_finDeCourseOuverture();
+    void set_m_finDeCourseOuverture(int finDeCourseOuverture);
     bool get_m_A_change();
     void set_m_A_change(bool A_change);
     bool get_m_B_change();
@@ -51,7 +51,7 @@ class JlmRotaryEncoder
     byte m_switchButton; // switch (SW) pin sw
     boolean m_unSwitch; // un seul appui à la fois sur sw
 
-    volatile unsigned int m_encoderPos;  // un compteur de position
+    volatile int m_encoderPos;  // un compteur de position
     boolean m_rotating;    // gestion de l'anti-rebonds
 
     // variable pour les routines de changement d'état
@@ -61,10 +61,10 @@ class JlmRotaryEncoder
     boolean m_B_change;
 
     volatile boolean m_interruptRoueCodeuse;    // gestion de l'anti-rebonds
-    const unsigned int m_finDeCourseMax; // valeur maxi de la fin de course 500
-    volatile unsigned int m_compteRoueCodeuse;  // un compteur de position 150 au départ
-    unsigned int m_finDeCourseFermeture; // initialisation de la valeur de la fin de course fermeture 250 au depart
-    unsigned int m_finDeCourseOuverture; // initialisation de la valeur de la fin de course ouverture 150 au depart
+    const int m_finDeCourseMax; // valeur maxi de la fin de course 500
+    volatile int m_compteRoueCodeuse;  // un compteur de position 150 au départ
+    int m_finDeCourseFermeture; // initialisation de la valeur de la fin de course fermeture 250 au depart
+    int m_finDeCourseOuverture; // initialisation de la valeur de la fin de course ouverture 150 au depart
 
 };
 

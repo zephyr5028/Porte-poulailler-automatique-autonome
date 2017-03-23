@@ -140,7 +140,6 @@ Lumiere lum(lumierePin, lumMatin, lumSoir, heureFenetreSoir, convertion, boucleL
 volatile boolean interruptBp = false; // etat interruption entree 9
 volatile boolean interruptRTC = false; // etat interruption entree 5
 volatile boolean interruptOuvBoi = false; // etat interruption entree 6
-volatile boolean itOuvFerm = false;
 
 /** Clavier */
 /* menus */
@@ -723,6 +722,7 @@ void ouverturePorte() {
     }
     // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
     if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
+      // if ( (touche == 4 and boitierOuvert)) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
 
@@ -736,8 +736,8 @@ void  fermeturePorte() {
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
-    //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
-    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
+    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
+    //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
   }
@@ -754,7 +754,7 @@ void  fermeturePorte() {
 */
 ///-----routine interruption D2 INT0------
 void myInterruptINT0() {
-  // itOuvFerm = 1;
+
 }
 
 //-----routine interruption D3 INT1-----
@@ -771,9 +771,6 @@ void routineInterruptionBp() {
       if (monServo.get_m_ouvFerm())  monServo.set_m_ouvFerm(false); else  monServo.set_m_ouvFerm(true);
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
-      //   byte timerOuvFermPorte =  rtc.lectureRegistreEtConversion( RTC_SECONDS , 0x7f);
-      //  Serial.println (timerOuvFermPorte);
-      //  Serial.println(millis());
     }
     clav.testRelacheBp(interruptBp);// test du relache du bp
   }
@@ -1068,8 +1065,12 @@ void setup() {
   rotary.init();// initialisation de la position de la roue codeuse
 
   if (!testServoMoteur) {
+    if (digitalRead(securiteHaute)) {
     reduit = 1;// vitesse normale
     monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
+    } else {
+      rotary.set_m_compteRoueCodeuse(rotary.get_m_finDeCourseOuverture());
+    }
   }
   rotary.writeRotaryDtClk();// mise à jour position encodeur
 }
@@ -1107,12 +1108,7 @@ void loop() {
   ouverturePorte();
   fermeturePorte();
 
-  // if (itOuvFerm) {
-  rotary.compteurRoueCodeuse(itOuvFerm);
-  //  if ((digitalRead(encoderPinDT) && digitalRead(encoderPinCLK))) {
-  //  itOuvFerm = 0 ; // attente it
-  // }
-  // }
+  rotary.compteurRoueCodeuse(); // mis à jour du compteur de l'encodeur rotatif
 
   routineTestFermetureBoitier(); // test fermeture boitier
   routineTestOuvertureBoitier();// test ouvertuer boitier

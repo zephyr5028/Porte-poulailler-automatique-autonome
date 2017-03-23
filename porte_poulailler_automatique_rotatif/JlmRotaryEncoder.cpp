@@ -74,40 +74,28 @@ void JlmRotaryEncoder::switchClear()
 
 
 ///-----compteur roue codeuse-----
-void JlmRotaryEncoder::compteurRoueCodeuse(bool itOuvFerm) {
-  /* if (!digitalRead(m_encoderPinA) && digitalRead(m_encoderPinB)) {
-     m_compteRoueCodeuse++;
-    }
-    else if (!digitalRead(m_encoderPinB) && digitalRead(m_encoderPinA)) {
-     m_compteRoueCodeuse--;
-    }*/
- /* Serial.print (m_A_change);
-  Serial.print("  ");
-  Serial.print (m_B_change);
-
-  Serial.print("        ");*/
-
+void JlmRotaryEncoder::compteurRoueCodeuse() {
+  /* Serial.print (m_A_change);
+    Serial.print("  ");
+    Serial.print (m_B_change);
+    Serial.print("        ");*/
   bool A = digitalRead(m_encoderPinA);
   bool B = digitalRead(m_encoderPinB);
   if ((!A && B && m_A_change && m_B_change) or
       ( A && !B && !m_A_change && !m_B_change)) {
     m_compteRoueCodeuse++;
-    //  m_A_change = A;
-    //  m_B_change = B;
   }
   else if ((!B && A && m_A_change && m_B_change ) or
            (B && !A && !m_A_change && !m_B_change)) {
     m_compteRoueCodeuse--;
-    //  m_A_change = A;
-    //  m_B_change = B;
   }
   m_A_change = A;
   m_B_change = B;
- /* Serial.print (A);
-  Serial.print("  ");
-  Serial.print (B);
-  Serial.print("        ");
-  Serial.println (m_compteRoueCodeuse);*/
+  /* Serial.print (A);
+    Serial.print("  ");
+    Serial.print (B);
+    Serial.print("        ");
+    Serial.println (m_compteRoueCodeuse);*/
 }
 
 /// mise à jour de A et B change
@@ -117,9 +105,9 @@ void JlmRotaryEncoder::writeRotaryDtClk() {
 }
 
 ///-----reglage de la fin de course-----
-unsigned int  JlmRotaryEncoder::reglageFinDeCourse (bool ouvFerm, byte touche) {
+int  JlmRotaryEncoder::reglageFinDeCourse (bool ouvFerm, byte touche) {
   if (touche == 2 or touche == 3) {
-    unsigned int finDeCourse;
+    int finDeCourse;
     if (ouvFerm) finDeCourse = m_finDeCourseOuverture; else finDeCourse = m_finDeCourseFermeture;
     if (touche == 2) {
       if (finDeCourse < m_finDeCourseMax) {
@@ -154,29 +142,29 @@ byte JlmRotaryEncoder::testCompteurRoueCodeuse (byte tolerance) {
 }
 
 //-----accesseur - getter-----
-unsigned int JlmRotaryEncoder::get_m_compteRoueCodeuse() {
+int JlmRotaryEncoder::get_m_compteRoueCodeuse() {
   return m_compteRoueCodeuse;
 }
 //-----mutateur - setter-----
-void JlmRotaryEncoder::set_m_compteRoueCodeuse(unsigned int compteRoueCodeuse) {
+void JlmRotaryEncoder::set_m_compteRoueCodeuse(int compteRoueCodeuse) {
   m_compteRoueCodeuse = compteRoueCodeuse;
 }
 
 //-----accesseur - getter-----
-unsigned int JlmRotaryEncoder::get_m_finDeCourseFermeture() {
+int JlmRotaryEncoder::get_m_finDeCourseFermeture() {
   return m_finDeCourseFermeture;
 }
 //-----mutateur - setter-----
-void JlmRotaryEncoder::set_m_finDeCourseFermeture(unsigned int finDeCourseFermeture) {
+void JlmRotaryEncoder::set_m_finDeCourseFermeture(int finDeCourseFermeture) {
   m_finDeCourseFermeture = finDeCourseFermeture;
 }
 
 //-----accesseur - getter-----
-unsigned int JlmRotaryEncoder::get_m_finDeCourseOuverture() {
+int JlmRotaryEncoder::get_m_finDeCourseOuverture() {
   return m_finDeCourseOuverture;
 }
 //-----mutateur - setter-----
-void JlmRotaryEncoder::set_m_finDeCourseOuverture(unsigned int finDeCourseOuverture) {
+void JlmRotaryEncoder::set_m_finDeCourseOuverture(int finDeCourseOuverture) {
   m_finDeCourseOuverture = finDeCourseOuverture;
 }
 
