@@ -9,7 +9,7 @@
 ServoMoteur::ServoMoteur( byte pinCde, byte pinRelais, const byte pinSecuriteHaute, const int pulseStop, const int pulseOuvFerm ,
                           const int pulseReduit, const boolean debug) :  m_pinCde(pinCde), m_pinRelais(pinRelais),
   m_pulseStop(pulseStop),  m_pulseOuvFerm(pulseOuvFerm), m_pinSecuriteHaute(pinSecuriteHaute),
-  m_pulseReduit(pulseReduit), m_debug(debug), m_pulse(pulseStop), m_ouvFerm(false), m_servoAction(false), m_debutDescente(0)
+  m_pulseReduit(pulseReduit), m_debug(debug), m_pulse(pulseStop), m_ouvFerm(false), m_servoAction(false), m_debutTemps(0), m_tempsTotal(0)
 {
 }
 
@@ -32,9 +32,6 @@ void ServoMoteur::init () {
 void ServoMoteur::servoOuvFerm(boolean batterieFaible, bool reduit)
 {
   if (!batterieFaible and  !m_servoAction) { // si la batterie n'est pas faible et le servo non en action
-    //if ((unsigned long)(millis() - previousMillis) >= interval)
-    m_debutDescente  = millis();
-    // Serial.println(m_debutDescente);
     ServoMoteur::relaisSousTension(); // relais sous tension
     modificationVitesse(reduit);
     delay(200);// attente mise sous tension
@@ -73,12 +70,15 @@ unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsi
 
 ///-----relais hors tension-----
 void ServoMoteur::relaisHorsTension () {
+  m_tempsTotal = millis() - m_debutTemps; // calcul tu temps en la mise sous tension du relais et la mise hors tension
+  //Serial.println(m_tempsTotal);// affichage sur console du temps de montée ou descente
   digitalWrite(m_pinRelais, LOW);
   if (m_ouvFerm) !m_ouvFerm; else m_ouvFerm;
 }
 
 ///-----relais sous tension-----
 void ServoMoteur::relaisSousTension() {
+  m_debutTemps  = millis();// pour le calcul tu temps de montée ou descente
   digitalWrite(m_pinRelais, HIGH);
 }
 
@@ -110,5 +110,10 @@ bool ServoMoteur::get_m_servoAction() {
 //-----mutateur - setter-----
 void ServoMoteur::set_m_servoAction(bool servoAction) {
   m_servoAction = servoAction;
+}
+
+//-----mutateur - setter-----
+unsigned int ServoMoteur::get_m_tempsTotal() {
+  return m_tempsTotal;
 }
 

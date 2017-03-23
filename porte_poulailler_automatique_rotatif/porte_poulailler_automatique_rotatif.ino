@@ -672,14 +672,14 @@ void testServo() {
       }
       else if (commande == 'r' ) {
         // mise sous tension du servo et ouverture de la porte
-        monServo.set_m_ouvFerm(true);// ouverture
+        monServo.set_m_ouvFerm(false);// ouverture
         monServo.servoOuvFerm(batterieFaible, true);// mise soustension du servo
         delay(50);
         Serial.println(monServo.read());
       }
       else if (commande == 'f') {
         // mise sous tension du servo et descente de la porte
-        monServo.set_m_ouvFerm(false);// fermeture
+        monServo.set_m_ouvFerm(true);// fermeture
         monServo.servoOuvFerm(batterieFaible, true);// mise soustension du servo
         delay(50);
         Serial.println(monServo.read());
@@ -736,7 +736,7 @@ void  fermeturePorte() {
       monServo.servoVitesse( reduit);
     }
     if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
-    //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
+      //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
   }
@@ -844,6 +844,7 @@ void lumiere() {
     bool nonReglable = 1; // pour afficher le curseur sur la premiere ligne car non reglable
     mydisp.affichageLumFinCourse(lumValue, ligne, nonReglable);
   } else   if (radio.get_m_radio())  {
+    radio.envoiUnsignedInt(lum.get_m_lumMatin(), boitierOuvert, ";"); // envoi message radio lumiere du matin
     radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
     radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
   }
@@ -971,11 +972,11 @@ void routineGestionWatchdog() {
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
           affiPulsePlusCptRoue();
           affiFinDeCourseFermeture();
-          affiFinDeCourseOuverture();
           lumiere();
-          radio.envoiUnsignedInt( memoireLibre, boitierOuvert, ";"); // envoi message radio : memoire sram restante
+          radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";"); // envoi message radio : memoire sram restante
           radio.chaineVide();
         }
+       // Serial.println (monServo.get_m_tempsTotal());
         tempsWatchdog = bouclesWatchdog ; // initialisation du nombre de boucles
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
@@ -1051,7 +1052,7 @@ void setup() {
   rotary.set_m_finDeCourseOuverture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseOuverture
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
-  // attachInterrupt(0, myInterruptINT0, CHANGE); // validation de l'interruption sur int0 (d2)
+  // attachInterrupt(0, myInterruptINT0, FALLING); // validation de l'interruption sur int0 (d2)
 
   tools.setupPower(); // initialisation power de l'arduino
 
@@ -1065,8 +1066,8 @@ void setup() {
 
   if (!testServoMoteur) {
     if (digitalRead(securiteHaute)) {
-    reduit = 1;// vitesse normale
-    monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
+      reduit = 1;// vitesse normale
+      monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
     } else {
       rotary.set_m_compteRoueCodeuse(rotary.get_m_finDeCourseOuverture());
     }

@@ -3,7 +3,7 @@
 // surcharge constructeur avec timer - broches dt et clk ainsi que sw si besoin
 JlmRotaryEncoder::JlmRotaryEncoder(byte dt, byte clk, byte sw) : m_encoderPinA(dt), m_encoderPinB(clk), m_switchButton(sw),
   m_A_set(false) , m_B_set(false), m_A_change(false), m_B_change(false), m_rotating(false), m_encoderPos(0),  m_unSwitch(true),
-  m_finDeCourseFermeture(40), m_finDeCourseOuverture(100), m_compteRoueCodeuse(120),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
+  m_finDeCourseFermeture(60), m_finDeCourseOuverture(100), m_compteRoueCodeuse(130),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
 {
   JlmRotaryEncoder::init();// initialisation des branchements
 }
@@ -123,7 +123,7 @@ int  JlmRotaryEncoder::reglageFinDeCourse (bool ouvFerm, byte touche) {
 ///-----test du compteur roue codeuse pour affichage ouvert ou ferme-----
 byte JlmRotaryEncoder::testCompteurRoueCodeuse (byte tolerance) {
   byte resultat;
-  if ( m_compteRoueCodeuse > (m_finDeCourseFermeture - 5) and m_compteRoueCodeuse < (m_finDeCourseFermeture + 5)) {
+  if ( m_compteRoueCodeuse > (m_finDeCourseOuverture + m_finDeCourseFermeture - 5) and m_compteRoueCodeuse < (m_finDeCourseOuverture + m_finDeCourseFermeture + 5)) {
     resultat = 1; // creneau porte fermée
   } else  if ( m_compteRoueCodeuse > (m_finDeCourseOuverture - 5) and m_compteRoueCodeuse < (m_finDeCourseOuverture + 5)) {
     resultat = 2;// creneau porte ouverte

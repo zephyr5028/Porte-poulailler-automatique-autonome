@@ -33,6 +33,7 @@ class ServoMoteur : public ServoTimer2
     void set_m_ouvFerm(bool ouvFerm); // mutateur - setter
     bool get_m_servoAction(); // accesseur - getter
     void set_m_servoAction(bool servoAction); // mutateur - setter
+    unsigned int get_m_tempsTotal(); // accesseur - getter
 
 
   protected:
@@ -49,7 +50,8 @@ class ServoMoteur : public ServoTimer2
     int m_pulse;// vitesse du servo à un instant donné
     bool m_ouvFerm;// ouverture / fermeture
     bool m_servoAction; // servo en action - false servo à l'arrêt
-    unsigned long m_debutDescente;// temps
+    unsigned long m_debutTemps;// / pour le calcul tu temps de montée ou descente
+    unsigned int m_tempsTotal; // temps calculé
 
 };
 
