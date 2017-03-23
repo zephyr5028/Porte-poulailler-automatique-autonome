@@ -3,7 +3,7 @@
 // surcharge constructeur avec timer - broches dt et clk ainsi que sw si besoin
 JlmRotaryEncoder::JlmRotaryEncoder(byte dt, byte clk, byte sw) : m_encoderPinA(dt), m_encoderPinB(clk), m_switchButton(sw),
   m_A_set(false) , m_B_set(false), m_A_change(false), m_B_change(false), m_rotating(false), m_encoderPos(0),  m_unSwitch(true),
-  m_finDeCourseFermeture(250), m_finDeCourseOuverture(150), m_compteRoueCodeuse(150),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
+  m_finDeCourseFermeture(40), m_finDeCourseOuverture(100), m_compteRoueCodeuse(120),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
 {
   JlmRotaryEncoder::init();// initialisation des branchements
 }
@@ -74,28 +74,20 @@ void JlmRotaryEncoder::switchClear()
 
 
 ///-----compteur roue codeuse-----
+// code gray et comparaison avec l'état des pins n-1
 void JlmRotaryEncoder::compteurRoueCodeuse() {
-  /* Serial.print (m_A_change);
-    Serial.print("  ");
-    Serial.print (m_B_change);
-    Serial.print("        ");*/
-  bool A = digitalRead(m_encoderPinA);
-  bool B = digitalRead(m_encoderPinB);
-  if ((!A && B && m_A_change && m_B_change) or
-      ( A && !B && !m_A_change && !m_B_change)) {
+  bool pinA = digitalRead(m_encoderPinA);
+  bool pinB = digitalRead(m_encoderPinB);
+  if ((!pinA && pinB && m_A_change && m_B_change) or
+      ( pinA && !pinB && !m_A_change && !m_B_change)) {
     m_compteRoueCodeuse++;
   }
-  else if ((!B && A && m_A_change && m_B_change ) or
-           (B && !A && !m_A_change && !m_B_change)) {
+  else if ((!pinB && pinA && m_A_change && m_B_change ) or
+           (pinB && !pinA && !m_A_change && !m_B_change)) {
     m_compteRoueCodeuse--;
   }
-  m_A_change = A;
-  m_B_change = B;
-  /* Serial.print (A);
-    Serial.print("  ");
-    Serial.print (B);
-    Serial.print("        ");
-    Serial.println (m_compteRoueCodeuse);*/
+  m_A_change = pinA;// n-1
+  m_B_change = pinB;// n-1
 }
 
 /// mise à jour de A et B change

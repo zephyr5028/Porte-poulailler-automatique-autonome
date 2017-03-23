@@ -71,7 +71,7 @@
 #include "PowerTools.h"
 const boolean debug = false; // positionner debug pour l'utiliser ou pas
 /*-----------------------------*/
-const byte bouclesWatchdog = 32;// nombre de boucles du watchdog : environ 64s pour 8 boucles
+const byte bouclesWatchdog = 16;// nombre de boucles du watchdog : environ 64s pour 8 boucles
 /*-----------------------------*/
 unsigned int memoireLibre = 0; // variable pour calcul de la memoire libre
 volatile int f_wdt = 1; // flag watchdog
@@ -119,12 +119,11 @@ enum PinAssignments {
 };
 // classe encodeur rotatif KY040
 #include "JlmRotaryEncoder.h"
-JlmRotaryEncoder rotary(encoderPinDT, encoderPinCLK); // clearButton si besoin
-const unsigned int compteRoueCodeuse = 120;  // un compteur de position
-const unsigned int finDeCourseOuverture = 100; // initialisation de la valeur de la fin de course ouverture
-const unsigned int finDeCourseFermeture = 20; // initialisation de la valeur de la fin de course fermeture
+//const int compteRoueCodeuse = 120;  // un compteur de position
+//const int finDeCourseOuverture = 100; // initialisation de la valeur de la fin de course ouverture
+//const int finDeCourseFermeture = 40; // initialisation de la valeur de la fin de course fermeture
 // définition des pin pour le KY040
-
+JlmRotaryEncoder rotary(encoderPinDT, encoderPinCLK); // clearButton si besoin
 
 /** lumiere */
 #include "Lumiere.h"
@@ -132,8 +131,8 @@ const byte lumierePin = A0; //analog pin A0 : luminosite
 const float convertion = 5;// rapport de convertion CAD float
 const byte heureFenetreSoir = 17; //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
 const byte boucleLumiere = 2; // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
-const unsigned int lumMatin = 300; // valeur de la lumière du matin
-const unsigned int lumSoir = 900; // valeur de la lumiere du soir
+const int lumMatin = 300; // valeur de la lumière du matin
+const int lumSoir = 900; // valeur de la lumiere du soir
 Lumiere lum(lumierePin, lumMatin, lumSoir, heureFenetreSoir, convertion, boucleLumiere, debug); // objet lumiere
 
 /** interruptions */
@@ -780,7 +779,7 @@ void routineInterruptionBp() {
 void  routineInterrruptionAlarme2() {
   if ( RTC.alarm(alarm_2) and interruptRTC ) {    // has Alarm2 (fermeture) triggered?  alarme rtc
     // mise sous tension du servo pour la fermeture de la porte
-    monServo.set_m_ouvFerm(false); // fermeture
+    monServo.set_m_ouvFerm(true); // fermeture
     reduit = 1;// vitesse normale
     monServo.servoOuvFerm(batterieFaible, reduit);
     interruptRTC = false; // autorisation de la prise en compte de l'IT
@@ -791,7 +790,7 @@ void  routineInterrruptionAlarme2() {
 void  routineInterruptionAlarme1() {
   if ( RTC.alarm(alarm_1) and interruptRTC ) {    // has Alarm1 (ouverture) triggered?  alarme rtc
     // mise sous tension du servo pour l'ouverture de la porte
-    monServo.set_m_ouvFerm(true); // ouverture
+    monServo.set_m_ouvFerm(false); // ouverture
     reduit = 1;// vitesse normale
     monServo.servoOuvFerm(batterieFaible, reduit);
     interruptRTC = false; // autorisation de la prise en compte de l'IT
@@ -861,12 +860,12 @@ void ouvFermLum() {
   byte declenchementLuminosite = lum.declenchementServoLuminosite(); // test de la luninosite et declenchement du servo
   switch (declenchementLuminosite) {
     case 1: // mise sous tension du servo pour l'ouverture de la porte
-      monServo.set_m_ouvFerm(true); // ouverture
+      monServo.set_m_ouvFerm(false); // ouverture
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
       break;
     case 2: // mise sous tension du servo pour la fermeture de la porte
-      monServo.set_m_ouvFerm(false); // fermeture
+      monServo.set_m_ouvFerm(true); // fermeture
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
       break;

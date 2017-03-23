@@ -79,7 +79,7 @@ void Lumiere::fenetreNonDeclenchement(byte horaire) {
 
 ///-----non Declenchement Position Servo et mise à jour du compteur watchdog lumiere-----
 void Lumiere::nonDeclenchementPositionServo (volatile unsigned int compteRoueCodeuse, unsigned int finDeCourseFermeture, unsigned int finDeCourseOuverture) {
-  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and !m_ouverture) or (( compteRoueCodeuse >= (finDeCourseFermeture - 2)) and !m_fermeture)) {
+  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and !m_ouverture) or (( compteRoueCodeuse >= (finDeCourseOuverture + finDeCourseFermeture - 2)) and !m_fermeture)) {
     m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
 }
