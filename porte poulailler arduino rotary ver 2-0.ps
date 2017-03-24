@@ -1,6 +1,6 @@
 %!PS-Adobe-3.0
 %%Creator: gEDA gschem 1.8.1-20121123-13-g875406c
-%%CreationDate: Tue Mar 21 11:36:50 2017
+%%CreationDate: Fri Mar 24 16:38:49 2017
 %%Title: /home/jlm-atelier/Bureau/GIT/dossier composants porte poulailler/porte poulailler arduino schemas/porte poulailler arduino rotary ver 2-0.sch
 %%Author: (null)
 %%BoundingBox: 0 0 595 841
@@ -1405,13 +1405,13 @@ gsave
 false false false false 202.222224 [(5w 12v) ] 0 40300 45500 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(Porte du poulailler - arduino - rotary encoder) (                       ajout switch on / off) ] 0 51700 40900 180.555557 text
+false false false false 202.222224 [(Porte du poulailler - arduino - rotary encoder) ( servo et relais sur +5v pour temps constant) ] 0 51700 40900 180.555557 text
 grestore
 gsave
 false false false false 202.222224 [(mars 2017) ] 0 50800 40300 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(rev 2.0.2 arduino) ] 0 54300 40200 180.555557 text
+false false false false 202.222224 [(rev 2.0.3 arduino) ] 0 54300 40200 180.555557 text
 grestore
 45500 43500 45500 43600 10 line
 gsave
@@ -1596,13 +1596,6 @@ grestore
 49100 50500 49203 50500 10 line
 49203 50500 49203 50503 10 line
 gsave
-47400 46800 47400 47000 10 line
-47250 47000 47550 47000 10 line
-grestore
-gsave
-true false false false 202.222224 [(Bat) ] 0 47400 47050 180.555557 text
-grestore
-gsave
 52900 47800 53050 47800 10 line
 53800 47800 53650 47800 10 line
 53050 47700 53650 47700 10 line
@@ -1628,18 +1621,6 @@ grestore
 53500 50500 53500 50000 10 line
 53500 48500 54800 48500 10 line
 53500 48500 53500 49100 10 line
-gsave
-55400 50500 55400 50700 10 line
-55250 50700 55550 50700 10 line
-newpath
-55400 50500
-25
-0 360 arc
-fill
-grestore
-gsave
-true false false false 202.222224 [(Bat) ] 0 55400 50750 180.555557 text
-grestore
 55700 47200 53700 47200 10 line
 gsave
 53700 45400 53700 45600 10 line
@@ -3493,7 +3474,6 @@ gsave
 false false false false 161.777776 [(on/off 2/2) ] 0 46900 42300 144.444443 text
 grestore
 47200 45800 47400 45800 10 line
-47400 45400 47400 46800 10 line
 47400 45400 47390 45400 10 line
 47390 45400 47390 42600 10 line
 gsave
@@ -3559,6 +3539,24 @@ grestore
 54399 49001 54399 48800 10 line
 54399 48800 55700 48800 10 line
 55700 48800 55700 47200 10 line
+gsave
+54800 50500 54800 50700 10 line
+54650 50700 54950 50700 10 line
+gsave
+false false false false 161.777776 [(+5V) ] 0 54675 50750 144.444443 text
+grestore
+newpath
+54800 50500
+25
+0 360 arc
+fill
+newpath
+54800 50500
+25
+0 360 arc
+fill
+grestore
+47400 45400 47400 45800 10 line
 60 60 50370 46170 fbox
 newpath
 51200 45400
@@ -3819,7 +3817,7 @@ newpath
 0 360 arc
 fill
 newpath
-55400 50500
+54800 50500
 25
 0 360 arc
 fill
@@ -3830,11 +3828,6 @@ newpath
 fill
 newpath
 54500 48500
-25
-0 360 arc
-fill
-newpath
-55400 50500
 25
 0 360 arc
 fill
@@ -4623,21 +4616,6 @@ newpath
 fill
 60 60 46370 42770 fbox
 newpath
-47400 45800
-25
-0 360 arc
-fill
-newpath
-47400 45800
-25
-0 360 arc
-fill
-newpath
-47400 45800
-25
-0 360 arc
-fill
-newpath
 47390 45400
 25
 0 360 arc
@@ -4660,7 +4638,12 @@ newpath
 0 360 arc
 fill
 newpath
-55400 50500
+54800 50500
+25
+0 360 arc
+fill
+newpath
+54800 50500
 25
 0 360 arc
 fill
