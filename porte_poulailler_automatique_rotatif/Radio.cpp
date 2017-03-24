@@ -92,7 +92,7 @@ void Radio::envoiFloat(float valeur, boolean boitierOuvert, char *texte ) {
 void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char *texte) {
   if (m_radio and !boitierOuvert) {
     char chaine1[m_taille - 1] = "";
-    char valeur_temp[10] = "";
+    char valeur_temp[8] = "";
     sprintf(valeur_temp, "%u", valeur); // u Unsigned decimal integer
     strcat(chaine1, valeur_temp);
     strcat(chaine1, texte);

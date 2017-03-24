@@ -34,6 +34,9 @@ class ServoMoteur : public ServoTimer2
     bool get_m_servoAction(); // accesseur - getter
     void set_m_servoAction(bool servoAction); // mutateur - setter
     unsigned int get_m_tempsTotal(); // accesseur - getter
+    void set_m_tempsTotal(unsigned int tempsTotal); // mutateur - setter
+    unsigned long get_m_debutTemps(); // accesseur - getter
+    void set_m_debutTemps(unsigned long debutTemps); // mutateur - setter
 
 
   protected:
@@ -41,7 +44,7 @@ class ServoMoteur : public ServoTimer2
     void modificationVitesse( bool reduit); // modification de la vitesse
 
     const boolean m_debug ; // pour affichage console si nécessaire
-    const  byte m_pinCde; // numero de la broche reliée à la commande du servo moteur
+    const byte m_pinCde; // numero de la broche reliée à la commande du servo moteur
     const byte m_pinRelais; // numero de la broche reliée à la commande du relais pour le servo moteur
     const byte m_pinSecuriteHaute; // pin pour la securite d'ouverture de porte
     const int m_pulseStop; // value should usually be 750 to 2200 (1500 = stop)

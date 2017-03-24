@@ -71,7 +71,7 @@
 #include "PowerTools.h"
 const boolean debug = false; // positionner debug pour l'utiliser ou pas
 /*-----------------------------*/
-const byte bouclesWatchdog = 16;// nombre de boucles du watchdog : environ 64s pour 8 boucles
+const byte bouclesWatchdog = 2;// nombre de boucles du watchdog : environ 64s pour 8 boucles
 /*-----------------------------*/
 unsigned int memoireLibre = 0; // variable pour calcul de la memoire libre
 volatile int f_wdt = 1; // flag watchdog
@@ -719,9 +719,11 @@ void ouverturePorte() {
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
+    // utilisation du temps de monte pour la sécurité 126ms * les pas du codeur rotatif
     // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
-    if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
-      // if ( (touche == 4 and boitierOuvert)) {
+    if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)  or ( ( millis() - monServo.get_m_debutTemps()) > (126 * rotary.get_m_finDeCourseFermeture()))) {
+      //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (126 * rotary.get_m_finDeCourseFermeture()))) {
+      //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) ) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
 
@@ -735,8 +737,10 @@ void  fermeturePorte() {
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
-    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
-      //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
+    // utilisation du temps de descente pour la sécurité 126ms * les pas du codeur rotatif
+    //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
+    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert) or (( millis() - monServo.get_m_debutTemps()) > (126 * rotary.get_m_finDeCourseFermeture()))) {
+      //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert) ) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
   }
@@ -973,10 +977,11 @@ void routineGestionWatchdog() {
           affiPulsePlusCptRoue();
           affiFinDeCourseFermeture();
           lumiere();
-          radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";"); // envoi message radio : memoire sram restante
+          radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";\0"); // envoi message radio : memoire sram restante
+          radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert, ";\0");
           radio.chaineVide();
         }
-       // Serial.println (monServo.get_m_tempsTotal());
+        // Serial.println (monServo.get_m_tempsTotal());
         tempsWatchdog = bouclesWatchdog ; // initialisation du nombre de boucles
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
@@ -1103,7 +1108,7 @@ void loop() {
 
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
-  batterieFaible = accusCde.accusFaible(); // test de la batterie commande < 4.8v
+  batterieFaible = accusCde.accusFaible() or accusServo.accusFaible() ; // test de la batterie commande < 4.8v
 
   ouverturePorte();
   fermeturePorte();

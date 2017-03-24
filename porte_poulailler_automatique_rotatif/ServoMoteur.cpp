@@ -71,7 +71,6 @@ unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsi
 ///-----relais hors tension-----
 void ServoMoteur::relaisHorsTension () {
   m_tempsTotal = millis() - m_debutTemps; // calcul tu temps en la mise sous tension du relais et la mise hors tension
-  //Serial.println(m_tempsTotal);// affichage sur console du temps de montée ou descente
   digitalWrite(m_pinRelais, LOW);
   if (m_ouvFerm) !m_ouvFerm; else m_ouvFerm;
 }
@@ -115,5 +114,20 @@ void ServoMoteur::set_m_servoAction(bool servoAction) {
 //-----mutateur - setter-----
 unsigned int ServoMoteur::get_m_tempsTotal() {
   return m_tempsTotal;
+}
+
+//-----mutateur - setter-----
+void ServoMoteur::set_m_tempsTotal(unsigned int tempsTotal) {
+  m_tempsTotal = tempsTotal;
+}
+
+//-----mutateur - setter-----
+unsigned long ServoMoteur::get_m_debutTemps() {
+  return m_debutTemps;
+}
+
+//-----mutateur - setter-----
+void ServoMoteur::set_m_debutTemps(unsigned long debutTemps) {
+  m_debutTemps = debutTemps;
 }
 
