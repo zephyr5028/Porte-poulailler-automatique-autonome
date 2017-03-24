@@ -71,7 +71,7 @@
 #include "PowerTools.h"
 const boolean debug = false; // positionner debug pour l'utiliser ou pas
 /*-----------------------------*/
-const byte bouclesWatchdog = 2;// nombre de boucles du watchdog : environ 64s pour 8 boucles
+const byte bouclesWatchdog = 16;// nombre de boucles du watchdog : environ 64s pour 8 boucles
 /*-----------------------------*/
 unsigned int memoireLibre = 0; // variable pour calcul de la memoire libre
 volatile int f_wdt = 1; // flag watchdog
