@@ -3,7 +3,7 @@
 // surcharge constructeur avec timer - broches dt et clk ainsi que sw si besoin
 JlmRotaryEncoder::JlmRotaryEncoder(byte dt, byte clk, byte sw) : m_encoderPinA(dt), m_encoderPinB(clk), m_switchButton(sw),
   m_A_set(false) , m_B_set(false), m_A_change(false), m_B_change(false), m_rotating(false), m_encoderPos(0),  m_unSwitch(true),
-  m_finDeCourseFermeture(60), m_finDeCourseOuverture(100), m_compteRoueCodeuse(130),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
+  m_finDeCourseFermeture(60), m_finDeCourseOuverture(100), m_compteRoueCodeuse(150),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
 {
   JlmRotaryEncoder::init();// initialisation des branchements
 }

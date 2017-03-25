@@ -69,71 +69,75 @@
 /** power and tools */
 /** watchdog - Optimisation de la consommation */
 #include "PowerTools.h"
-const boolean debug = false; // positionner debug pour l'utiliser ou pas
+#define DEBUG false // positionner debug pour l'utiliser ou pas
 /*-----------------------------*/
-const byte bouclesWatchdog = 16;// nombre de boucles du watchdog : environ 64s pour 8 boucles
+#define WATCHDOG_BOUCLES 16 // nombre de boucles du watchdog : environ 64s pour 8 boucles
 /*-----------------------------*/
 unsigned int memoireLibre = 0; // variable pour calcul de la memoire libre
 volatile int f_wdt = 1; // flag watchdog
-byte tempsWatchdog = bouclesWatchdog ; // boucle temps du chien de garde
+byte tempsWatchdog = WATCHDOG_BOUCLES ; // boucle temps du chien de garde
 boolean reglage = false; // menu=false ou reglage=true
-PowerTools tools (debug); // objet tools et power
+PowerTools tools (DEBUG ); // objet tools et power
 
 /** radio 433MHz */
 #include "Radio.h"
-const boolean emissionRadio = true ; // positionner radio pour l'utiliser (true) ou pas
-const byte pinEmRadio = 10; // pin D10 emetteur radio
-const int vitesseTransmission = 600;//nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
-const byte pinSwitchEmissionRadio = A2; // broche A2 en entree digitale pour le switch emission on/off
-Radio radio(pinEmRadio, pinSwitchEmissionRadio, vitesseTransmission, VW_MAX_MESSAGE_LEN, emissionRadio, debug); // classe Radio
+#define RADIO_EMISSION  true  // positionner radio pour l'utiliser (true) ou pas
+#define PIN_RADIO_EMISSION  10  // pin D10 emetteur radio
+#define RADIO_TRANSMISSION_VITESSE  600 //nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
+#define PIN_RADIO_EMISSION_SWITCH A2 // broche A2 en entree digitale pour le switch emission on/off
+Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VITESSE, VW_MAX_MESSAGE_LEN, RADIO_EMISSION, DEBUG ); // classe Radio
 
 /** led broche 13 */
 #define LED_PIN 13
 
 /** servo - montée et descente de la porte */
 #include "ServoMoteur.h"
-const bool testServoMoteur = false; // pour utiliser ou non le test du servomoteur
-const byte servoCde = 8; // pin D8 cde du servo
-const byte servoPin = 4; // pin D4 relais du servo
-const byte securiteHaute = 12; // pin D12 pour l'ouverture de porte
-const int pulseStop = 1500; // value should usually be 750 to 2200 (1500 = stop)
+#define SERVO_TEST  false // pour utiliser ou non le test du servomoteur
+#define PIN_SERVO_CDE 8 // pin D8 cde du servo
+#define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
+#define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
+#define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop)
+#define SERVO_PULSE_OUVERTURE_FERMETURE   140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   60  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 60)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
-ServoMoteur monServo(servoCde, servoPin, securiteHaute, pulseStop, 140, 60, debug);
+ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
 
 /** Accus */
 #include "Accus.h"
-const byte accusPinCde = A6; //analog pin A6 : tension batterie commandes
-const byte accusPinServo = A7; //analog pin A7 : tension batterie servo moteur
-const float tensionMiniAccus = 4.8; //valeur minimum de l'accu 4.8v
-const float rapportConvertion = 7.5;// rapport de convertion CAD float
+#define PIN_ACCUS_CDE  A6  //analog pin A6 : tension batterie commandes
+#define PIN_ACCUS_SERVO  A7  //analog pin A7 : tension batterie servo moteur
+#define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
+#define ACCUS_CONVERSION_RAPPORT  7.5 // rapport de convertion CAD float
 boolean batterieFaible = false; // si batterie < 4,8v = true
-Accus accusCde (accusPinCde, tensionMiniAccus, rapportConvertion, debug); // objet accus commande mini 4.8v, convertion 7.5
-Accus accusServo (accusPinServo); // objet accus servo moteur mini 4.8v, convertion 7.5
+Accus accusCde (PIN_ACCUS_CDE, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG ); // objet accus commande mini 4.8v, convertion 7.5
+Accus accusServo (PIN_ACCUS_SERVO, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG ); // objet accus servo moteur mini 4.8v, convertion 7.5
 
 /** encodeur rotatif */
+#include "JlmRotaryEncoder.h"
+#define SECURITE_TEMPS_FERMETURE  136 // utilisation du temps de descente pour la sécurité =  SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
+#define SECURITE_TEMPS_OUVERTURE  116 // utilisation du temps de monté pour la sécurité =  SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
+#define ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION 100; // initialisation de la position de l'encodeur rotatif avec le contact reed
+#define ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION   150  // initialisation pa defaut au demarrage de la possition de la roue codeuse 
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_OUVERTURE  5 // initialisation par defaut au demarrage de la valeur de fin de course ouverture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  40 // initialisation par defaut au demarrage de la valeur de fin de course fermeture
 // définition des pin pour le KY040
 enum PinAssignments {
   encoderPinDT = 11,   // right (DT)
   encoderPinCLK = 7,   // left (CLK)
 };
 // classe encodeur rotatif KY040
-#include "JlmRotaryEncoder.h"
-//const int compteRoueCodeuse = 120;  // un compteur de position
-//const int finDeCourseOuverture = 100; // initialisation de la valeur de la fin de course ouverture
-//const int finDeCourseFermeture = 40; // initialisation de la valeur de la fin de course fermeture
-// définition des pin pour le KY040
 JlmRotaryEncoder rotary(encoderPinDT, encoderPinCLK); // clearButton si besoin
 
 /** lumiere */
 #include "Lumiere.h"
-const byte lumierePin = A0; //analog pin A0 : luminosite
-const float convertion = 5;// rapport de convertion CAD float
-const byte heureFenetreSoir = 17; //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
-const byte boucleLumiere = 2; // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
-const int lumMatin = 300; // valeur de la lumière du matin
-const int lumSoir = 900; // valeur de la lumiere du soir
-Lumiere lum(lumierePin, lumMatin, lumSoir, heureFenetreSoir, convertion, boucleLumiere, debug); // objet lumiere
+#define PIN_LUMIERE A0  //analog pin A0 : luminosite
+#define LUMIERE_CONVERSION_RAPPORT  5 // rapport de convertion CAD float
+#define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
+#define LUMIERE_BOUCLES   2  // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
+#define LUMIERE_MATIN  300  // valeur de la lumière du matin
+#define LUMIERE_SOIR  900  // valeur de la lumiere du soir
+Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LUMIERE_CONVERSION_RAPPORT, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 
 /** interruptions */
 volatile boolean interruptBp = false; // etat interruption entree 9
@@ -167,10 +171,10 @@ byte incrementation = 0; // incrementation verticale
 boolean relache = false; // relache de la touche
 byte touche = -1; // valeur de la touche appuyee (-1 pour non appuyée)
 boolean  boitierOuvert = true; // le boitier est ouvert
-Clavier clav(menuManuel, pinBp, pinBoitier, debounce, debug); // class Clavier avec le nombre de lignes du menu
+Clavier clav(menuManuel, pinBp, pinBoitier, debounce, DEBUG ); // class Clavier avec le nombre de lignes du menu
 
 /** LCD DigoleSerialI2C */
-const int boucleTemps = 1000; // temps entre deux affichages
+#define LCD_AFFICHAGE_TEMPS_BOUCLE  1000  // temps entre deux affichages
 int temps = 0;// pour calcul dans la fonction temporisationAffichage
 bool LcdCursor = true; //curseur du lcd if true = enable
 #ifdef  LCD_DIGOLE
@@ -195,7 +199,7 @@ const byte alarm_1 = 1; // alarme 1
 const byte alarm_2 = 2; //alarme 2
 const bool typeTemperature = true; // true = celsius , false = fahrenheit
 tmElements_t tm; // declaration de tm pour la lecture des informations date et heure
-HorlogeDS3232 rtc(adresseBoitier24C32, rtcINT, debug);
+HorlogeDS3232 rtc(adresseBoitier24C32, rtcINT, DEBUG );
 
 /** progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
@@ -630,7 +634,7 @@ void regFinDeCourseOuverture() {
 */
 /// reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
 void testServo() {
-  if (testServoMoteur) {
+  if (SERVO_TEST) {
     int pulse = monServo.get_m_pulse();
     //des données sur la liaison série : (lorsque l'on appuie sur a, q, z, s, e, d )
     if (Serial.available())    {
@@ -719,10 +723,11 @@ void ouverturePorte() {
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
-    // utilisation du temps de monte pour la sécurité 126ms * les pas du codeur rotatif
+    // utilisation du temps de monte pour la sécurité SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
     // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
-    if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)  or ( ( millis() - monServo.get_m_debutTemps()) > (126 * rotary.get_m_finDeCourseFermeture()))) {
-      //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (126 * rotary.get_m_finDeCourseFermeture()))) {
+    if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert)  
+    or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
+      //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
       //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) ) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
@@ -737,9 +742,10 @@ void  fermeturePorte() {
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
-    // utilisation du temps de descente pour la sécurité 126ms * les pas du codeur rotatif
+    // utilisation du temps de descente pour la sécurité SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
     //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
-    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert) or (( millis() - monServo.get_m_debutTemps()) > (126 * rotary.get_m_finDeCourseFermeture()))) {
+    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert) 
+    or (( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_FERMETURE * rotary.get_m_finDeCourseFermeture()))) {
       //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert) ) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
@@ -982,7 +988,7 @@ void routineGestionWatchdog() {
           radio.chaineVide();
         }
         // Serial.println (monServo.get_m_tempsTotal());
-        tempsWatchdog = bouclesWatchdog ; // initialisation du nombre de boucles
+        tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
       f_wdt = 0;
@@ -1069,8 +1075,8 @@ void setup() {
 
   rotary.init();// initialisation de la position de la roue codeuse
 
-  if (!testServoMoteur) {
-    if (digitalRead(securiteHaute)) {
+  if (!SERVO_TEST) {
+    if (digitalRead(PIN_SECURITE_OUVERTURE)) {
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
     } else {
@@ -1084,7 +1090,7 @@ void setup() {
 void loop() {
 
   lectureClavier(); // lecture du clavier
-  temporisationAffichage(boucleTemps) ; // temporisation pour l'affichage
+  temporisationAffichage(LCD_AFFICHAGE_TEMPS_BOUCLE) ; // temporisation pour l'affichage
 
   //reglages
   reglageTime(); // reglages de l'heure, minute, seconde si touche fleche droite
@@ -1098,7 +1104,7 @@ void loop() {
   regFinDeCourseOuverture(); // reglage fin de course ouverture
   eclairageAfficheur(); // retro eclairage de l'afficheur
 
-  if (testServoMoteur) {
+  if (SERVO_TEST) {
     testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
   }
 
@@ -1114,6 +1120,8 @@ void loop() {
   fermeturePorte();
 
   rotary.compteurRoueCodeuse(); // mis à jour du compteur de l'encodeur rotatif
+
+Serial.println (monServo.get_m_tempsTotal());
 
   routineTestFermetureBoitier(); // test fermeture boitier
   routineTestOuvertureBoitier();// test ouvertuer boitier
