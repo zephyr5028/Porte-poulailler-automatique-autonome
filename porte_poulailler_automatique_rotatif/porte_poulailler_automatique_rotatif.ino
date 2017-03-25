@@ -116,11 +116,11 @@ Accus accusServo (PIN_ACCUS_SERVO, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPO
 /** encodeur rotatif */
 #include "JlmRotaryEncoder.h"
 #define SECURITE_TEMPS_FERMETURE  136 // utilisation du temps de descente pour la sécurité =  SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
-#define SECURITE_TEMPS_OUVERTURE  116 // utilisation du temps de monté pour la sécurité =  SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
-#define ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION 100; // initialisation de la position de l'encodeur rotatif avec le contact reed
-#define ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION   150  // initialisation pa defaut au demarrage de la possition de la roue codeuse 
+#define SECURITE_TEMPS_OUVERTURE  136 // utilisation du temps de monté pour la sécurité =  SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
+#define ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION 100 // initialisation de la position de l'encodeur rotatif avec le contact reed
+#define ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION   190  // initialisation par defaut au demarrage de la possition de la roue codeuse 
 #define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_OUVERTURE  5 // initialisation par defaut au demarrage de la valeur de fin de course ouverture
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  40 // initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  70 // initialisation par defaut au demarrage de la valeur de fin de course fermeture
 // définition des pin pour le KY040
 enum PinAssignments {
   encoderPinDT = 11,   // right (DT)
@@ -725,11 +725,17 @@ void ouverturePorte() {
     }
     // utilisation du temps de monte pour la sécurité SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
     // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
-    if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert)  
-    or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
+    // finDeCourseOuverture - 4 pour la protection su servo moteur
+   // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 4 ) or !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert)  
+   // or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
+       if ( !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert)  ) {
       //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
       //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) ) {
+      Serial.println (rotary.get_m_compteRoueCodeuse());
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
+     //  if (rotary.get_m_compteRoueCodeuse() < ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION) {
+       rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
+      // }
     }
 
   }
@@ -1080,7 +1086,7 @@ void setup() {
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);// mise sous tension du servo et ouverture de la porte
     } else {
-      rotary.set_m_compteRoueCodeuse(rotary.get_m_finDeCourseOuverture());
+      rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
     }
   }
   rotary.writeRotaryDtClk();// mise à jour position encodeur
@@ -1121,7 +1127,7 @@ void loop() {
 
   rotary.compteurRoueCodeuse(); // mis à jour du compteur de l'encodeur rotatif
 
-Serial.println (monServo.get_m_tempsTotal());
+//Serial.println (monServo.get_m_tempsTotal());
 
   routineTestFermetureBoitier(); // test fermeture boitier
   routineTestOuvertureBoitier();// test ouvertuer boitier

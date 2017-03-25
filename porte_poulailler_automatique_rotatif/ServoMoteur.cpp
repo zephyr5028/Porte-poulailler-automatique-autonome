@@ -68,17 +68,18 @@ unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsi
   }
 }
 
-///-----relais hors tension-----
-void ServoMoteur::relaisHorsTension () {
-  m_tempsTotal = millis() - m_debutTemps; // calcul tu temps en la mise sous tension du relais et la mise hors tension
-  digitalWrite(m_pinRelais, LOW);
-  if (m_ouvFerm) !m_ouvFerm; else m_ouvFerm;
-}
-
 ///-----relais sous tension-----
 void ServoMoteur::relaisSousTension() {
-  m_debutTemps  = millis();// pour le calcul tu temps de montée ou descente
   digitalWrite(m_pinRelais, HIGH);
+  m_debutTemps  = millis();// pour le calcul tu temps de montée ou descente
+}
+
+///-----relais hors tension-----
+void ServoMoteur::relaisHorsTension () {
+  ServoTimer2::write(m_pulseStop);  // value should usually be 750 to 2200 (environ 1500 = stop)
+  digitalWrite(m_pinRelais, LOW);
+  m_tempsTotal = millis() - m_debutTemps; // calcul tu temps en la mise sous tension du relais et la mise hors tension;
+  if (m_ouvFerm) !m_ouvFerm; else m_ouvFerm;
 }
 
 //-----accesseur - getter-----
