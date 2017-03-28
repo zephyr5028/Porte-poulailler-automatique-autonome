@@ -34,7 +34,7 @@ void ServoMoteur::servoOuvFerm(boolean batterieFaible, bool reduit)
   if (!batterieFaible and  !m_servoAction) { // si la batterie n'est pas faible et le servo non en action
     ServoMoteur::relaisSousTension(); // relais sous tension
     modificationVitesse(reduit);
-    delay(200);// attente mise sous tension
+  //  delay(200);// attente mise sous tension
     m_servoAction = true; // servo en action
   }
 }
@@ -59,7 +59,7 @@ void ServoMoteur::modificationVitesse( bool reduit) {
 unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsigned int finDeCourse) {
   ServoMoteur::relaisHorsTension(); // relais hors tension
   if (!digitalRead(m_pinSecuriteHaute)) {
-    delay(200); // attente fin de l'arrêt complet du servo
+   // delay(200); // attente fin de l'arrêt complet du servo
     m_servoAction = false; // servo arrêt
     return finDeCourse;
   } else {
@@ -71,6 +71,7 @@ unsigned int ServoMoteur::servoHorsTension (unsigned int compteRoueCodeuse, unsi
 ///-----relais sous tension-----
 void ServoMoteur::relaisSousTension() {
   digitalWrite(m_pinRelais, HIGH);
+   ServoTimer2::write(m_pulseStop);  // value should usually be 750 to 2200 (environ 1500 = stop)
   m_debutTemps  = millis();// pour le calcul tu temps de montée ou descente
 }
 

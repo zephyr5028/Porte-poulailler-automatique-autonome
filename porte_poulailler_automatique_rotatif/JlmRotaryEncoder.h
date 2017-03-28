@@ -17,7 +17,7 @@ class JlmRotaryEncoder
 {
   public:
 
-    JlmRotaryEncoder(byte dt, byte clk, byte sw = 0) ; // constructeur avec broches pour dt , clk et sw
+    JlmRotaryEncoder(byte pinA, byte pinB, byte sw = 0) ; // constructeur avec broches pour dt , clk et sw
 
     ~JlmRotaryEncoder(); // destructeur
 
@@ -46,8 +46,8 @@ class JlmRotaryEncoder
 
 
 
-    byte m_encoderPinA; // right (DT) pin A
-    byte m_encoderPinB; // left (CLK) pin B
+    byte m_encoderPinA; //  pin A
+    byte m_encoderPinB; //  pin B
     byte m_switchButton; // switch (SW) pin sw
     boolean m_unSwitch; // un seul appui à la fois sur sw
 

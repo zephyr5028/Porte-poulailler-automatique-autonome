@@ -1,7 +1,7 @@
 #include "JlmRotaryEncoder.h"
 
 // surcharge constructeur avec timer - broches dt et clk ainsi que sw si besoin
-JlmRotaryEncoder::JlmRotaryEncoder(byte dt, byte clk, byte sw) : m_encoderPinA(dt), m_encoderPinB(clk), m_switchButton(sw),
+JlmRotaryEncoder::JlmRotaryEncoder(byte pinA, byte pinB, byte sw) : m_encoderPinA(pinA), m_encoderPinB(pinB), m_switchButton(sw),
   m_A_set(false) , m_B_set(false), m_A_change(false), m_B_change(false), m_rotating(false), m_encoderPos(0),  m_unSwitch(true),
   m_finDeCourseFermeture(70), m_finDeCourseOuverture(100), m_compteRoueCodeuse(190),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
 {
@@ -16,7 +16,7 @@ JlmRotaryEncoder::~JlmRotaryEncoder()
 // initialisation des branchements
 void JlmRotaryEncoder::init()
 {
-  pinMode(m_encoderPinA, INPUT); //
+ // pinMode(m_encoderPinA, INPUT); //
   pinMode(m_encoderPinB, INPUT); //
   if (m_switchButton != 0)   pinMode(m_switchButton, INPUT_PULLUP); // utilisation du pullup
 }
@@ -76,24 +76,37 @@ void JlmRotaryEncoder::switchClear()
 ///-----compteur roue codeuse-----
 // code gray et comparaison avec l'état des pins n-1
 void JlmRotaryEncoder::compteurRoueCodeuse() {
+// delay(3);
   bool pinA = digitalRead(m_encoderPinA);
   bool pinB = digitalRead(m_encoderPinB);
-  if ((!pinA && pinB && m_A_change && m_B_change) or
-      ( pinA && !pinB && !m_A_change && !m_B_change)) {
+  if (pinB) {
+    m_compteRoueCodeuse--;
+  } else {
     m_compteRoueCodeuse++;
   }
-  else if ((!pinB && pinA && m_A_change && m_B_change ) or
+  Serial.print(pinA);
+  Serial.print(pinB);
+  /*
+    bool pinA = digitalRead(m_encoderPinA);
+    bool pinB = digitalRead(m_encoderPinB);
+    if ((!pinA && pinB && m_A_change && m_B_change) or
+      ( pinA && !pinB && !m_A_change && !m_B_change)) {
+    m_compteRoueCodeuse++;
+    }
+    else if ((!pinB && pinA && m_A_change && m_B_change ) or
            (pinB && !pinA && !m_A_change && !m_B_change)) {
     m_compteRoueCodeuse--;
-  }
-  m_A_change = pinA;// n-1
-  m_B_change = pinB;// n-1
+    }
+    m_A_change = pinA;// n-1
+    m_B_change = pinB;// n-1
+  */
 }
 
 /// mise à jour de A et B change
 void JlmRotaryEncoder::writeRotaryDtClk() {
   m_A_change = digitalRead(m_encoderPinA);
   m_B_change = digitalRead(m_encoderPinB);
+
 }
 
 ///-----reglage de la fin de course-----
