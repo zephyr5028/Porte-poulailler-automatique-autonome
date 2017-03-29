@@ -96,7 +96,7 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-#define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop)
+#define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop)
 #define SERVO_PULSE_OUVERTURE_FERMETURE   140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   60  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 60)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
@@ -107,7 +107,7 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #include "Accus.h"
 #define PIN_ACCUS_CDE  A6  //analog pin A6 : tension batterie commandes
 #define PIN_ACCUS_SERVO  A7  //analog pin A7 : tension batterie servo moteur
-#define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
+#define ACCUS_TESION_MINIMALE  5.1 //valeur minimum de l'accu 4.8v + tension diode shottky
 #define ACCUS_CONVERSION_RAPPORT  7.5 // rapport de convertion CAD float
 boolean batterieFaible = false; // si batterie < 4,8v = true
 Accus accus (PIN_ACCUS_CDE, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG ); // objet accus commande mini 4.8v, convertion 7.5
@@ -125,9 +125,9 @@ Accus accus (PIN_ACCUS_CDE, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEB
 #define ENCODER_PIN_B   11   // B
 // classe encodeur rotatif KY040
 JlmRotaryEncoder rotary(ENCODER_PIN_A, ENCODER_PIN_B); // clearButton si besoin
-bool interruptD2 = 0;
-unsigned long debutTemps = 0;
-unsigned long finTemps = 0;
+volatile bool interruptEncodeur = false; // valider la prise en compte de l'interruption
+volatile unsigned long debutTempsEncodeur = 0; // utilisation de millis()
+int tempoEncodeur = 10; // tempo pour éviter les rebonds
 
 /** lumiere */
 #include "Lumiere.h"
@@ -344,7 +344,7 @@ void affiTensionBatCdes() {
 
 ///-------affichage tension batterie servo-moteur
 void affiTensionBatServo() {
-   int valBat = accus.tensionAccusCAD(); // tension batterie CAD
+  int valBat = accus.tensionAccusCAD(); // tension batterie CAD
   float voltage = accus.tensionAccus(valBat);// read the input on analog pin A6 : tension batterie
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
@@ -354,15 +354,15 @@ void affiTensionBatServo() {
     radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
   }
   /*
-  int valBatServo = accusServo.tensionAccusCAD(); // tension batterie CAD
-  float voltage = accusServo.tensionAccus(valBatServo);// read the input on analog pin A3 : tension batterie servo moteur
-  // print out the value you read:
-  if ( boitierOuvert) { // si le boitier est ouvert
+    int valBatServo = accusServo.tensionAccusCAD(); // tension batterie CAD
+    float voltage = accusServo.tensionAccus(valBatServo);// read the input on analog pin A3 : tension batterie servo moteur
+    // print out the value you read:
+    if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
     mydisp.affichageVoltage(  voltage, "V",  ligne);
-  } else   if (radio.get_m_radio()) {
+    } else   if (radio.get_m_radio()) {
     radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
-  }
+    }
   */
 }
 
@@ -782,11 +782,11 @@ void  fermeturePorte() {
 */
 ///-----routine interruption D2 INT0------
 void myInterruptINT0() {
-  rotary.compteurRoueCodeuse(); // mis à jour du compteur de l'encodeur rotatif
- /* if (interruptD2 == 0) {
-    interruptD2 = 1;
-    debutTemps  = millis();
-  }*/
+  //rotary.compteurRoueCodeuse(); // mis à jour du compteur de l'encodeur rotatif
+  if (!interruptEncodeur) {
+    interruptEncodeur  = true; // pour prise en compte de l'it
+    debutTempsEncodeur  = millis(); // pour éviter les rebonds sur le front descendant du signal
+  }
 }
 
 //-----routine interruption D3 INT1-----
@@ -1086,7 +1086,7 @@ void setup() {
   rotary.set_m_finDeCourseOuverture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseOuverture
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
-  attachInterrupt(0, myInterruptINT0, FALLING); // validation de l'interruption sur int0 (d2)
+  attachInterrupt(0, myInterruptINT0, RISING); // validation de l'interruption sur int0 (d2)
 
   tools.setupPower(); // initialisation power de l'arduino
 
@@ -1106,7 +1106,6 @@ void setup() {
       rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
     }
   }
-  // rotary.writeRotaryDtClk();// mise à jour position encodeur
 }
 
 /* loop */
@@ -1141,14 +1140,14 @@ void loop() {
 
   ouverturePorte();
   fermeturePorte();
-/*
-  if (interruptD2) {
-    finTemps = millis();
-    if ((finTemps - debutTemps) > 5 ) {
+
+  /* pas de l'encodeur RISING */
+  if (interruptEncodeur) {
+    if ((millis() - debutTempsEncodeur) > tempoEncodeur ) {
       rotary.compteurRoueCodeuse(); // mis à jour du compteur de l'encodeur rotatif
-      interruptD2 = 0;
+      interruptEncodeur = false; // autorisation nouvelle it
     }
-  }*/
+  }
 
   //Serial.println (monServo.get_m_tempsTotal());
 

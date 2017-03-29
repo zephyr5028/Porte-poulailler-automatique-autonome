@@ -40,11 +40,9 @@ class JlmRotaryEncoder
     void set_m_A_change(bool A_change);
     bool get_m_B_change();
     void set_m_B_change(bool B_change);
-    void writeRotaryDtClk();
 
+    
   protected:
-
-
 
     byte m_encoderPinA; //  pin A
     byte m_encoderPinB; //  pin B
@@ -62,9 +60,9 @@ class JlmRotaryEncoder
 
     volatile boolean m_interruptRoueCodeuse;    // gestion de l'anti-rebonds
     const int m_finDeCourseMax; // valeur maxi de la fin de course 500
-    volatile int m_compteRoueCodeuse;  // un compteur de position 150 au départ
-    int m_finDeCourseFermeture; // initialisation de la valeur de la fin de course fermeture 250 au depart
-    int m_finDeCourseOuverture; // initialisation de la valeur de la fin de course ouverture 150 au depart
+    volatile int m_compteRoueCodeuse;  // un compteur de position au départ
+    int m_finDeCourseFermeture; // initialisation de la valeur de la fin de course fermeture au depart
+    int m_finDeCourseOuverture; // initialisation de la valeur de la fin de course ouverture au depart
 
 };
 

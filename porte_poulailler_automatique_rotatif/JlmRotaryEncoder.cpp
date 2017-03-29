@@ -78,8 +78,8 @@ void JlmRotaryEncoder::switchClear()
 void JlmRotaryEncoder::compteurRoueCodeuse() {
   bool pinA = digitalRead(m_encoderPinA);
   bool pinB = digitalRead(m_encoderPinB);
-  if (!pinA) {
-    if (pinB) {
+  if (pinA) {
+    if (!pinB) {
       m_compteRoueCodeuse--;
     } else {
       m_compteRoueCodeuse++;
@@ -87,27 +87,7 @@ void JlmRotaryEncoder::compteurRoueCodeuse() {
   }
   Serial.print(pinA);
   Serial.print(pinB);
-  /*
-    bool pinA = digitalRead(m_encoderPinA);
-    bool pinB = digitalRead(m_encoderPinB);
-    if ((!pinA && pinB && m_A_change && m_B_change) or
-      ( pinA && !pinB && !m_A_change && !m_B_change)) {
-    m_compteRoueCodeuse++;
-    }
-    else if ((!pinB && pinA && m_A_change && m_B_change ) or
-           (pinB && !pinA && !m_A_change && !m_B_change)) {
-    m_compteRoueCodeuse--;
-    }
-    m_A_change = pinA;// n-1
-    m_B_change = pinB;// n-1
-  */
-}
-
-/// mise à jour de A et B change
-void JlmRotaryEncoder::writeRotaryDtClk() {
-  m_A_change = digitalRead(m_encoderPinA);
-  m_B_change = digitalRead(m_encoderPinB);
-
+  Serial.print(" ");
 }
 
 ///-----reglage de la fin de course-----
