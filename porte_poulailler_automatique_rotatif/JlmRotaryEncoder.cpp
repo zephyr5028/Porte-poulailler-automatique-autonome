@@ -16,7 +16,7 @@ JlmRotaryEncoder::~JlmRotaryEncoder()
 // initialisation des branchements
 void JlmRotaryEncoder::init()
 {
- // pinMode(m_encoderPinA, INPUT); //
+  // pinMode(m_encoderPinA, INPUT); //
   pinMode(m_encoderPinB, INPUT); //
   if (m_switchButton != 0)   pinMode(m_switchButton, INPUT_PULLUP); // utilisation du pullup
 }
@@ -76,13 +76,14 @@ void JlmRotaryEncoder::switchClear()
 ///-----compteur roue codeuse-----
 // code gray et comparaison avec l'état des pins n-1
 void JlmRotaryEncoder::compteurRoueCodeuse() {
-// delay(3);
   bool pinA = digitalRead(m_encoderPinA);
   bool pinB = digitalRead(m_encoderPinB);
-  if (pinB) {
-    m_compteRoueCodeuse--;
-  } else {
-    m_compteRoueCodeuse++;
+  if (!pinA) {
+    if (pinB) {
+      m_compteRoueCodeuse--;
+    } else {
+      m_compteRoueCodeuse++;
+    }
   }
   Serial.print(pinA);
   Serial.print(pinB);
