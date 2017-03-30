@@ -105,12 +105,13 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 
 /** Accus */
 #include "Accus.h"
-#define PIN_ACCUS_CDE  A6  //analog pin A6 : tension batterie commandes
-#define PIN_ACCUS_SERVO  A7  //analog pin A7 : tension batterie servo moteur
-#define ACCUS_TESION_MINIMALE  5.1 //valeur minimum de l'accu 4.8v + tension diode shottky
+#define PIN_ACCUS_N1  A6  //analog pin A6 : tension batterie N1
+#define PIN_ACCUS_N2  A7  //analog pin A7 : tension batterie N2
+#define ACCUS_TESION_MINIMALE  4.9 //valeur minimum de l'accu 4.8v
 #define ACCUS_CONVERSION_RAPPORT  7.5 // rapport de convertion CAD float
-boolean batterieFaible = false; // si batterie < 4,8v = true
-Accus accus (PIN_ACCUS_CDE, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG ); // objet accus commande mini 4.8v, convertion 7.5
+boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
+Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
+Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
 
 /** encodeur rotatif */
 #include "JlmRotaryEncoder.h"
@@ -331,8 +332,8 @@ void eclairageAfficheur() {
 /* batteries */
 ///-------affichage tension batterie commandes
 void affiTensionBatCdes() {
-  int valBat = accus.tensionAccusCAD(); // tension batterie CAD
-  float voltage = accus.tensionAccus(valBat);// read the input on analog pin A6 : tension batterie
+  int valBat = accusN1.tensionAccusCAD(); // tension batterie CAD
+  float voltage = accusN1.tensionAccus(valBat);// read the input on analog pin A6 : tension batterie N1
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
@@ -344,18 +345,8 @@ void affiTensionBatCdes() {
 
 ///-------affichage tension batterie servo-moteur
 void affiTensionBatServo() {
-  int valBat = accus.tensionAccusCAD(); // tension batterie CAD
-  float voltage = accus.tensionAccus(valBat);// read the input on analog pin A6 : tension batterie
-  // print out the value you read:
-  if ( boitierOuvert) { // si le boitier est ouvert
-    byte ligne = 1;
-    mydisp.affichageVoltage(  voltage, "V",  ligne);
-  } else   if (radio.get_m_radio()) {
-    radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
-  }
-  /*
-    int valBatServo = accusServo.tensionAccusCAD(); // tension batterie CAD
-    float voltage = accusServo.tensionAccus(valBatServo);// read the input on analog pin A3 : tension batterie servo moteur
+    int valBat = accusN2.tensionAccusCAD(); // tension batterie CAD
+    float voltage = accusN2.tensionAccus(valBat);// read the input on analog pin A7 : tension batterie N2
     // print out the value you read:
     if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
@@ -363,7 +354,6 @@ void affiTensionBatServo() {
     } else   if (radio.get_m_radio()) {
     radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
     }
-  */
 }
 
 /* choix pour l'ouverture et la fermeture :
@@ -1136,7 +1126,7 @@ void loop() {
 
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
-  batterieFaible = accus.accusFaible() ; // test de la batterie commande < 4.8v
+  batterieFaible = accusN1.accusFaible() or accusN2.accusFaible(); // test de la tension de la batterie
 
   ouverturePorte();
   fermeturePorte();
