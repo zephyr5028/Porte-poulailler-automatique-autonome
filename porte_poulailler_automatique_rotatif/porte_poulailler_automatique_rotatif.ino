@@ -107,8 +107,8 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #include "Accus.h"
 #define PIN_ACCUS_N1  A6  //analog pin A6 : tension batterie N1
 #define PIN_ACCUS_N2  A7  //analog pin A7 : tension batterie N2
-#define ACCUS_TESION_MINIMALE  4.9 //valeur minimum de l'accu 4.8v
-#define ACCUS_CONVERSION_RAPPORT  7.5 // rapport de convertion CAD float
+#define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
+#define ACCUS_CONVERSION_RAPPORT  7.3 // rapport de convertion CAD float
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
 Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
 Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
@@ -128,7 +128,7 @@ Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DE
 JlmRotaryEncoder rotary(ENCODER_PIN_A, ENCODER_PIN_B); // clearButton si besoin
 volatile bool interruptEncodeur = false; // valider la prise en compte de l'interruption
 volatile unsigned long debutTempsEncodeur = 0; // utilisation de millis()
-int tempoEncodeur = 10; // tempo pour éviter les rebonds
+int tempoEncodeur = 15; // tempo pour éviter les rebonds
 
 /** lumiere */
 #include "Lumiere.h"
