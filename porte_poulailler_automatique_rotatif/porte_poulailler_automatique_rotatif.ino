@@ -732,7 +732,7 @@ void ouverturePorte() {
     if ( !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert)  ) {
       //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
       //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) ) {
-      Serial.println (rotary.get_m_compteRoueCodeuse());
+   //   Serial.println (rotary.get_m_compteRoueCodeuse());
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
       //  if (rotary.get_m_compteRoueCodeuse() < ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION) {
       rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
@@ -754,7 +754,7 @@ void  fermeturePorte() {
     //  if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)
     //  or (( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_FERMETURE * rotary.get_m_finDeCourseFermeture()))) {
     if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
-      Serial.println (rotary.get_m_compteRoueCodeuse());
+     // Serial.println (rotary.get_m_compteRoueCodeuse());
       //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert) ) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
