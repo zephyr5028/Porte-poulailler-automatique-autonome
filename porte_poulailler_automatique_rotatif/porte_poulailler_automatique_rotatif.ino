@@ -115,17 +115,16 @@ Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DE
 
 /** encodeur rotatif */
 #include "JlmRotaryEncoder.h"
-#define SECURITE_TEMPS_FERMETURE  136 // utilisation du temps de descente pour la sécurité =  SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
-#define SECURITE_TEMPS_OUVERTURE  136 // utilisation du temps de monté pour la sécurité =  SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
+#define SECURITE_TEMPS_FERMETURE  300 // utilisation du temps de descente pour la sécurité =  SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
+#define SECURITE_TEMPS_OUVERTURE  300 // utilisation du temps de monté pour la sécurité =  SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
 #define ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION 100 // initialisation de la position de l'encodeur rotatif avec le contact reed
 #define ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION   190  // initialisation par defaut au demarrage de la possition de la roue codeuse 
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_OUVERTURE  5 // initialisation par defaut au demarrage de la valeur de fin de course ouverture
 #define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  70 // initialisation par defaut au demarrage de la valeur de fin de course fermeture
 // définition des pin pour le KY040
 #define ENCODER_PIN_A   2   // A
 #define ENCODER_PIN_B   11   // B
 // classe encodeur rotatif KY040
-JlmRotaryEncoder rotary(ENCODER_PIN_A, ENCODER_PIN_B); // clearButton si besoin
+JlmRotaryEncoder rotary(ENCODER_PIN_A, ENCODER_PIN_B, ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE, ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION); // clearButton si besoin
 volatile bool interruptEncodeur = false; // valider la prise en compte de l'interruption
 volatile unsigned long debutTempsEncodeur = 0; // utilisation de millis()
 int tempoEncodeur = 15; // tempo pour éviter les rebonds
@@ -345,15 +344,15 @@ void affiTensionBatCdes() {
 
 ///-------affichage tension batterie servo-moteur
 void affiTensionBatServo() {
-    int valBat = accusN2.tensionAccusCAD(); // tension batterie CAD
-    float voltage = accusN2.tensionAccus(valBat);// read the input on analog pin A7 : tension batterie N2
-    // print out the value you read:
-    if ( boitierOuvert) { // si le boitier est ouvert
+  int valBat = accusN2.tensionAccusCAD(); // tension batterie CAD
+  float voltage = accusN2.tensionAccus(valBat);// read the input on analog pin A7 : tension batterie N2
+  // print out the value you read:
+  if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
     mydisp.affichageVoltage(  voltage, "V",  ligne);
-    } else   if (radio.get_m_radio()) {
+  } else   if (radio.get_m_radio()) {
     radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
-    }
+  }
 }
 
 /* choix pour l'ouverture et la fermeture :
@@ -725,14 +724,10 @@ void ouverturePorte() {
       monServo.servoVitesse( reduit);
     }
     // utilisation du temps de monte pour la sécurité SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
-    // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 2) or !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert)) {
-    // finDeCourseOuverture - 4 pour la protection su servo moteur
     // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 4 ) or !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert)
     // or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
-    if ( !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert)  ) {
-      //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
-      //if ( !digitalRead(securiteHaute) or (touche == 4 and boitierOuvert) ) {
-   //   Serial.println (rotary.get_m_compteRoueCodeuse());
+    if ( !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
+      //   Serial.println (rotary.get_m_compteRoueCodeuse());
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
       //  if (rotary.get_m_compteRoueCodeuse() < ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION) {
       rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
@@ -750,12 +745,10 @@ void  fermeturePorte() {
       monServo.servoVitesse( reduit);
     }
     // utilisation du temps de descente pour la sécurité SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
-    //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or !digitalRead(securiteHaute) or  (touche == 4 and boitierOuvert)) {
-    //  if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)
-    //  or (( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_FERMETURE * rotary.get_m_finDeCourseFermeture()))) {
-    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
-     // Serial.println (rotary.get_m_compteRoueCodeuse());
-      //if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert) ) {
+    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)
+        or (( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_FERMETURE * rotary.get_m_finDeCourseFermeture()))) {
+      // if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
+      // Serial.println (rotary.get_m_compteRoueCodeuse());
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
   }
@@ -1076,7 +1069,7 @@ void setup() {
   rotary.set_m_finDeCourseOuverture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseOuverture
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
-  attachInterrupt(0, myInterruptINT0, RISING); // validation de l'interruption sur int0 (d2)
+  //attachInterrupt(0, myInterruptINT0, RISING); // validation de l'interruption sur int0 (d2)
 
   tools.setupPower(); // initialisation power de l'arduino
 

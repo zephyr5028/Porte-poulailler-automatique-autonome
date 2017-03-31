@@ -1,9 +1,8 @@
 #include "JlmRotaryEncoder.h"
 
 // surcharge constructeur avec timer - broches dt et clk ainsi que sw si besoin
-JlmRotaryEncoder::JlmRotaryEncoder(byte pinA, byte pinB, byte sw) : m_encoderPinA(pinA), m_encoderPinB(pinB), m_switchButton(sw),
-  m_A_set(false) , m_B_set(false), m_A_change(false), m_B_change(false), m_rotating(false), m_encoderPos(0),  m_unSwitch(true),
-  m_finDeCourseFermeture(70), m_finDeCourseOuverture(100), m_compteRoueCodeuse(190),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
+JlmRotaryEncoder::JlmRotaryEncoder(byte pinA, byte pinB,  int finDeCourseFermeture, int finDeCourseOuverture, int compteRoueCodeuse) : m_encoderPinA(pinA), m_encoderPinB(pinB),
+  m_finDeCourseFermeture(finDeCourseFermeture), m_finDeCourseOuverture(finDeCourseOuverture), m_compteRoueCodeuse(compteRoueCodeuse),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
 {
   JlmRotaryEncoder::init();// initialisation des branchements
 }
@@ -16,65 +15,13 @@ JlmRotaryEncoder::~JlmRotaryEncoder()
 // initialisation des branchements
 void JlmRotaryEncoder::init()
 {
-  // pinMode(m_encoderPinA, INPUT); //
+  // pinMode(m_encoderPinA, INPUT); // interruption D2
+  attachInterrupt(0, m_encoderPinA, RISING); // validation de l'interruption sur int0 (d2)
   pinMode(m_encoderPinB, INPUT); //
-  if (m_switchButton != 0)   pinMode(m_switchButton, INPUT_PULLUP); // utilisation du pullup
 }
-
-// changement d'état de A
-int JlmRotaryEncoder::encoderA()
-{
-  // debounce
-  if ( m_rotating ) delay (3);  // attendre un petit peut
-  m_rotating = true; //activation de l'anti-rebond
-  // Confirmation du changement
-  if ( digitalRead(m_encoderPinA) != m_A_set )  {
-    m_A_set = !m_A_set;
-    if (m_B_change) {
-      m_encoderPos += 1;
-      m_B_change = false;
-    } else
-      m_A_change = true;
-    m_rotating = false;  //libération de l'anti-rebond
-  }
-  return m_encoderPos;
-}
-
-// changement d'etat de B
-int JlmRotaryEncoder::encoderB()
-{
-  if ( m_rotating ) delay (3);
-  m_rotating = true;
-  if ( digitalRead(m_encoderPinB) != m_B_set )  {
-    m_B_set = !m_B_set;
-    if (m_A_change) {
-      m_compteRoueCodeuse -= 1;
-      m_encoderPos -= 1;
-      m_A_change = false;
-    } else
-      m_B_change = true;
-    m_rotating = false;
-  }
-  return m_encoderPos;
-}
-
-// clear le compteur avec le switch
-void JlmRotaryEncoder::switchClear()
-{
-  //debounce et un seul appui à la fois
-  if (digitalRead(m_switchButton) == LOW )  delay(20); else m_unSwitch = true;
-  if (digitalRead(m_switchButton) == LOW  and m_unSwitch) {
-    m_encoderPos = 0;
-    m_A_change = false;
-    m_B_change = false;
-    m_unSwitch = false;
-  }
-}
-
-
 
 ///-----compteur roue codeuse-----
-// code gray et comparaison avec l'état des pins n-1
+// code gray avec l'it sur la broche d2 INT0
 void JlmRotaryEncoder::compteurRoueCodeuse() {
   bool pinA = digitalRead(m_encoderPinA);
   bool pinB = digitalRead(m_encoderPinB);
@@ -85,9 +32,9 @@ void JlmRotaryEncoder::compteurRoueCodeuse() {
       m_compteRoueCodeuse++;
     }
   }
- // Serial.print(pinA);
- // Serial.print(pinB);
- // Serial.print(" ");
+  // Serial.print(pinA);
+  // Serial.print(pinB);
+  // Serial.print(" ");
 }
 
 ///-----reglage de la fin de course-----
@@ -155,20 +102,11 @@ void JlmRotaryEncoder::set_m_finDeCourseOuverture(int finDeCourseOuverture) {
 }
 
 //-----accesseur - getter-----
-bool JlmRotaryEncoder::get_m_A_change() {
-  return m_A_change;
+volatile boolean  JlmRotaryEncoder::get_m_interruptRoueCodeuse() {
+  return m_interruptRoueCodeuse;
 }
 //-----mutateur - setter-----
-void JlmRotaryEncoder::set_m_A_change(bool A_change) {
-  m_A_change = A_change;
-}
-
-//-----accesseur - getter-----
-bool JlmRotaryEncoder::get_m_B_change() {
-  return m_B_change;
-}
-//-----mutateur - setter-----
-void JlmRotaryEncoder::set_m_B_change(bool B_change) {
-  m_B_change = B_change;
+void  JlmRotaryEncoder::set_m_interruptRoueCodeuse( volatile boolean interruptRoueCodeuse) {
+  m_interruptRoueCodeuse = interruptRoueCodeuse;
 }
 
