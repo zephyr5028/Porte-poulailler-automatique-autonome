@@ -16,7 +16,7 @@ JlmRotaryEncoder::~JlmRotaryEncoder()
 void JlmRotaryEncoder::init()
 {
   // pinMode(m_encoderPinA, INPUT); // interruption D2
-  attachInterrupt(0, m_encoderPinA, RISING); // validation de l'interruption sur int0 (d2)
+//  attachInterrupt(0, m_encoderPinA, RISING); // validation de l'interruption sur int0 (d2)
   pinMode(m_encoderPinB, INPUT); //
 }
 

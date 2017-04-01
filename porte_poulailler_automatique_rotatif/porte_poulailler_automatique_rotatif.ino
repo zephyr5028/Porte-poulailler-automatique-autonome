@@ -991,6 +991,7 @@ void routineGestionWatchdog() {
           lumiere();
           radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";\0"); // envoi message radio : memoire sram restante
           radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert, ";\0");
+          radio.envoiUnsignedInt(rotary.get_m_compteRoueCodeuse(), boitierOuvert, ";\0");
           radio.chaineVide();
         }
         // Serial.println (monServo.get_m_tempsTotal());
@@ -1069,7 +1070,7 @@ void setup() {
   rotary.set_m_finDeCourseOuverture ((val2 << 8) + val1);  // mots 2 byte vers mot int finDeCourseOuverture
 
   attachInterrupt(1, myInterruptINT1, FALLING); // validation de l'interruption sur int1 (d3)
-  //attachInterrupt(0, myInterruptINT0, RISING); // validation de l'interruption sur int0 (d2)
+  attachInterrupt(0, myInterruptINT0, RISING); // validation de l'interruption sur int0 (d2)
 
   tools.setupPower(); // initialisation power de l'arduino
 
