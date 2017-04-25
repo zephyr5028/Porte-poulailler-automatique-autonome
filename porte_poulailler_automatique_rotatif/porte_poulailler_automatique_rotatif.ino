@@ -982,6 +982,19 @@ void routineGestionWatchdog() {
         }
         // informations à afficher
         if (radio.get_m_radio()) {
+
+          /**
+           * date; // format __/__/___
+           * heure; //format __:__:__
+           * temperature; // format __.__C 
+           * tension bat 1; // format __.__V
+           * tension bat 2; // format __.__V
+           * lumiere; // ___L
+           * position porte; // ouv/ferm
+           * compteur roue codeuse; //format ___R
+           * temps fonctionnement servo; // format _____ms 
+           * 
+           */
           displayTime();
           read_temp(typeTemperature); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
