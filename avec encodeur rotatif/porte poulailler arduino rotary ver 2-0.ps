@@ -1,6 +1,6 @@
 %!PS-Adobe-3.0
 %%Creator: gEDA gschem 1.8.1-20121123-13-g875406c
-%%CreationDate: Mon Apr 10 11:38:11 2017
+%%CreationDate: Thu Apr 27 18:04:03 2017
 %%Title: /home/jlm-atelier/Bureau/GIT/dossier composants porte poulailler/porte poulailler arduino schemas/porte poulailler arduino rotary ver 2-0.sch
 %%Author: (null)
 %%BoundingBox: 0 0 595 841
@@ -1410,13 +1410,13 @@ gsave
 false false false false 202.222224 [(5w 12v) ] 0 40300 45500 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(Porte du poulailler - arduino - rotary encoder) (                   ajout c7 et c8 pour stabilite) ] 0 51700 40900 180.555557 text
+false false false false 202.222224 [(Porte du poulailler - arduino - rotary encoder) (                   ajout c9 sur Bp extÅrieur) ] 0 51700 40900 180.555557 text
 grestore
 gsave
 false false false false 202.222224 [(avril 2017) ] 0 50800 40300 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(rev 2.0.5 arduino) ] 0 54300 40200 180.555557 text
+false false false false 202.222224 [(rev 2.0.6 arduino) ] 0 54300 40200 180.555557 text
 grestore
 45500 43500 45500 43600 10 line
 gsave
@@ -2706,11 +2706,6 @@ gsave
 45100 48000 45300 48000 10 line
 45300 48000 45400 48000 10 line
 45700 48000 45800 48000 10 line
-newpath
-45100 48000
-25
-0 360 arc
-fill
 grestore
 gsave
 false true false false 202.222224 [(1N4148) ] 0 45300 47700 180.555557 text
@@ -2857,27 +2852,32 @@ grestore
 45000 47200 45200 47200 10 line
 44000 46100 44000 46500 10 line
 gsave
-45100 48900 45100 48700 10 line
-45100 48000 45100 48200 10 line
-45300 48500 44900 48500 10 line
-45300 48400 44900 48400 10 line
-45100 48200 45100 48400 10 line
-45100 48500 45100 48700 10 line
+45000 48900 45000 48700 10 line
+45000 48000 45000 48200 10 line
+45200 48500 44800 48500 10 line
+45200 48400 44800 48400 10 line
+45000 48200 45000 48400 10 line
+45000 48500 45000 48700 10 line
 newpath
-45100 48000
+45000 48000
+25
+0 360 arc
+fill
+newpath
+45000 48000
 25
 0 360 arc
 fill
 grestore
 gsave
-false true false true 202.222224 [(1uF) ] 0 45000 48300 180.555557 text
+false true false true 202.222224 [(1uF) ] 0 44900 48300 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(C5) ] 0 44800 48700 180.555557 text
+false false false false 202.222224 [(C5) ] 0 44700 48700 180.555557 text
 grestore
 44000 49100 44000 48800 10 line
 45400 48400 45400 49100 10 line
-45100 48900 45100 49100 10 line
+45000 48900 45000 49100 10 line
 gsave
 43700 48600 43700 48200 10 line
 43700 48600 43400 48400 10 line
@@ -2948,7 +2948,7 @@ gsave
 false false false false 80.888888 [(pic ouverture boitier) (declenchement IT sur D3) ] 0 45100 47000 72.222221 text
 grestore
 gsave
-false true false false 202.222224 [(1N4148) ] 0 44500 48500 180.555557 text
+false true false false 202.222224 [(1N4148) ] 0 44400 48500 180.555557 text
 grestore
 44000 49100 47400 49100 10 line
 gsave
@@ -3357,6 +3357,25 @@ gsave
 false false false false 202.222224 [(100nf) ] 0 47400 40100 180.555557 text
 grestore
 47999 40300 47999 40299 10 line
+gsave
+53900 43000 53900 43200 10 line
+53900 43900 53900 43700 10 line
+53700 43400 54100 43400 10 line
+53700 43500 54100 43500 10 line
+53900 43700 53900 43500 10 line
+53900 43400 53900 43200 10 line
+60 60 53870 42970 fbox
+60 60 53870 43870 fbox
+grestore
+gsave
+false false false false 202.222224 [(C9) ] 0 53400 43600 180.555557 text
+grestore
+gsave
+false false false false 202.222224 [(100nf) ] 0 53300 43100 180.555557 text
+grestore
+gsave
+false false false false 202.222224 [(sur Bp ext.) ] 0 54100 43200 180.555557 text
+grestore
 60 60 50370 46170 fbox
 newpath
 51200 45400
@@ -3422,17 +3441,17 @@ newpath
 0 360 arc
 fill
 newpath
+45500 42100
+25
+0 360 arc
+fill
+newpath
 45500 42300
 25
 0 360 arc
 fill
 newpath
 45500 42400
-25
-0 360 arc
-fill
-newpath
-45500 42100
 25
 0 360 arc
 fill
@@ -4043,11 +4062,6 @@ newpath
 0 360 arc
 fill
 newpath
-45100 48000
-25
-0 360 arc
-fill
-newpath
 46000 47900
 25
 0 360 arc
@@ -4118,7 +4132,12 @@ newpath
 0 360 arc
 fill
 newpath
-45100 48000
+45000 48000
+25
+0 360 arc
+fill
+newpath
+45000 48000
 25
 0 360 arc
 fill
@@ -4138,12 +4157,12 @@ newpath
 0 360 arc
 fill
 newpath
-45100 49100
+45000 49100
 25
 0 360 arc
 fill
 newpath
-45100 49100
+45000 49100
 25
 0 360 arc
 fill
@@ -4198,7 +4217,7 @@ newpath
 0 360 arc
 fill
 newpath
-45100 48000
+45000 48000
 25
 0 360 arc
 fill
@@ -4208,7 +4227,7 @@ newpath
 0 360 arc
 fill
 newpath
-45100 49100
+45000 49100
 25
 0 360 arc
 fill
@@ -4411,5 +4430,7 @@ newpath
 25
 0 360 arc
 fill
+60 60 53870 42970 fbox
+60 60 53870 43870 fbox
 showpage
 %%End
