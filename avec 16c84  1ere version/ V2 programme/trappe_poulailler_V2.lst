@@ -1,0 +1,663 @@
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 1
+
+ADDR CODE  LINE SOURCE
+
+           0001 
+           0002 ; CC5X Version 3.4B, Copyright (c) B Knudsen Data
+           0003 ; C compiler for the PICmicro family
+           0004 ; ************  25. Jan 2011   9:50  *************
+           0005 
+           0006 	processor  16F84A
+           0007 	radix  DEC
+           0008 
+2007 3FF2  0009 	__config 0x3FF2
+           0010 
+     0001  0011 TMR0        EQU   0x01
+     0003  0012 STATUS      EQU   0x03
+     0005  0013 PORTA       EQU   0x05
+     0085  0014 TRISA       EQU   0x85
+     0006  0015 PORTB       EQU   0x06
+     0086  0016 TRISB       EQU   0x86
+     000B  0017 INTCON      EQU   0x0B
+     0000  0018 Carry       EQU   0
+     0002  0019 Zero_       EQU   2
+     0005  0020 RP0         EQU   5
+     0002  0021 T0IF        EQU   2
+     0005  0022 T0IE        EQU   5
+     0081  0023 OPTION_REG  EQU   0x81
+     0010  0024 compteur2   EQU   0x10
+     0011  0025 compteur1   EQU   0x11
+     0013  0026 sens        EQU   0x13
+     0000  0027 signal      EQU   0
+     0001  0028 etat        EQU   1
+     0002  0029 servo_sous_tension EQU   2
+     0003  0030 tant_que    EQU   3
+     0015  0031 compteurdelay EQU   0x15
+     0017  0032 defaut      EQU   0x17
+     001A  0033 av          EQU   0x1A
+     001B  0034 ar          EQU   0x1B
+     001C  0035 stop        EQU   0x1C
+     000C  0036 svrWREG     EQU   0x0C
+     000D  0037 svrSTATUS   EQU   0x0D
+     000E  0038 tempsdelay_2 EQU   0x0E
+           0039 
+0000 28CA  0040 	GOTO main
+           0041 
+           0042   ; FILE trappe_poulailler_V2.c
+           0043 			;// commande d'ouverture v2.1
+           0044 			;// date 25.01.2011
+           0045 			;// gestion de la ldr par ampli ops
+           0046 			;// pour la trappe du poulailler
+           0047 			;// avec servo moteur
+           0048 			;// et ldr pour la lumière
+           0049 			;// compiler cc5x
+           0050 			;#pragma chip PIC16F84A
+           0051 			;//config _CP_OFF & _WDTE_OFF & _PWRTE_ON & _FOSC1-FSOC0_HS
+           0052 			;#pragma config |= 0x3ff2
+           0053 			;#include "int16CXX.h"
+           0054 			;int compteur2;
+           0055 			;long compteur1;
+           0056 			;int sens;
+           0057 			;bit signal;
+           0058 			;bit etat;
+           0059 			;bit servo_sous_tension;
+           0060 			;bit tant_que;
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 2
+
+ADDR CODE  LINE SOURCE
+
+           0061 			;long compteurdelay;
+           0062 			;int defaut;
+           0063 			;long tempsdelay;
+           0064 			;
+           0065 			;int av;
+           0066 			;int ar;
+           0067 			;int stop;
+           0068 			;
+           0069 			;
+           0070 			;// interruption
+           0071 			;#pragma origin 4
+     0000  0072 	ORG 0x0004
+           0073 			;interrupt inter_50(void) // pour cde sevo
+           0074 			;{
+           0075 inter_50
+           0076 			;int_save_registers // + autres si necessaire (option, FSR...)
+0004 008C  0077 	MOVWF svrWREG
+0005 0E03  0078 	SWAPF STATUS,W
+0006 008D  0079 	MOVWF svrSTATUS
+           0080 			;TMR0 = 233;
+0007 30E9  0081 	MOVLW 233
+0008 1283  0082 	BCF   0x03,RP0
+0009 0081  0083 	MOVWF TMR0
+           0084 			;if (servo_sous_tension == 1) {
+000A 1D14  0085 	BTFSS 0x14,servo_sous_tension
+000B 2827  0086 	GOTO  m003
+           0087 			;if (++compteur1==360) {
+000C 0A91  0088 	INCF  compteur1,1
+000D 1903  0089 	BTFSC 0x03,Zero_
+000E 0A92  0090 	INCF  compteur1+1,1
+000F 0811  0091 	MOVF  compteur1,W
+0010 3A68  0092 	XORLW 104
+0011 1D03  0093 	BTFSS 0x03,Zero_
+0012 281A  0094 	GOTO  m001
+0013 0B12  0095 	DECFSZ compteur1+1,W
+0014 281A  0096 	GOTO  m001
+           0097 			;compteur1=0;
+0015 0191  0098 	CLRF  compteur1
+0016 0192  0099 	CLRF  compteur1+1
+           0100 			;compteur2=0;
+0017 0190  0101 	CLRF  compteur2
+           0102 			;signal = 1;
+0018 1414  0103 	BSF   0x14,signal
+           0104 			;
+           0105 			;}
+           0106 			;else {
+0019 2827  0107 	GOTO  m003
+           0108 			;if (signal == 1) {
+001A 1C14  0109 m001	BTFSS 0x14,signal
+001B 2827  0110 	GOTO  m003
+           0111 			;if (compteur2 == sens) {
+001C 0810  0112 	MOVF  compteur2,W
+001D 0613  0113 	XORWF sens,W
+001E 1D03  0114 	BTFSS 0x03,Zero_
+001F 2824  0115 	GOTO  m002
+           0116 			;signal = 0;
+0020 1014  0117 	BCF   0x14,signal
+           0118 			;PORTB.1=0;
+0021 1283  0119 	BCF   0x03,RP0
+0022 1086  0120 	BCF   PORTB,1
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 3
+
+ADDR CODE  LINE SOURCE
+
+           0121 			;}
+           0122 			;else{
+0023 2827  0123 	GOTO  m003
+           0124 			;PORTB.1=1;
+0024 1283  0125 m002	BCF   0x03,RP0
+0025 1486  0126 	BSF   PORTB,1
+           0127 			;compteur2++;
+0026 0A90  0128 	INCF  compteur2,1
+           0129 			;}
+           0130 			;}
+           0131 			;}
+           0132 			;}
+           0133 			;compteurdelay++; // pour delay
+0027 0A95  0134 m003	INCF  compteurdelay,1
+0028 1903  0135 	BTFSC 0x03,Zero_
+0029 0A96  0136 	INCF  compteurdelay+1,1
+           0137 			;if (PORTB.6 == 1) { // led clignotante
+002A 1283  0138 	BCF   0x03,RP0
+002B 1F06  0139 	BTFSS PORTB,6
+002C 282F  0140 	GOTO  m004
+           0141 			;PORTB.6 = 0;
+002D 1306  0142 	BCF   PORTB,6
+           0143 			;}
+           0144 			;else {
+002E 2831  0145 	GOTO  m005
+           0146 			;PORTB.6 = 1;
+002F 1283  0147 m004	BCF   0x03,RP0
+0030 1706  0148 	BSF   PORTB,6
+           0149 			;}
+           0150 			;T0IF = 0;
+0031 110B  0151 m005	BCF   0x0B,T0IF
+           0152 			;int_restore_registers
+0032 0E0D  0153 	SWAPF svrSTATUS,W
+0033 0083  0154 	MOVWF STATUS
+0034 0E8C  0155 	SWAPF svrWREG,1
+0035 0E0C  0156 	SWAPF svrWREG,W
+           0157 			;}
+0036 0009  0158 	RETFIE
+           0159 			;
+           0160 			;// fonction delay
+           0161 			;void delay_s (long tempsdelay)
+           0162 			;{
+           0163 delay_s
+           0164 			;compteurdelay = 0;
+0037 0195  0165 	CLRF  compteurdelay
+0038 0196  0166 	CLRF  compteurdelay+1
+           0167 			;while (compteurdelay <= tempsdelay) {
+0039 0816  0168 m006	MOVF  compteurdelay+1,W
+003A 020F  0169 	SUBWF tempsdelay_2+1,W
+003B 1903  0170 	BTFSC 0x03,Zero_
+003C 2845  0171 	GOTO  m007
+003D 0816  0172 	MOVF  compteurdelay+1,W
+003E 060F  0173 	XORWF tempsdelay_2+1,W
+003F 1803  0174 	BTFSC 0x03,Carry
+0040 3A80  0175 	XORLW 128
+0041 3980  0176 	ANDLW 128
+0042 1903  0177 	BTFSC 0x03,Zero_
+0043 2849  0178 	GOTO  m008
+0044 2839  0179 	GOTO  m006
+0045 0815  0180 m007	MOVF  compteurdelay,W
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 4
+
+ADDR CODE  LINE SOURCE
+
+0046 020E  0181 	SUBWF tempsdelay_2,W
+0047 1803  0182 	BTFSC 0x03,Carry
+           0183 			;}
+0048 2839  0184 	GOTO  m006
+           0185 			;}
+0049 0008  0186 m008	RETURN
+           0187 			;
+           0188 			;// fonction sleep avec reveil sur front descendant
+           0189 			;void sleepfrontdescendant (void)
+           0190 			;{
+           0191 sleepfrontdescendant
+           0192 			;INTCON = 0b00010000; // bit INTE à 1 pour it sur front sur rb0
+004A 3010  0193 	MOVLW 16
+004B 008B  0194 	MOVWF INTCON
+           0195 			;OPTION = 0b10000000; // bit INTEDG à 0 pour front descendant sur rb0
+004C 3080  0196 	MOVLW 128
+004D 1683  0197 	BSF   0x03,RP0
+004E 0081  0198 	MOVWF OPTION_REG
+           0199 			;PORTB.6 = 0;
+004F 1283  0200 	BCF   0x03,RP0
+0050 1306  0201 	BCF   PORTB,6
+           0202 			;sleep();
+0051 0063  0203 	SLEEP
+           0204 			;INTCON = 0b10100000;
+0052 30A0  0205 	MOVLW 160
+0053 008B  0206 	MOVWF INTCON
+           0207 			;OPTION = 0b11000000;
+0054 30C0  0208 	MOVLW 192
+0055 1683  0209 	BSF   0x03,RP0
+0056 0081  0210 	MOVWF OPTION_REG
+           0211 			;}
+0057 0008  0212 	RETURN
+           0213 			;
+           0214 			;// fonction ouverture
+           0215 			;void ouverture (void)
+           0216 			;{
+           0217 ouverture
+           0218 			;if (PORTB.5 == 0) { // contacteur haut = 1 ouverture - trappe basse
+0058 1283  0219 	BCF   0x03,RP0
+0059 1A86  0220 	BTFSC PORTB,5
+005A 288F  0221 	GOTO  m014
+           0222 			;PORTA.2 = 1; // cde relais
+005B 1505  0223 	BSF   PORTA,2
+           0224 			;delay_s(10000);
+005C 3010  0225 	MOVLW 16
+005D 008E  0226 	MOVWF tempsdelay_2
+005E 3027  0227 	MOVLW 39
+005F 008F  0228 	MOVWF tempsdelay_2+1
+0060 2037  0229 	CALL  delay_s
+           0230 			;sens = av;
+0061 081A  0231 	MOVF  av,W
+0062 0093  0232 	MOVWF sens
+           0233 			;servo_sous_tension = 1;
+0063 1514  0234 	BSF   0x14,servo_sous_tension
+           0235 			;compteurdelay = 0;
+0064 0195  0236 	CLRF  compteurdelay
+0065 0196  0237 	CLRF  compteurdelay+1
+           0238 			;defaut = 0;
+0066 0197  0239 	CLRF  defaut
+           0240 			;while (PORTB.5 == 0 && defaut < 7)  {
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 5
+
+ADDR CODE  LINE SOURCE
+
+0067 1283  0241 m009	BCF   0x03,RP0
+0068 1A86  0242 	BTFSC PORTB,5
+0069 287C  0243 	GOTO  m011
+006A 1B97  0244 	BTFSC defaut,7
+006B 2870  0245 	GOTO  m010
+006C 3007  0246 	MOVLW 7
+006D 0217  0247 	SUBWF defaut,W
+006E 1803  0248 	BTFSC 0x03,Carry
+006F 287C  0249 	GOTO  m011
+           0250 			;if (compteurdelay == 20000) { // arrêt de securité
+0070 0815  0251 m010	MOVF  compteurdelay,W
+0071 3A20  0252 	XORLW 32
+0072 1D03  0253 	BTFSS 0x03,Zero_
+0073 2867  0254 	GOTO  m009
+0074 0816  0255 	MOVF  compteurdelay+1,W
+0075 3A4E  0256 	XORLW 78
+0076 1D03  0257 	BTFSS 0x03,Zero_
+0077 2867  0258 	GOTO  m009
+           0259 			;compteurdelay = 0;
+0078 0195  0260 	CLRF  compteurdelay
+0079 0196  0261 	CLRF  compteurdelay+1
+           0262 			;defaut ++;
+007A 0A97  0263 	INCF  defaut,1
+           0264 			;}
+           0265 			;}
+007B 2867  0266 	GOTO  m009
+           0267 			;if (defaut == 7 ) {   // en mode automatique ou manuel
+007C 0817  0268 m011	MOVF  defaut,W
+007D 3A07  0269 	XORLW 7
+007E 1D03  0270 	BTFSS 0x03,Zero_
+007F 288A  0271 	GOTO  m013
+           0272 			;servo_sous_tension = 0;
+0080 1114  0273 	BCF   0x14,servo_sous_tension
+           0274 			;PORTB.1 = 0;
+0081 1283  0275 	BCF   0x03,RP0
+0082 1086  0276 	BCF   PORTB,1
+           0277 			;PORTA.2 = 0;
+0083 1105  0278 	BCF   PORTA,2
+           0279 			;T0IE = 0;
+0084 128B  0280 	BCF   0x0B,T0IE
+           0281 			;PORTB.6 = 0;
+0085 1306  0282 	BCF   PORTB,6
+           0283 			;sleep();  // arrêt en mode sommeil (il faut une RAZ pour en sortir)
+0086 0063  0284 	SLEEP
+           0285 			;while (tant_que == 0) {
+0087 1994  0286 m012	BTFSC 0x14,tant_que
+0088 288F  0287 	GOTO  m014
+           0288 			;}
+0089 2887  0289 	GOTO  m012
+           0290 			;}
+           0291 			;else {
+           0292 			;sens = stop;
+008A 081C  0293 m013	MOVF  stop,W
+008B 0093  0294 	MOVWF sens
+           0295 			;servo_sous_tension =0;
+008C 1114  0296 	BCF   0x14,servo_sous_tension
+           0297 			;PORTA.2 = 0; // cde relais
+008D 1283  0298 	BCF   0x03,RP0
+008E 1105  0299 	BCF   PORTA,2
+           0300 			;}
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 6
+
+ADDR CODE  LINE SOURCE
+
+           0301 			;}
+           0302 			;}
+008F 0008  0303 m014	RETURN
+           0304 			;
+           0305 			;// fonction fermeture
+           0306 			;void fermeture (void)
+           0307 			;{
+           0308 fermeture
+           0309 			;if (PORTB.2 == 0) {  // contacteur bas  -  trappe haute
+0090 1283  0310 	BCF   0x03,RP0
+0091 1906  0311 	BTFSC PORTB,2
+0092 28C9  0312 	GOTO  m020
+           0313 			;PORTA.2 = 1; // cde relais
+0093 1505  0314 	BSF   PORTA,2
+           0315 			;delay_s(10000);
+0094 3010  0316 	MOVLW 16
+0095 008E  0317 	MOVWF tempsdelay_2
+0096 3027  0318 	MOVLW 39
+0097 008F  0319 	MOVWF tempsdelay_2+1
+0098 2037  0320 	CALL  delay_s
+           0321 			;sens = ar;
+0099 081B  0322 	MOVF  ar,W
+009A 0093  0323 	MOVWF sens
+           0324 			;servo_sous_tension = 1;
+009B 1514  0325 	BSF   0x14,servo_sous_tension
+           0326 			;compteurdelay = 0;
+009C 0195  0327 	CLRF  compteurdelay
+009D 0196  0328 	CLRF  compteurdelay+1
+           0329 			;defaut = 0;
+009E 0197  0330 	CLRF  defaut
+           0331 			;while (PORTB.2 == 0 && defaut < 6) {
+009F 1283  0332 m015	BCF   0x03,RP0
+00A0 1906  0333 	BTFSC PORTB,2
+00A1 28B4  0334 	GOTO  m017
+00A2 1B97  0335 	BTFSC defaut,7
+00A3 28A8  0336 	GOTO  m016
+00A4 3006  0337 	MOVLW 6
+00A5 0217  0338 	SUBWF defaut,W
+00A6 1803  0339 	BTFSC 0x03,Carry
+00A7 28B4  0340 	GOTO  m017
+           0341 			;if (compteurdelay == 20000) {  // arrêt de sécurité
+00A8 0815  0342 m016	MOVF  compteurdelay,W
+00A9 3A20  0343 	XORLW 32
+00AA 1D03  0344 	BTFSS 0x03,Zero_
+00AB 289F  0345 	GOTO  m015
+00AC 0816  0346 	MOVF  compteurdelay+1,W
+00AD 3A4E  0347 	XORLW 78
+00AE 1D03  0348 	BTFSS 0x03,Zero_
+00AF 289F  0349 	GOTO  m015
+           0350 			;compteurdelay = 0;
+00B0 0195  0351 	CLRF  compteurdelay
+00B1 0196  0352 	CLRF  compteurdelay+1
+           0353 			;defaut ++;
+00B2 0A97  0354 	INCF  defaut,1
+           0355 			;}
+           0356 			;}
+00B3 289F  0357 	GOTO  m015
+           0358 			;if (defaut == 6 && PORTB.4 == 0) {  // manuel
+00B4 0817  0359 m017	MOVF  defaut,W
+00B5 3A06  0360 	XORLW 6
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 7
+
+ADDR CODE  LINE SOURCE
+
+00B6 1D03  0361 	BTFSS 0x03,Zero_
+00B7 28C4  0362 	GOTO  m019
+00B8 1283  0363 	BCF   0x03,RP0
+00B9 1A06  0364 	BTFSC PORTB,4
+00BA 28C4  0365 	GOTO  m019
+           0366 			;servo_sous_tension = 0;
+00BB 1114  0367 	BCF   0x14,servo_sous_tension
+           0368 			;PORTB.1 = 0;
+00BC 1086  0369 	BCF   PORTB,1
+           0370 			;PORTA.2 = 0;
+00BD 1105  0371 	BCF   PORTA,2
+           0372 			;T0IE = 0;
+00BE 128B  0373 	BCF   0x0B,T0IE
+           0374 			;PORTB.6 = 0;
+00BF 1306  0375 	BCF   PORTB,6
+           0376 			;sleep();  // arrêt en mode sommeil (il faut une RAZ pour en sortir)
+00C0 0063  0377 	SLEEP
+           0378 			;while (tant_que == 0) {
+00C1 1994  0379 m018	BTFSC 0x14,tant_que
+00C2 28C9  0380 	GOTO  m020
+           0381 			;}
+00C3 28C1  0382 	GOTO  m018
+           0383 			;}
+           0384 			;else {
+           0385 			;sens = stop;
+00C4 081C  0386 m019	MOVF  stop,W
+00C5 0093  0387 	MOVWF sens
+           0388 			;servo_sous_tension = 0;
+00C6 1114  0389 	BCF   0x14,servo_sous_tension
+           0390 			;PORTA.2 = 0; // cde relais
+00C7 1283  0391 	BCF   0x03,RP0
+00C8 1105  0392 	BCF   PORTA,2
+           0393 			;}
+           0394 			;}
+           0395 			;}
+00C9 0008  0396 m020	RETURN
+           0397 			;
+           0398 			;// programme
+           0399 			;void main (void)
+           0400 			;{
+           0401 main
+           0402 			;INTCON = 0b10100000; //bits GIE et T0IE à 1 pour utiliser l'interruption du timer
+00CA 30A0  0403 	MOVLW 160
+00CB 008B  0404 	MOVWF INTCON
+           0405 			;OPTION = 0b11000000;  // 
+00CC 30C0  0406 	MOVLW 192
+00CD 1683  0407 	BSF   0x03,RP0
+00CE 0081  0408 	MOVWF OPTION_REG
+           0409 			;TRISB = 0b10111101;  // b6 et b1 en sortie
+00CF 30BD  0410 	MOVLW 189
+00D0 0086  0411 	MOVWF TRISB
+           0412 			;TRISA = 0b11111011;  // a2 en sortie
+00D1 30FB  0413 	MOVLW 251
+00D2 0085  0414 	MOVWF TRISA
+           0415 			;PORTB.6 = 1; // led
+00D3 1283  0416 	BCF   0x03,RP0
+00D4 1706  0417 	BSF   PORTB,6
+           0418 			;PORTA.2 = 0; // cde relais
+00D5 1105  0419 	BCF   PORTA,2
+           0420 			;PORTB.1 = 0; // cde servo moteur à 0
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 8
+
+ADDR CODE  LINE SOURCE
+
+00D6 1086  0421 	BCF   PORTB,1
+           0422 			;servo_sous_tension = 0;
+00D7 1114  0423 	BCF   0x14,servo_sous_tension
+           0424 			;signal = 1;  
+00D8 1414  0425 	BSF   0x14,signal
+           0426 			;etat = 1;
+00D9 1494  0427 	BSF   0x14,etat
+           0428 			;tant_que = 0;
+00DA 1194  0429 	BCF   0x14,tant_que
+           0430 			;av = 31;  // avant
+00DB 301F  0431 	MOVLW 31
+00DC 009A  0432 	MOVWF av
+           0433 			;ar = 21;  // retour
+00DD 3015  0434 	MOVLW 21
+00DE 009B  0435 	MOVWF ar
+           0436 			;stop = 0;  // stop à 0
+00DF 019C  0437 	CLRF  stop
+           0438 			;sens = stop;
+00E0 081C  0439 	MOVF  stop,W
+00E1 0093  0440 	MOVWF sens
+           0441 			;compteur1 = 0;
+00E2 0191  0442 	CLRF  compteur1
+00E3 0192  0443 	CLRF  compteur1+1
+           0444 			;compteur2 = 0;
+00E4 0190  0445 	CLRF  compteur2
+           0446 			;
+           0447 			;// Fin des inits et debut du programme principal 
+           0448 			;
+           0449 			;while (tant_que == 0) {
+00E5 1994  0450 m021	BTFSC 0x14,tant_que
+00E6 293D  0451 	GOTO  m031
+           0452 			;
+           0453 			;if (PORTB.4 == 0) { // manuel
+00E7 1283  0454 	BCF   0x03,RP0
+00E8 1A06  0455 	BTFSC PORTB,4
+00E9 2910  0456 	GOTO  m023
+           0457 			;delay_s(20000);
+00EA 3020  0458 	MOVLW 32
+00EB 008E  0459 	MOVWF tempsdelay_2
+00EC 304E  0460 	MOVLW 78
+00ED 008F  0461 	MOVWF tempsdelay_2+1
+00EE 2037  0462 	CALL  delay_s
+           0463 			;if (PORTB.4 == 0) {
+00EF 1A06  0464 	BTFSC PORTB,4
+00F0 28E5  0465 	GOTO  m021
+           0466 			;if (PORTB.3 == 0) { // montée
+00F1 1986  0467 	BTFSC PORTB,3
+00F2 2900  0468 	GOTO  m022
+           0469 			;delay_s(10000);
+00F3 3010  0470 	MOVLW 16
+00F4 008E  0471 	MOVWF tempsdelay_2
+00F5 3027  0472 	MOVLW 39
+00F6 008F  0473 	MOVWF tempsdelay_2+1
+00F7 2037  0474 	CALL  delay_s
+           0475 			;if (PORTB.3 == 0) {
+00F8 1D86  0476 	BTFSS PORTB,3
+           0477 			;ouverture();
+00F9 2058  0478 	CALL  ouverture
+           0479 			;}
+           0480 			;delay_s(20000);
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 9
+
+ADDR CODE  LINE SOURCE
+
+00FA 3020  0481 	MOVLW 32
+00FB 008E  0482 	MOVWF tempsdelay_2
+00FC 304E  0483 	MOVLW 78
+00FD 008F  0484 	MOVWF tempsdelay_2+1
+00FE 2037  0485 	CALL  delay_s
+           0486 			;}
+           0487 			;else {
+00FF 28E5  0488 	GOTO  m021
+           0489 			;if (PORTB.7 == 0) { // descente
+0100 1283  0490 m022	BCF   0x03,RP0
+0101 1B86  0491 	BTFSC PORTB,7
+0102 28E5  0492 	GOTO  m021
+           0493 			;delay_s(10000);
+0103 3010  0494 	MOVLW 16
+0104 008E  0495 	MOVWF tempsdelay_2
+0105 3027  0496 	MOVLW 39
+0106 008F  0497 	MOVWF tempsdelay_2+1
+0107 2037  0498 	CALL  delay_s
+           0499 			;if (PORTB.7 == 0) {
+0108 1F86  0500 	BTFSS PORTB,7
+           0501 			;fermeture();
+0109 2090  0502 	CALL  fermeture
+           0503 			;}
+           0504 			;delay_s(20000);
+010A 3020  0505 	MOVLW 32
+010B 008E  0506 	MOVWF tempsdelay_2
+010C 304E  0507 	MOVLW 78
+010D 008F  0508 	MOVWF tempsdelay_2+1
+010E 2037  0509 	CALL  delay_s
+           0510 			;}
+           0511 			;}
+           0512 			;}
+           0513 			;}
+           0514 			;
+           0515 			;else {  // automatique
+010F 28E5  0516 	GOTO  m021
+           0517 			;delay_s (20000);
+0110 3020  0518 m023	MOVLW 32
+0111 008E  0519 	MOVWF tempsdelay_2
+0112 304E  0520 	MOVLW 78
+0113 008F  0521 	MOVWF tempsdelay_2+1
+0114 2037  0522 	CALL  delay_s
+           0523 			;if (PORTB.4 == 1 ) {  // automatique rb4 = 1
+0115 1283  0524 	BCF   0x03,RP0
+0116 1E06  0525 	BTFSS PORTB,4
+0117 28E5  0526 	GOTO  m021
+           0527 			;if (PORTB.5 == 1 ) {  // trappe haute rb5 = 1
+0118 1E86  0528 	BTFSS PORTB,5
+0119 2926  0529 	GOTO  m026
+           0530 			;if (PORTA.4 == 1 ) {  // ldr haut = 1, ra4 = 1
+011A 1E05  0531 	BTFSS PORTA,4
+011B 291E  0532 	GOTO  m024
+           0533 			;sleepfrontdescendant();
+011C 204A  0534 	CALL  sleepfrontdescendant
+           0535 			;}
+           0536 			;else {
+011D 2937  0537 	GOTO  m030
+           0538 			;if (PORTB.0 == 1 ) {  // ldr ou =1, rb0 = 1
+011E 1283  0539 m024	BCF   0x03,RP0
+011F 1C06  0540 	BTFSS PORTB,0
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 10
+
+ADDR CODE  LINE SOURCE
+
+0120 2923  0541 	GOTO  m025
+           0542 			;sleepfrontdescendant();
+0121 204A  0543 	CALL  sleepfrontdescendant
+           0544 			;}
+           0545 			;else {
+0122 2937  0546 	GOTO  m030
+           0547 			;fermeture();
+0123 2090  0548 m025	CALL  fermeture
+           0549 			;sleepfrontdescendant();
+0124 204A  0550 	CALL  sleepfrontdescendant
+           0551 			;}
+           0552 			;}
+           0553 			;}
+           0554 			;else {
+0125 2937  0555 	GOTO  m030
+           0556 			;if (PORTB.2 == 1 ) {  // trappe basse rb2 = 1
+0126 1283  0557 m026	BCF   0x03,RP0
+0127 1D06  0558 	BTFSS PORTB,2
+0128 2930  0559 	GOTO  m028
+           0560 			;if (PORTA.4 == 0 ) {  // ldr haut = 0, ra4 = 0
+0129 1A05  0561 	BTFSC PORTA,4
+012A 292D  0562 	GOTO  m027
+           0563 			;sleepfrontdescendant();
+012B 204A  0564 	CALL  sleepfrontdescendant
+           0565 			;}
+           0566 			;else {
+012C 2937  0567 	GOTO  m030
+           0568 			;ouverture();
+012D 2058  0569 m027	CALL  ouverture
+           0570 			;sleepfrontdescendant();
+012E 204A  0571 	CALL  sleepfrontdescendant
+           0572 			;}
+           0573 			;}
+           0574 			;else {
+012F 2937  0575 	GOTO  m030
+           0576 			;if (PORTA.4 == 1 ) {  //  ldr haut = 1
+0130 1283  0577 m028	BCF   0x03,RP0
+0131 1E05  0578 	BTFSS PORTA,4
+0132 2936  0579 	GOTO  m029
+           0580 			;ouverture();
+0133 2058  0581 	CALL  ouverture
+           0582 			;sleepfrontdescendant();
+0134 204A  0583 	CALL  sleepfrontdescendant
+           0584 			;}
+           0585 			;else {
+0135 2937  0586 	GOTO  m030
+           0587 			;sleepfrontdescendant();
+0136 204A  0588 m029	CALL  sleepfrontdescendant
+           0589 			;}
+           0590 			;}
+           0591 			;}
+           0592 			;delay_s (20000);
+0137 3020  0593 m030	MOVLW 32
+0138 008E  0594 	MOVWF tempsdelay_2
+0139 304E  0595 	MOVLW 78
+013A 008F  0596 	MOVWF tempsdelay_2+1
+013B 2037  0597 	CALL  delay_s
+           0598 			;}
+           0599 			;}
+           0600 			;}
+CC5X Version 3.4B,   File: trappe_poulailler_V2.c 25. Jan 2011   9:50   Page 11
+
+ADDR CODE  LINE SOURCE
+
+013C 28E5  0601 	GOTO  m021
+013D 0063  0602 m031	SLEEP
+013E 28CA  0603 	GOTO main
+           0604 
+           0605 	END
+           0606 
+           0607 
+           0608 ; *** KEY INFO ***
+           0609 
+           0610 ; 0x0004   51 word(s)  4 % : inter_50
+           0611 ; 0x0037   19 word(s)  1 % : delay_s
+           0612 ; 0x004A   14 word(s)  1 % : sleepfrontdescendant
+           0613 ; 0x0058   56 word(s)  5 % : ouverture
+           0614 ; 0x0090   58 word(s)  5 % : fermeture
+           0615 ; 0x00CA  117 word(s) 11 % : main
+           0616 
+           0617 ; RAM usage: 17 bytes (4 local), 51 bytes free
+           0618 ; Maximum call level: 2 (+1 for interrupt)
+           0619 ; Total of 316 code words (30 %)
