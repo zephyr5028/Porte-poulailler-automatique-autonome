@@ -96,7 +96,7 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-#define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop)
+#define SERVO_PULSE_STOP 1350 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE   140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   60  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 60)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
