@@ -2,10 +2,10 @@
 /**
     \porte du poulailler avec encodeur rotatif v2.0.0
     \file porte_poulailler_affichage_clavier_rtc
-    \brief Automatisation de la porte du poulailler en utilisant l'heure ou la lumière
-    \details Simplification d'utilisation. Electrinique avec microcontroleur alimentée par batterie, couplée à un capteur solaire
+    \brief Automatisation de la porte du poulailler en utilisant l'heure ou la lumière.
+    \details Simplification d'utilisation. Electronique avec microcontroleur, alimentée par batterie, couplée à un capteur solaire.
     \author Zephyr5028
-    \date hiver 2017
+    \mai 2017
 */
 /**
     porte-poulailler : affichage + clavier + rtc
