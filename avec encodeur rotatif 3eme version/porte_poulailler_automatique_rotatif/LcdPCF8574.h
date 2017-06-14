@@ -27,7 +27,7 @@ class LcdPCF8574  : public LiquidCrystal_I2C
     void resetPos(byte ligne);//reset display position and clean the line
     void affichageDateHeure(String jourSemaine, byte jourHeure, byte moisMinute,  byte anneeSeconde);//affichage de la date ou de l'heure
     String transformation (String chaine, byte dateHeure); // transformation donnees date et heure
-    void affichageLumFinCourse( unsigned int lum,  byte ligne, bool siNonReglable = 0); //affichage lumiere et fin de course
+    void affichageLumFinCourse( unsigned int lum,  byte ligne,String texte, bool siNonReglable = 0); //affichage lumiere et fin de course
     void affichageVoltage( float voltage, String texte,  byte ligne); //affichage tensions
     void affichageChoix( bool ouverture, bool fermeture,  byte ligne);//affichage choix ouverture fermeture
     void affichageServo(int pulse, int compteRoueCodeuse,  byte ligne) ; //affichage pulse et roue codeuse du servo

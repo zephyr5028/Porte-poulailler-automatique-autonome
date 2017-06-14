@@ -131,12 +131,13 @@ String LcdPCF8574::transformation (String texte, byte dateHeure ) {
 }
 
 ///-----affichage lumiere et fin de course-----
-void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte ligne, bool siNonReglable)
+void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte ligne, String texte, bool siNonReglable)
 {
   m_ligne = ligne;
   String chaineLigne = "";
   chaineLigne += "    =  ";
   chaineLigne += LumFinCourse;
+  chaineLigne += texte;
   affichageUneLigne(chaineLigne);// affichage sur lcd
   if (siNonReglable)  cursorPosition(0, 0, "");
 }
@@ -170,10 +171,10 @@ void LcdPCF8574::affichageServo(int pulse, int roueCodeuse, byte ligne)
 {
   m_ligne = ligne;
   String chaineLigne = "";
-  chaineLigne += " P:";
   chaineLigne += pulse;
-  chaineLigne += "   R:";
+   chaineLigne += "ms   ";
   chaineLigne += roueCodeuse;
+    chaineLigne += "pas";
   affichageUneLigne(chaineLigne);// affichage sur lcd
   cursorPosition(0, 0, ""); // decalage, ligne, texte
 }

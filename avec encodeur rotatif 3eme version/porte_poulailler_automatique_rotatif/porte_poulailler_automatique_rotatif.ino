@@ -1,23 +1,24 @@
 /**@file*/
 /**
-    \porte du poulailler avec encodeur rotatif v2.0.0
+    \porte du poulailler avec encodeur rotatif v2.0.1
     \file porte_poulailler_affichage_clavier_rtc
     \brief Automatisation de la porte du poulailler en utilisant l'heure ou la lumière.
     \details Simplification d'utilisation. Electronique avec microcontroleur, alimentée par batterie, couplée à un capteur solaire.
     \author Zephyr5028
-    \mai 2017
+    \juin 2017
 */
 /**
     porte-poulailler : affichage + clavier + rtc
 */
 
 /**
-  03 2017 encodeur rotatif
+  06 2017 texte envoyé par radio, convertir la lumière en lux, convertir la course de la porte en cm, menu affichage fin de course ouverture
+  03 2017 encodeur rotatif.
   01 2017 classes radio, lcd (digole et liquidcrystal), horloge, bouton.
   29 12 2016 classe Codeur (optique).
-  28 12 2016 classe Lumiere - ok.
-  26 12 2016 classe Accus - ok.
-  21 12 2016 ajout de la classe servo - ok.
+  28 12 2016 classe Lumiere.
+  26 12 2016 classe Accus.
+  21 12 2016 ajout de la classe servo.
   01 12 2016first commit sur gihub.
   20 09 2016 classe clavier/
 
@@ -98,7 +99,7 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
 #define SERVO_PULSE_STOP 1350 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE   140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   60  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 60)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 60)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
 ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
@@ -136,7 +137,7 @@ int tempoEncodeur = 15; // tempo pour éviter les rebonds
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
 #define LUMIERE_BOUCLES   2  // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define LUMIERE_MATIN  300  // valeur de la lumière du matin
-#define LUMIERE_SOIR  900  // valeur de la lumiere du soir
+#define LUMIERE_SOIR  50  // valeur de la lumiere du soir
 Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LUMIERE_CONVERSION_RAPPORT, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 
 /** interruptions */
@@ -156,8 +157,8 @@ const byte menuLumiere = 6;
 const byte menuLumiereMatin = 7;
 const byte menuLumiereSoir = 8;
 const byte menuChoix = 9;
-const byte menuFinDeCourseFermeture = 10;
-const byte menuFinDeCourseOuverture = 11;
+const byte menuFinDeCourseOuverture = 10;
+const byte menuFinDeCourseFermeture = 11;
 const byte menuTensionBatCdes = 12; // tension batterie commandes
 const byte menuTensionBatServo = 13; // tension batterie servo
 const byte menuManuel = 14; // nombre de lignes du  menu
@@ -187,7 +188,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display
 LcdPCF8574  mydisp(0x27, 16, 2);
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.0  .Porte Poulailler.Manque carte RTC";
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte Poulailler.Manque carte RTC";
 #endif
 
 /** RTC_DS3231 */
@@ -203,7 +204,7 @@ HorlogeDS3232 rtc(adresseBoitier24C32, rtcINT, DEBUG );
 
 /** progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
-const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm .Course fermeture. Fin course ouv . Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
+const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm .Course fermeture.Course ouverture. Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 const char ouvertureDuBoitier[] PROGMEM = "Ouverture du boitier.";
 const char fermetureDuBoitier[] PROGMEM = "Fermeture du boitier.";
@@ -259,6 +260,13 @@ void displayDate() {
       semaine[i - j] = pgm_read_byte(listeDayWeek + i);
     }
     mydisp.affichageDateHeure(semaine, tm.Day, tm.Month, tm.Year);
+  } else   if (radio.get_m_radio()) {
+    int timeDate = rtc.lectureRegistreEtConversion (RTC_DATE); // date
+    int timeMonth = rtc.lectureRegistreEtConversion( RTC_MONTH ) ; // mois
+    int timeYear = rtc.lectureRegistreEtConversion(RTC_YEAR) ; // year
+    radio.envoiUnsignedInt(timeDate,  boitierOuvert, "/");// envoi message radio
+    radio.envoiUnsignedInt(timeMonth,  boitierOuvert, "/");// envoi message radio
+    radio.envoiUnsignedInt(timeYear,  boitierOuvert, ";");// envoi message radio
   }
 }
 
@@ -270,8 +278,10 @@ void displayTime () {
   } else   if (radio.get_m_radio()) {
     int timeHour = rtc.lectureRegistreEtConversion (RTC_HOURS, 0x3f); // heure
     int timeMinute = rtc.lectureRegistreEtConversion( RTC_MINUTES ) ; // minutes
-    radio.envoiUnsignedInt(timeHour,  boitierOuvert, "h");// envoi message radio heure + etat  boitier
-    radio.envoiUnsignedInt(timeMinute,  boitierOuvert, "m;");// envoi message radio minute  + etat  boitier
+    int timeSeconde = rtc.lectureRegistreEtConversion(RTC_SECONDS) ; // secondes
+    radio.envoiUnsignedInt(timeHour,  boitierOuvert, ":");// envoi message radio
+    radio.envoiUnsignedInt(timeMinute,  boitierOuvert, ":");// envoi message radio
+    radio.envoiUnsignedInt(timeSeconde,  boitierOuvert, ";");// envoi message radio
   }
 }
 
@@ -299,7 +309,7 @@ void affiPulsePlusCptRoue() {
   unsigned int compteRoueCodeuse = rotary.get_m_compteRoueCodeuse();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
-    mydisp.affichageServo(pulse, compteRoueCodeuse, ligne);
+    mydisp.affichageServo(pulse, compteRoueCodeuse - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, ligne);
   } else   if (radio.get_m_radio() and tempsWatchdog <= 0 ) { // eviter l'envoi à l'initialisation
     char chaine1[VW_MAX_MESSAGE_LEN - 1] = "";
     switch (test) {
@@ -314,7 +324,7 @@ void affiPulsePlusCptRoue() {
         break;
     }
     radio.envoiMessage(chaine1);// on envoie le message ouverture / fermeture
-    radio.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert, ";"); // envoi message radio compteur roue codeuse
+    // radio.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert, "P;"); // envoi message radio compteur roue codeuse
   }
 }
 
@@ -474,7 +484,7 @@ void affiLumMatin() {
   if (boitierOuvert) {
     unsigned int lumMatin = lum.get_m_lumMatin();
     byte ligne = 1;
-    mydisp.affichageLumFinCourse(lumMatin,  ligne);
+    mydisp.affichageLumFinCourse(lumMatin,  ligne, " lux");
   }
 }
 
@@ -504,7 +514,7 @@ void affiLumSoir() {
   if (boitierOuvert) {
     unsigned int lumSoir = lum.get_m_lumSoir();
     byte ligne = 1;
-    mydisp.affichageLumFinCourse(lumSoir, ligne);
+    mydisp.affichageLumFinCourse(lumSoir, ligne, " lux");
   }
 }
 
@@ -560,10 +570,15 @@ void affiFinDeCourseFermeture() {
   unsigned int finDeCourseFermeture = rotary.get_m_finDeCourseFermeture();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
-    mydisp.affichageLumFinCourse(finDeCourseFermeture, ligne);
-  } else   if (radio.get_m_radio()) {
-    radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
+    mydisp.affichageLumFinCourse(finDeCourseFermeture, ligne, " pas");
   }
+  ////////////////////////////
+  /*
+    else   if (radio.get_m_radio()) {
+    radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
+    }
+  */
+  ///////////////////////////
 }
 
 ///------affichage fin de course Ouverture-------
@@ -571,10 +586,16 @@ void affiFinDeCourseOuverture() {
   unsigned int finDeCourseOuverture = rotary.get_m_finDeCourseOuverture();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
-    mydisp.affichageLumFinCourse(finDeCourseOuverture, ligne);
-  } else   if (radio.get_m_radio()) {
-    radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
+    bool nonReglable = 1; // pour afficher le curseur sur la premiere ligne car non reglable
+    mydisp.affichageLumFinCourse(finDeCourseOuverture - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, ligne, " pas", nonReglable);
   }
+  ///////////////////
+  /*
+    else   if (radio.get_m_radio()) {
+    radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
+    }
+  */
+  /////////////////////
 }
 
 ///------reglage fin de course Fermeture------
@@ -727,13 +748,11 @@ void ouverturePorte() {
     // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 4 ) or !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert)
     // or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
     if ( !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
-      //   Serial.println (rotary.get_m_compteRoueCodeuse());
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
       //  if (rotary.get_m_compteRoueCodeuse() < ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION) {
       rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
       // }
     }
-
   }
 }
 
@@ -858,20 +877,22 @@ void lumiere() {
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;// première ligne car non reglable
     bool nonReglable = 1; // pour afficher le curseur sur la premiere ligne car non reglable
-    mydisp.affichageLumFinCourse(lumValue, ligne, nonReglable);
+    mydisp.affichageLumFinCourse(lumValue, ligne, " lux", nonReglable);
   } else   if (radio.get_m_radio())  {
-    radio.envoiUnsignedInt(lum.get_m_lumMatin(), boitierOuvert, ";"); // envoi message radio lumiere du matin
-    radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
-    radio.envoiUnsignedInt(lumValue, boitierOuvert, ";"); // envoi message radio lumiere
+    // radio.envoiUnsignedInt(lum.get_m_lumMatin(), boitierOuvert, ";"); // envoi message radio lumiere du matin
+    //  radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
+    radio.envoiUnsignedInt(lumValue, boitierOuvert, "L;"); // envoi message radio lumiere
   }
 }
 
 ///-----ouverture/fermeture par test de la lumière----
 void ouvFermLum() {
   byte  valHeure = rtc.lectureRegistreEtConversion(RTC_HOURS & 0x3f); // lecture de l'heure
+  byte  valMois = rtc.lectureRegistreEtConversion(RTC_MONTH); // lecture du mois
   lum.testLuminosite(); // test de la luminosite pour mise à jour du compteur watchdog lumiere
   //fenetre de non declenchement pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 et mise à jour du compteur watchdog lumiere
-  lum.fenetreNonDeclenchement(valHeure) ;
+  // horaire évoluant en fonction du mois
+  lum.fenetreNonDeclenchement(valHeure, valMois) ;
   //non eclenchement en fonction de la position du servo et mise à jour du compteur watchdog lumiere
   lum.nonDeclenchementPositionServo (rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseFermeture(), rotary.get_m_finDeCourseOuverture());
   byte declenchementLuminosite = lum.declenchementServoLuminosite(); // test de la luninosite et declenchement du servo
@@ -928,10 +949,10 @@ void deroulementMenu (byte increment) {
         affiChoixOuvFerm(); // choix
         break;
       case 10:  // fin de course Fermeture
-        affiFinDeCourseFermeture(); // fin de course Haut
+        affiFinDeCourseOuverture();  // fin de course ouverture
         break;
       case 11:  // fin de course ouverture
-        affiFinDeCourseOuverture();  // fin de course ouverture
+        affiFinDeCourseFermeture(); // fin de course Haut
         break;
       case 12:  // tension batterie commandes
         affiTensionBatCdes(); //
@@ -984,30 +1005,29 @@ void routineGestionWatchdog() {
         if (radio.get_m_radio()) {
 
           /**
-           * date; // format __/__/___
-           * heure; //format __:__:__
-           * temperature; // format __.__C 
-           * tension bat 1; // format __.__V
-           * tension bat 2; // format __.__V
-           * lumiere; // ___L
-           * position porte; // ouv/ferm
-           * compteur roue codeuse; //format ___R
-           * temps fonctionnement servo; // format _____ms 
-           * 
-           */
+             date; // format __/__/___
+             heure; //format __:__:__
+             temperature; // format __.__C pour celcius
+             tension bat 1; // format __.__V pour volt
+             tension bat 2; // format __.__V
+             lumiere; // ___L pour lux
+             position porte; // ouv/ferm
+             temps fonctionnement servo; // format _____ms
+             compteur roue codeuse; //format ___P pour  pas
+          */
+          displayDate();
           displayTime();
           read_temp(typeTemperature); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
-          affiPulsePlusCptRoue();
-          affiFinDeCourseFermeture();
+          //affiFinDeCourseFermeture();
           lumiere();
-          radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";\0"); // envoi message radio : memoire sram restante
-          radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert, ";\0");
-          radio.envoiUnsignedInt(rotary.get_m_compteRoueCodeuse(), boitierOuvert, ";\0");
+          affiPulsePlusCptRoue();
+          radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert, "ms;\0");
+          radio.envoiUnsignedInt(rotary.get_m_compteRoueCodeuse() - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, boitierOuvert, "P;\0");
+          //radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";\0"); // envoi message radio : memoire sram restante
           radio.chaineVide();
         }
-        // Serial.println (monServo.get_m_tempsTotal());
         tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
@@ -1050,7 +1070,7 @@ void setup() {
     affichageDemarrage(colonne);
   }
 
-  incrementation = menuManuel; // pour affichage menu
+  incrementation = menuDate; // position du  menu au demarrage
   deroulementMenu (incrementation); // affichage du menu
 
   lum.set_m_ouverture( rtc.i2c_eeprom_read_byte( 0x14));// lecture du type d'ouverture @14  de l'eeprom de la carte rtc (i2c @ 0x57)

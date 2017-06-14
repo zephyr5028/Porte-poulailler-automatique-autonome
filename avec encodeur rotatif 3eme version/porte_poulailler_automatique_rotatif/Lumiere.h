@@ -23,7 +23,7 @@ class Lumiere
     float tensionLuminosite(int valLumiere); // convertion CAD  vers tension lumiminosite
     float Lumiere::tensionLuminositeCADversFloat();//lecture et convertion vers tension luminosite en float
     void testLuminosite();//test luminosite et mise à jour du compteur watchdog lumiere
-    void fenetreNonDeclenchement(byte horaire);//fenetre de non declenchement et mise à jour du compteur watchdog lumiere
+    void fenetreNonDeclenchement(byte horaire, byte mois);//fenetre de non declenchement et mise à jour du compteur watchdog lumiere
     //non Declenchement Position Servo et mise à jour du compteur watchdog lumiere
     void nonDeclenchementPositionServo (volatile unsigned int compteRoueCodeuse, unsigned int finDeCourseFermeture, unsigned int finDeCourseOuverture);
     byte declenchementServoLuminosite();//declenchement servo par la luminosite

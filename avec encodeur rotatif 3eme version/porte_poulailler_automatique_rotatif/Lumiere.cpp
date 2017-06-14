@@ -45,7 +45,10 @@ unsigned int  Lumiere::reglageLumiere (bool matinSoir, byte touche) {
 ///------- lecture luminosite CAD-----
 int Lumiere::luminositeCAD() {
   int valLumiere = analogRead(m_lumierePin); //read the input on analog pin tension batterie
-  return 1023 - valLumiere; // inversion
+  //////////////
+  return valLumiere;
+  //return 1023 - valLumiere; // inversion
+  //////////////
 }
 
 ///------- convertion CAD  vers tension luminosite -----
@@ -64,35 +67,61 @@ float Lumiere::tensionLuminositeCADversFloat() {
 ///-----test luminosite et mise à jour du compteur watchdog lumiere-----
 void Lumiere::testLuminosite() {
   int sensorValue = luminositeCAD();
-  if (sensorValue > m_lumMatin and sensorValue < m_lumSoir) {
+  ///////////////////////
+  if (sensorValue >  m_lumSoir and sensorValue < m_lumMatin) {
+    //  if (sensorValue > m_lumMatin and sensorValue < m_lumSoir) {
+    ////////////////////////////
     m_compteurWatchdogLumiere = 0;//raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
 }
 
 ///-----fenetre de non declenchement et mise à jour du compteur watchdog lumiere------
 // fenetre de non declenchement avec la lumiere si utilisation horaire : jour 17h00 nuit  9h00 jour (25 décembre)
-void Lumiere::fenetreNonDeclenchement(byte horaire) {
-  if ((m_ouverture and horaire < m_heureFenetreSoir) or (m_fermeture and horaire > m_heureFenetreSoir)) {
+void Lumiere::fenetreNonDeclenchement(byte horaire, byte mois) {
+  byte fenetre =  m_heureFenetreSoir;
+  if (mois == 3 or mois == 10 or mois == 4 or mois == 9) {
+    fenetre = m_heureFenetreSoir + 1;
+  } else if (mois == 5 or mois == 8 ) {
+    fenetre = m_heureFenetreSoir + 2;
+  } else if (mois == 6 or mois == 7) {
+    fenetre = m_heureFenetreSoir + 3;
+  }
+  if ((m_ouverture and horaire < fenetre) or (m_fermeture and horaire > fenetre)) {
     m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre ou un eclairage
   }
 }
 
 ///-----non Declenchement Position Servo et mise à jour du compteur watchdog lumiere-----
 void Lumiere::nonDeclenchementPositionServo (volatile unsigned int compteRoueCodeuse, unsigned int finDeCourseFermeture, unsigned int finDeCourseOuverture) {
-  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and !m_ouverture) or (( compteRoueCodeuse >= (finDeCourseOuverture + finDeCourseFermeture - 2)) and !m_fermeture)) {
+  int sensorValue = luminositeCAD();
+  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and !m_ouverture and (sensorValue >= m_lumMatin))
+      or (( compteRoueCodeuse >= (finDeCourseOuverture + finDeCourseFermeture - 2)) and !m_fermeture and (sensorValue <= m_lumSoir))) {
     m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
+  //////////////////////////////////
+  /*
+    if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and !m_ouverture) or (( compteRoueCodeuse >= (finDeCourseOuverture + finDeCourseFermeture - 2)) and !m_fermeture)) {
+    m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
+    }
+  */
+  /////////////////////////////
 }
 
 ///-----declenchement servo par la luminosite-----
 byte Lumiere::declenchementServoLuminosite() {
   if (m_compteurWatchdogLumiere >= m_tempsLum) {
     int sensorValue = luminositeCAD();
-    if ((sensorValue <= m_lumMatin) and !m_ouverture ) {
+    //////////////////////
+    if ((sensorValue >= m_lumMatin) and !m_ouverture ) {
+      // if ((sensorValue <= m_lumMatin) and !m_ouverture ) {
+      ////////////////////
       m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
       return 1; // ok + ouverture
     }
-    if ((sensorValue >= m_lumSoir) and !m_fermeture ) {
+    /////////////////////////
+    if ((sensorValue <= m_lumSoir) and !m_fermeture ) {
+      // if ((sensorValue >= m_lumSoir) and !m_fermeture ) {
+      /////////////////////
       m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
       return 2; // ok + fermeture
     }
