@@ -100,14 +100,24 @@ void Radio::envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert, char *t
   }
 }
 
+///-----envoi message int avec test de l'ouverture du boitier plus texte-----
+void Radio::envoiInt(int valeur, boolean boitierOuvert, char *texte) {
+  if (m_radio and !boitierOuvert) {
+    char chaine1[m_taille - 1] = "";
+    char valeur_temp[8] = "";
+    sprintf(valeur_temp, "%d", valeur); // d signed decimal integer
+    strcat(chaine1, valeur_temp);
+    strcat(chaine1, texte);
+    Radio::envoiMessage(chaine1);// on envoie le message
+  }
+}
+
 ///-----test du switch emission radio on/off-----
 void Radio::testSwitchEmissionRadio() {
  if (m_radio and !digitalRead(m_pinSwitchEmissionRadio)) {
-    //delay(40);
     raz_m_chaine();// effacement du tableau
     m_radio = false;
   } else if (!m_radio and digitalRead(m_pinSwitchEmissionRadio)) {
-    //delay(40);
     m_radio = true;
   }
 }

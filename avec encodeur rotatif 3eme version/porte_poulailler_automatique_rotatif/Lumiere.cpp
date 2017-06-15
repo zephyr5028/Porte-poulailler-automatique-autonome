@@ -45,10 +45,7 @@ unsigned int  Lumiere::reglageLumiere (bool matinSoir, byte touche) {
 ///------- lecture luminosite CAD-----
 int Lumiere::luminositeCAD() {
   int valLumiere = analogRead(m_lumierePin); //read the input on analog pin tension batterie
-  //////////////
   return valLumiere;
-  //return 1023 - valLumiere; // inversion
-  //////////////
 }
 
 ///------- convertion CAD  vers tension luminosite -----
@@ -67,10 +64,7 @@ float Lumiere::tensionLuminositeCADversFloat() {
 ///-----test luminosite et mise à jour du compteur watchdog lumiere-----
 void Lumiere::testLuminosite() {
   int sensorValue = luminositeCAD();
-  ///////////////////////
   if (sensorValue >  m_lumSoir and sensorValue < m_lumMatin) {
-    //  if (sensorValue > m_lumMatin and sensorValue < m_lumSoir) {
-    ////////////////////////////
     m_compteurWatchdogLumiere = 0;//raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
 }
@@ -98,30 +92,17 @@ void Lumiere::nonDeclenchementPositionServo (volatile unsigned int compteRoueCod
       or (( compteRoueCodeuse >= (finDeCourseOuverture + finDeCourseFermeture - 2)) and !m_fermeture and (sensorValue <= m_lumSoir))) {
     m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
-  //////////////////////////////////
-  /*
-    if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and !m_ouverture) or (( compteRoueCodeuse >= (finDeCourseOuverture + finDeCourseFermeture - 2)) and !m_fermeture)) {
-    m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-    }
-  */
-  /////////////////////////////
 }
 
 ///-----declenchement servo par la luminosite-----
 byte Lumiere::declenchementServoLuminosite() {
   if (m_compteurWatchdogLumiere >= m_tempsLum) {
     int sensorValue = luminositeCAD();
-    //////////////////////
     if ((sensorValue >= m_lumMatin) and !m_ouverture ) {
-      // if ((sensorValue <= m_lumMatin) and !m_ouverture ) {
-      ////////////////////
       m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
       return 1; // ok + ouverture
     }
-    /////////////////////////
     if ((sensorValue <= m_lumSoir) and !m_fermeture ) {
-      // if ((sensorValue >= m_lumSoir) and !m_fermeture ) {
-      /////////////////////
       m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
       return 2; // ok + fermeture
     }

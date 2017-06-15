@@ -28,6 +28,8 @@ class Radio
     void envoiFloat(float valeur, boolean boitierOuvert = true, char *texte = "");
     // envoi du message unsigned int avec test de l'ouverture du boitier
     void envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert = true, char *texte = "");
+     // envoi du message int avec test de l'ouverture du boitier
+    void envoiInt(int valeur, boolean boitierOuvert = true, char *texte = "");
     void testSwitchEmissionRadio();//test du switch emission radio on/off
     bool get_m_radio(); //accesseur - getter
     void set_m_radio(bool radio);//mutateur - setter

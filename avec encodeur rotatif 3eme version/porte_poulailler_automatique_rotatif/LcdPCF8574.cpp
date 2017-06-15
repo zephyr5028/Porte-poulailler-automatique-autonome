@@ -131,7 +131,7 @@ String LcdPCF8574::transformation (String texte, byte dateHeure ) {
 }
 
 ///-----affichage lumiere et fin de course-----
-void LcdPCF8574::affichageLumFinCourse( unsigned int LumFinCourse, byte ligne, String texte, bool siNonReglable)
+void LcdPCF8574::affichageLumFinCourse( int LumFinCourse, byte ligne, String texte, bool siNonReglable)
 {
   m_ligne = ligne;
   String chaineLigne = "";

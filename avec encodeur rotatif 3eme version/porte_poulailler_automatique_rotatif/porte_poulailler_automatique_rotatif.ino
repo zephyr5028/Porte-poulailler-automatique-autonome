@@ -204,10 +204,11 @@ HorlogeDS3232 rtc(adresseBoitier24C32, rtcINT, DEBUG );
 
 /** progmem  mémoire flash */
 const char listeDayWeek[] PROGMEM = "DimLunMarMerJeuVenSam"; // day of week en mémoire flash
-const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm .Course fermeture.Course ouverture. Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
+const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure Ouverture. Heure Fermeture.  Temperature   .     Lumiere    .  Lumiere matin .  Lumiere soir  . Choix Ouv/Ferm .Course ouverture.Course fermeture. Tension bat N1 . Tension bat N2 .Servo Pulse Rcod.";
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 const char ouvertureDuBoitier[] PROGMEM = "Ouverture du boitier.";
 const char fermetureDuBoitier[] PROGMEM = "Fermeture du boitier.";
+//const char aimantEnHaut[] PROGMEM = " aimant en haut .";
 
 
 #include "AA_fonctions.h" // prototypes des fonctions du programme
@@ -324,7 +325,6 @@ void affiPulsePlusCptRoue() {
         break;
     }
     radio.envoiMessage(chaine1);// on envoie le message ouverture / fermeture
-    // radio.envoiUnsignedInt(compteRoueCodeuse, boitierOuvert, "P;"); // envoi message radio compteur roue codeuse
   }
 }
 
@@ -572,13 +572,6 @@ void affiFinDeCourseFermeture() {
     byte ligne = 1;
     mydisp.affichageLumFinCourse(finDeCourseFermeture, ligne, " pas");
   }
-  ////////////////////////////
-  /*
-    else   if (radio.get_m_radio()) {
-    radio.envoiUnsignedInt(finDeCourseFermeture, boitierOuvert, ";"); // envoi message radio fin de course fermeture
-    }
-  */
-  ///////////////////////////
 }
 
 ///------affichage fin de course Ouverture-------
@@ -586,16 +579,14 @@ void affiFinDeCourseOuverture() {
   unsigned int finDeCourseOuverture = rotary.get_m_finDeCourseOuverture();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
-    bool nonReglable = 1; // pour afficher le curseur sur la premiere ligne car non reglable
-    mydisp.affichageLumFinCourse(finDeCourseOuverture - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, ligne, " pas", nonReglable);
-  }
-  ///////////////////
-  /*
-    else   if (radio.get_m_radio()) {
-    radio.envoiUnsignedInt(finDeCourseOuverture, boitierOuvert, ";"); // envoi message radio fin de course Ouverture
+    bool nonReglable = 0; // fin de course reglable
+    String texte = " pas"; // nb de pas , 0 pour l'aimant en haut
+    if (finDeCourseOuverture ==  ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION) {
+      texte = " pas ht"; // aimant en haut
     }
-  */
-  /////////////////////
+    mydisp.affichageLumFinCourse(finDeCourseOuverture - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, ligne, texte, nonReglable);
+    //}
+  }
 }
 
 ///------reglage fin de course Fermeture------
@@ -745,13 +736,15 @@ void ouverturePorte() {
       monServo.servoVitesse( reduit);
     }
     // utilisation du temps de monte pour la sécurité SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
-    // if ((rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() - 4 ) or !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert)
-    // or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
     if ( !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
-      //  if (rotary.get_m_compteRoueCodeuse() < ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION) {
-      rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
-      // }
+      /////////////////////
+      /*
+        if (rotary.get_m_compteRoueCodeuse() < ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION) {
+        rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
+        }
+      */
+      ////////////////////
     }
   }
 }
@@ -766,8 +759,6 @@ void  fermeturePorte() {
     // utilisation du temps de descente pour la sécurité SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
     if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)
         or (( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_FERMETURE * rotary.get_m_finDeCourseFermeture()))) {
-      // if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)) {
-      // Serial.println (rotary.get_m_compteRoueCodeuse());
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
   }
@@ -1020,11 +1011,10 @@ void routineGestionWatchdog() {
           read_temp(typeTemperature); // read temperature celsius=true
           affiTensionBatCdes(); // affichage tension batterie commandes sur terminal
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
-          //affiFinDeCourseFermeture();
           lumiere();
           affiPulsePlusCptRoue();
           radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert, "ms;\0");
-          radio.envoiUnsignedInt(rotary.get_m_compteRoueCodeuse() - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, boitierOuvert, "P;\0");
+          radio.envoiInt(rotary.get_m_compteRoueCodeuse() - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, boitierOuvert, "P;\0");
           //radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";\0"); // envoi message radio : memoire sram restante
           radio.chaineVide();
         }
@@ -1165,8 +1155,6 @@ void loop() {
       interruptEncodeur = false; // autorisation nouvelle it
     }
   }
-
-  //Serial.println (monServo.get_m_tempsTotal());
 
   routineTestFermetureBoitier(); // test fermeture boitier
   routineTestOuvertureBoitier();// test ouvertuer boitier
