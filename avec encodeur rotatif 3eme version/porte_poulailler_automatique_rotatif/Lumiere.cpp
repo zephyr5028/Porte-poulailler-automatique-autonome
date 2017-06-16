@@ -70,7 +70,7 @@ void Lumiere::testLuminosite() {
 }
 
 ///-----fenetre de non declenchement et mise à jour du compteur watchdog lumiere------
-// fenetre de non declenchement avec la lumiere si utilisation horaire : jour 17h00 nuit  9h00 jour (25 décembre)
+// fenetre de non declenchement avec la lumiere si utilisation horaire, en fonction du mois (jour 17h00 nuit  9h00 jour , 21 décembre)
 void Lumiere::fenetreNonDeclenchement(byte horaire, byte mois) {
   byte fenetre =  m_heureFenetreSoir;
   if (mois == 3 or mois == 10 or mois == 4 or mois == 9) {
@@ -80,7 +80,7 @@ void Lumiere::fenetreNonDeclenchement(byte horaire, byte mois) {
   } else if (mois == 6 or mois == 7) {
     fenetre = m_heureFenetreSoir + 3;
   }
-  if ((m_ouverture and horaire < fenetre) or (m_fermeture and horaire > fenetre)) {
+   if ((m_ouverture and horaire < fenetre) or (m_fermeture and horaire > fenetre)) {
     m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre ou un eclairage
   }
 }
