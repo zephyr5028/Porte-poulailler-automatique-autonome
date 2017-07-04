@@ -93,13 +93,13 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 
 /** servo - montée et descente de la porte */
 #include "ServoMoteur.h"
-#define SERVO_TEST  false // pour utiliser ou non le test du servomoteur
+#define SERVO_TEST false // pour utiliser ou non le test du servomoteur
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-#define SERVO_PULSE_STOP 1350 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-#define SERVO_PULSE_OUVERTURE_FERMETURE   140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 60)
+#define SERVO_PULSE_STOP 1498 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_OUVERTURE_FERMETURE   110  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   60  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
 ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
@@ -128,7 +128,7 @@ Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DE
 JlmRotaryEncoder rotary(ENCODER_PIN_A, ENCODER_PIN_B, ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE, ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION); // clearButton si besoin
 volatile bool interruptEncodeur = false; // valider la prise en compte de l'interruption
 volatile unsigned long debutTempsEncodeur = 0; // utilisation de millis()
-int tempoEncodeur = 15; // tempo pour éviter les rebonds
+int tempoEncodeur = 5; // tempo pour éviter les rebonds de l'encodeur 5ms
 
 /** lumiere */
 #include "Lumiere.h"
@@ -136,8 +136,8 @@ int tempoEncodeur = 15; // tempo pour éviter les rebonds
 #define LUMIERE_CONVERSION_RAPPORT  5 // rapport de convertion CAD float
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
 #define LUMIERE_BOUCLES   2  // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
-#define LUMIERE_MATIN  300  // valeur de la lumière du matin
-#define LUMIERE_SOIR  50  // valeur de la lumiere du soir
+#define LUMIERE_MATIN  330  // valeur de la lumière du matin
+#define LUMIERE_SOIR  80  // valeur de la lumiere du soir
 Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LUMIERE_CONVERSION_RAPPORT, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 
 /** interruptions */
@@ -731,8 +731,10 @@ void read_temp(const boolean typeTemperature) {
 ///------sequence ouverture de la porte------
 void ouverturePorte() {
   if (monServo.get_m_servoAction() and !monServo.get_m_ouvFerm()) {
+   //Serial.println (rotary.get_m_compteRoueCodeuse());
     if (rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() + 5) {
       reduit = 0;// vitesse reduite
+
       monServo.servoVitesse( reduit);
     }
     // utilisation du temps de monte pour la sécurité SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
@@ -752,7 +754,8 @@ void ouverturePorte() {
 ///-----sequence fermeture de la porte-----
 void  fermeturePorte() {
   if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
-    if (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + ( rotary.get_m_finDeCourseFermeture() - 5)) {
+    //Serial.println (rotary.get_m_compteRoueCodeuse());
+    if (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + ( rotary.get_m_finDeCourseFermeture() - 10)) {
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }

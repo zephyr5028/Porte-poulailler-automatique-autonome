@@ -34,7 +34,7 @@ void JlmRotaryEncoder::compteurRoueCodeuse() {
   }
   // Serial.print(pinA);
   // Serial.print(pinB);
-  // Serial.print(" ");
+  // Serial.println(" ");
 }
 
 ///-----reglage de la fin de course-----
