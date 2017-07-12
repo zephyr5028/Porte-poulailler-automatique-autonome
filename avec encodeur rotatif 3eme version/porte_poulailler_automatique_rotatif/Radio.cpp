@@ -112,6 +112,15 @@ void Radio::envoiInt(int valeur, boolean boitierOuvert, char *texte) {
   }
 }
 
+////-----envoi texte avec test de l'ouverture du boitier-----
+void Radio::envoiTexte(boolean boitierOuvert, char *texte) {
+   if (m_radio and !boitierOuvert) {
+    char chaine1[m_taille - 1] = "";
+    strcat(chaine1, texte);
+    Radio::envoiMessage(chaine1);// on envoie le message
+  }
+}
+
 ///-----test du switch emission radio on/off-----
 void Radio::testSwitchEmissionRadio() {
  if (m_radio and !digitalRead(m_pinSwitchEmissionRadio)) {
