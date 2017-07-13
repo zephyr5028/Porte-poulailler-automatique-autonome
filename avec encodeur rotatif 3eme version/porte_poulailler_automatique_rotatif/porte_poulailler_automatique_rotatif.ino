@@ -12,32 +12,30 @@
 */
 
 /**
-  06 2017 texte envoyé par radio, convertir la lumière en lux, convertir la course de la porte en cm, menu affichage fin de course ouverture
-  03 2017 encodeur rotatif.
-  01 2017 classes radio, lcd (digole et liquidcrystal), horloge, bouton.
-  29 12 2016 classe Codeur (optique).
-  28 12 2016 classe Lumiere.
-  26 12 2016 classe Accus.
-  21 12 2016 ajout de la classe servo.
-  01 12 2016first commit sur gihub.
-  20 09 2016 classe clavier/
-
-  19 septembre 2016 :
-    - suppression du blocage au demarrage (si = 200).
-  18 septembre 2016 :
-    En cas de probleme avec le sens de rotation du servo :
+  13 07 2017 : securité à la fermeture en cas de rembobinage inverse de la cordelette
+  12 07 2017 : intégration du numéro du boitier dans le message radio
+  06 2017 : texte envoyé par radio, convertir la lumière en lux, convertir la course de la porte en cm, menu affichage fin de course ouverture
+  03 2017 : encodeur rotatif.
+  01 2017 : classes radio, lcd (digole et liquidcrystal), horloge, bouton.
+  29 12 2016 : classe Codeur (optique).
+  28 12 2016 : classe Lumiere.
+  26 12 2016 : classe Accus.
+  21 12 2016 : ajout de la classe servo.
+  01 12 2016 : first commit sur gihub.
+  20 09 2016 : classe clavier.
+  19 09 2016 : suppression du blocage au demarrage (si = 200).
+  18 09 2016 : en cas de probleme avec le sens de rotation du servo :
     - variable globale : sens.
     - arret fin de course ( contact) quelque soit le sens.
     - diminution de la vitesse reduite dans la descente de la trappe (inertie).
-  17 septembre 2016 :
-  - problème avec servotimer2  :
+  17 09 2016 : problème avec servotimer2  :
        Le pulse en ms ne fonctionne pas donc le servo est tjs dans le même sens (hs).
        Les valeurs du pulse étaient mauvaise.
        Il faut :
                90° : 1500ms.
                 0° : 1000ms.
               180° : 2000ms.
-  10 septembre 2016 :
+  10 09 2016 : 
     - affichage compteur roue codeuse envoi radio.
     - delay d'attente de la remontée du servo augmentée : 300.
   Important :
@@ -763,7 +761,8 @@ void  fermeturePorte() {
       monServo.servoVitesse( reduit);
     }
     // utilisation du temps de descente pour la sécurité SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
-    if ((rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture()) or (touche == 4 and boitierOuvert)
+    // 2000 pour 2s de delais pour débuter la fermeture sans le test du relais reed
+    if (((!digitalRead(PIN_SECURITE_OUVERTURE) and ( millis() - monServo.get_m_debutTemps()) > 2000)) or (touche == 4 and boitierOuvert) or (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture())
         or (( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_FERMETURE * rotary.get_m_finDeCourseFermeture()))) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
