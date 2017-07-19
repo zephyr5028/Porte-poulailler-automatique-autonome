@@ -35,7 +35,7 @@
                90° : 1500ms.
                 0° : 1000ms.
               180° : 2000ms.
-  10 09 2016 : 
+  10 09 2016 :
     - affichage compteur roue codeuse envoi radio.
     - delay d'attente de la remontée du servo augmentée : 300.
   Important :
@@ -50,6 +50,11 @@
            __TIME__  l'heure de la compilation                         chaîne
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
+
+////////////////
+#define BUZZER_PIN 7 // broche du buzzer
+bool buzzer = 0;
+//////////////////
 
 //////////////////////
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
@@ -903,6 +908,11 @@ void ouvFermLum() {
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
       break;
+    case 3: // declenchement du buzzer
+      digitalWrite(BUZZER_PIN, HIGH);
+      delay(1000);
+      digitalWrite(BUZZER_PIN, LOW);
+      break;
   }
 }
 
@@ -1050,6 +1060,14 @@ void affichageDemarrage (byte colonne) {
 
 /* setup */
 void setup() {
+
+  //////////////////////////////
+  pinMode(BUZZER_PIN, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
+  digitalWrite(BUZZER_PIN, LOW);
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(1000);
+  digitalWrite(BUZZER_PIN, LOW);
+  ////////////////////////////////
 
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT); // led broche 13
