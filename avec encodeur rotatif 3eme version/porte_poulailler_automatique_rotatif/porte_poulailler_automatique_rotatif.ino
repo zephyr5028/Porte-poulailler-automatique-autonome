@@ -53,7 +53,6 @@
 
 ////////////////
 #define BUZZER_PIN 7 // broche du buzzer
-bool buzzer = 0;
 //////////////////
 
 //////////////////////
@@ -908,6 +907,13 @@ void ouvFermLum() {
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
       break;
+    ///////////////////////////
+    case 3: // declenchement du buzzer
+      digitalWrite(BUZZER_PIN, HIGH);
+      delay(1000);
+      digitalWrite(BUZZER_PIN, LOW);
+      break;
+    //////////////////////////
   }
 }
 
@@ -1167,21 +1173,6 @@ void loop() {
   // batterieFaible = accusN1.accusFaible() or accusN2.accusFaible(); // test de la tension des batteries
   batterieFaible = accusN2.accusFaible() ;// test de la tension de la batterie
   ////////////////////////
-
-  ///////////////////////////
- case 3: // declenchement du buzzer
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(1000);
-      digitalWrite(BUZZER_PIN, LOW);
-      break;
-
-          ///////////////////////////////
-    //declenchement du buzzer avant la dermeture par la lumière
-    if ((sensorValue <= m_lumSoir + 20)  and !m_fermeture ) {
-      return 3; //  buzzer
-      /////////////////////////////
-    }
-  //////////////////////////
 
   ouverturePorte();
   fermeturePorte();
