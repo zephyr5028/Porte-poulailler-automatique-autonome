@@ -106,58 +106,52 @@ byte Lumiere::declenchementServoLuminosite() {
       m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
       return 2; // ok + fermeture
     }
-    ///////////////////////////////
-    //declenchement du buzzer avant la dermeture par la lumière
-    if ((sensorValue <= m_lumSoir + 20)  and !m_fermeture ) {
-      return 3; //  buzzer
-      /////////////////////////////
-    }
-    return 0;
   }
+  return 0;
 }
 
-  //-----accesseur - getter-----
-  bool Lumiere::get_m_ouverture() {
-    return m_ouverture;
-  }
-  //-----mutateur - setter-----
-  void Lumiere::set_m_ouverture(bool ouverture) {
-    m_ouverture = ouverture;
-  }
+//-----accesseur - getter-----
+bool Lumiere::get_m_ouverture() {
+  return m_ouverture;
+}
+//-----mutateur - setter-----
+void Lumiere::set_m_ouverture(bool ouverture) {
+  m_ouverture = ouverture;
+}
 
-  ///-----accesseur - getter-----
-  bool Lumiere::get_m_fermeture() {
-    return m_fermeture;
-  }
-  //-----mutateur - setter-----
-  void Lumiere::set_m_fermeture(bool fermeture) {
-    m_fermeture = fermeture;
-  }
+///-----accesseur - getter-----
+bool Lumiere::get_m_fermeture() {
+  return m_fermeture;
+}
+//-----mutateur - setter-----
+void Lumiere::set_m_fermeture(bool fermeture) {
+  m_fermeture = fermeture;
+}
 
-  //-----accesseur - getter-----
-  unsigned int Lumiere::get_m_lumMatin() {
-    return m_lumMatin;
-  }
-  //-----mutateur - setter-----
-  void Lumiere::set_m_lumMatin(unsigned int lumMatin) {
-    m_lumMatin = lumMatin;
-  }
+//-----accesseur - getter-----
+unsigned int Lumiere::get_m_lumMatin() {
+  return m_lumMatin;
+}
+//-----mutateur - setter-----
+void Lumiere::set_m_lumMatin(unsigned int lumMatin) {
+  m_lumMatin = lumMatin;
+}
 
-  //-----accesseur - getter-----
-  unsigned int Lumiere::get_m_lumSoir() {
-    return m_lumSoir;
-  }
-  //-----mutateur - setter-----
-  void Lumiere::set_m_lumSoir(unsigned int lumSoir) {
-    m_lumSoir = lumSoir;
-  }
+//-----accesseur - getter-----
+unsigned int Lumiere::get_m_lumSoir() {
+  return m_lumSoir;
+}
+//-----mutateur - setter-----
+void Lumiere::set_m_lumSoir(unsigned int lumSoir) {
+  m_lumSoir = lumSoir;
+}
 
-  //-----accesseur - getter-----
-  unsigned int Lumiere::get_m_compteurWatchdogLumiere() {
-    return m_compteurWatchdogLumiere;
-  }
-  //-----mutateur - setter-----
-  void Lumiere::set_m_compteurWatchdogLumiere(unsigned int compteurWatchdogLumiere) {
-    m_compteurWatchdogLumiere = compteurWatchdogLumiere;
-  }
+//-----accesseur - getter-----
+unsigned int Lumiere::get_m_compteurWatchdogLumiere() {
+  return m_compteurWatchdogLumiere;
+}
+//-----mutateur - setter-----
+void Lumiere::set_m_compteurWatchdogLumiere(unsigned int compteurWatchdogLumiere) {
+  m_compteurWatchdogLumiere = compteurWatchdogLumiere;
+}
 
