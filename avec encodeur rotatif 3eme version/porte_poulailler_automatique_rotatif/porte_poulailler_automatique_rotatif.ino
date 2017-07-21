@@ -907,13 +907,6 @@ void ouvFermLum() {
       reduit = 1;// vitesse normale
       monServo.servoOuvFerm(batterieFaible, reduit);
       break;
-    ///////////////////////////
-    case 3: // declenchement du buzzer
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(1000);
-      digitalWrite(BUZZER_PIN, LOW);
-      break;
-    //////////////////////////
   }
 }
 
@@ -1037,6 +1030,14 @@ void routineGestionWatchdog() {
           radio.chaineVide();
         }
         tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
+        //////////////////////////////
+        //si le compteurWatchdogLumiere est > 0 , le buzzer fonctionne
+        if (lum.get_m_compteurWatchdogLumiere() > 0) {
+          digitalWrite(BUZZER_PIN, LOW);
+          delay(700);
+          digitalWrite(BUZZER_PIN, HIGH);
+        }
+        ////////////////////////////////
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
       f_wdt = 0;
@@ -1064,10 +1065,10 @@ void setup() {
 
   //////////////////////////////
   pinMode(BUZZER_PIN, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
-  digitalWrite(BUZZER_PIN, LOW);
   digitalWrite(BUZZER_PIN, HIGH);
-  delay(1000);
   digitalWrite(BUZZER_PIN, LOW);
+  delay(700);
+  digitalWrite(BUZZER_PIN, HIGH);
   ////////////////////////////////
 
   Serial.begin(9600);

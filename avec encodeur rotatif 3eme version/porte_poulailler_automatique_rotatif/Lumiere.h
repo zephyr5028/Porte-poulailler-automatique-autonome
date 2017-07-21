@@ -55,9 +55,6 @@ class Lumiere
     const byte m_heureFenetreSoir; // horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
     const byte m_tempsLum; // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
     const boolean m_debug ; // pour affichage console si nécessaire
-    //////////////////////
-    byte m_buzzer ; // compte le nombre de sonneries du buzzer
-    ///////////////////////
 
 };
 

@@ -10,7 +10,7 @@ Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lum
   m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir),
   m_rapportConvertion(rapportConvertion), m_debug(debug), m_ouverture(1), m_fermeture(0),
   m_lumiereMax(1020), m_incrementation(10), m_maxCAD(1023), m_compteurWatchdogLumiere(0),
-  m_heureFenetreSoir(heureFenetreSoir), m_tempsLum(tempsLum), m_buzzer(2)
+  m_heureFenetreSoir(heureFenetreSoir), m_tempsLum(tempsLum)
 {
 }
 
@@ -104,15 +104,9 @@ byte Lumiere::declenchementServoLuminosite() {
     }
     if ((sensorValue <= m_lumSoir) and !m_fermeture ) {
       m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-      m_buzzer = 2; // réarmement du compteur buzzer
+   /////   m_buzzer = 2; // réarmement du compteur buzzer
       return 2; // ok + fermeture
     }
-    ///////////////////////////
-    if ((sensorValue < m_lumSoir + 70)  and (sensorValue > m_lumSoir) and !m_fermeture and m_buzzer > 0) {
-      m_buzzer--;
-      return 3; //  buzzer
-    }
-    /////////////////////////////
   }
   return 0;
 }
