@@ -51,9 +51,6 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 
-////////////////
-#define BUZZER_PIN 7 // broche du buzzer
-//////////////////
 
 //////////////////////
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
@@ -83,13 +80,18 @@ unsigned int memoireLibre = 0; // variable pour calcul de la memoire libre
 volatile int f_wdt = 1; // flag watchdog
 byte tempsWatchdog = WATCHDOG_BOUCLES ; // boucle temps du chien de garde
 boolean reglage = false; // menu=false ou reglage=true
+
+////////////////
+#define BUZZER_PIN 7 // broche du buzzer
+//////////////////
+
 PowerTools tools (DEBUG ); // objet tools et power
 
 /** radio 433MHz */
 #include "Radio.h"
 #define RADIO_EMISSION  true  // positionner radio pour l'utiliser (true) ou pas
 #define PIN_RADIO_EMISSION  10  // pin D10 emetteur radio
-#define RADIO_TRANSMISSION_VITESSE  600 //nitialisation de la bibliothèque avec la vitesse (vitesse_bps)
+#define RADIO_TRANSMISSION_VITESSE  600 //initialisation de la bibliothèque avec la vitesse (vitesse_bps)
 #define PIN_RADIO_EMISSION_SWITCH A2 // broche A2 en entree digitale pour le switch emission on/off
 Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VITESSE, VW_MAX_MESSAGE_LEN, RADIO_EMISSION, DEBUG ); // classe Radio
 
@@ -140,7 +142,7 @@ int tempoEncodeur = 5; // tempo pour éviter les rebonds de l'encodeur 5ms
 #define PIN_LUMIERE A0  //analog pin A0 : luminosite
 #define LUMIERE_CONVERSION_RAPPORT  5 // rapport de convertion CAD float
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
-#define LUMIERE_BOUCLES   2  // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
+#define LUMIERE_BOUCLES   3  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define LUMIERE_MATIN  330  // valeur de la lumière du matin
 #define LUMIERE_SOIR  80  // valeur de la lumiere du soir
 Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LUMIERE_CONVERSION_RAPPORT, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
@@ -994,13 +996,27 @@ void routineGestionWatchdog() {
         digitalWrite(LED_PIN, HIGH);
         delay(10);
         digitalWrite(LED_PIN, LOW);
+        
+        //////////////////////////////
         if (batterieFaible) { // affichage si la batterie est faible
-          char chaine[27] = "";
+          char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
           for (byte i = 0; i < 27 ; i++) {
             chaine[i] = pgm_read_byte(affichageBatterieFaible + i);
           }
+          strcat(chaine, numeroSerieBoitier);
           radio.messageRadio(chaine);// on envoie le message
         }
+        /*
+          if (batterieFaible) { // affichage si la batterie est faible
+            char chaine[27] = "";
+            for (byte i = 0; i < 27 ; i++) {
+              chaine[i] = pgm_read_byte(affichageBatterieFaible + i);
+            }
+            radio.messageRadio(chaine);// on envoie le message
+          }
+        */
+        /////////////////////////////
+        
         // informations à afficher
         if (radio.get_m_radio()) {
           /**
@@ -1030,14 +1046,16 @@ void routineGestionWatchdog() {
           radio.chaineVide();
         }
         tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
+        
         //////////////////////////////
         //si le compteurWatchdogLumiere est > 0 , le buzzer fonctionne
         if (lum.get_m_compteurWatchdogLumiere() > 0) {
           digitalWrite(BUZZER_PIN, LOW);
-          delay(700);
+          delay(1200);
           digitalWrite(BUZZER_PIN, HIGH);
         }
         ////////////////////////////////
+        
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
       f_wdt = 0;
@@ -1067,7 +1085,7 @@ void setup() {
   pinMode(BUZZER_PIN, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
   digitalWrite(BUZZER_PIN, HIGH);
   digitalWrite(BUZZER_PIN, LOW);
-  delay(700);
+  delay(1200);
   digitalWrite(BUZZER_PIN, HIGH);
   ////////////////////////////////
 
