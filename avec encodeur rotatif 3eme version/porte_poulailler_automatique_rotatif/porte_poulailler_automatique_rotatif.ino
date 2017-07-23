@@ -82,6 +82,7 @@ byte tempsWatchdog = WATCHDOG_BOUCLES ; // boucle temps du chien de garde
 boolean reglage = false; // menu=false ou reglage=true
 
 ////////////////
+#define BUZZER true //positionner BUZZER en fonction de la presence ou pas d'un buzzer sur la carte (true = presence)
 #define BUZZER_PIN 7 // broche du buzzer
 //////////////////
 
@@ -142,7 +143,7 @@ int tempoEncodeur = 5; // tempo pour éviter les rebonds de l'encodeur 5ms
 #define PIN_LUMIERE A0  //analog pin A0 : luminosite
 #define LUMIERE_CONVERSION_RAPPORT  5 // rapport de convertion CAD float
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
-#define LUMIERE_BOUCLES   3  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
+#define LUMIERE_BOUCLES   4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define LUMIERE_MATIN  330  // valeur de la lumière du matin
 #define LUMIERE_SOIR  80  // valeur de la lumiere du soir
 Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LUMIERE_CONVERSION_RAPPORT, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
@@ -996,7 +997,7 @@ void routineGestionWatchdog() {
         digitalWrite(LED_PIN, HIGH);
         delay(10);
         digitalWrite(LED_PIN, LOW);
-        
+
         //////////////////////////////
         if (batterieFaible) { // affichage si la batterie est faible
           char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
@@ -1016,7 +1017,7 @@ void routineGestionWatchdog() {
           }
         */
         /////////////////////////////
-        
+
         // informations à afficher
         if (radio.get_m_radio()) {
           /**
@@ -1030,9 +1031,11 @@ void routineGestionWatchdog() {
              temps fonctionnement servo; // format _____ms
              compteur roue codeuse; //format ___P pour  pas
           */
+          
           ////////////////////////////
           radio.envoiTexte(boitierOuvert, numeroSerieBoitier);// envoi en debut de message le numero de serie du boitier
           ////////////////////////
+          
           displayDate();
           displayTime();
           read_temp(typeTemperature); // read temperature celsius=true
@@ -1046,16 +1049,18 @@ void routineGestionWatchdog() {
           radio.chaineVide();
         }
         tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
-        
+
         //////////////////////////////
-        //si le compteurWatchdogLumiere est > 0 , le buzzer fonctionne
-        if (lum.get_m_compteurWatchdogLumiere() > 0) {
-          digitalWrite(BUZZER_PIN, LOW);
-          delay(1200);
-          digitalWrite(BUZZER_PIN, HIGH);
+        if (BUZZER) {
+          //si le compteurWatchdogLumiere est > 0 , le buzzer fonctionne
+          if (lum.get_m_compteurWatchdogLumiere() > 0) {
+            digitalWrite(BUZZER_PIN, LOW);
+            delay(2000);
+            digitalWrite(BUZZER_PIN, HIGH);
+          }
         }
         ////////////////////////////////
-        
+
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
       f_wdt = 0;
@@ -1080,14 +1085,6 @@ void affichageDemarrage (byte colonne) {
 
 /* setup */
 void setup() {
-
-  //////////////////////////////
-  pinMode(BUZZER_PIN, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
-  digitalWrite(BUZZER_PIN, HIGH);
-  digitalWrite(BUZZER_PIN, LOW);
-  delay(1200);
-  digitalWrite(BUZZER_PIN, HIGH);
-  ////////////////////////////////
 
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT); // led broche 13
@@ -1149,6 +1146,16 @@ void setup() {
   monServo.init(); // initialisation du servo moteur et du relais
 
   rotary.init();// initialisation de la position de la roue codeuse
+
+  //////////////////////////////
+  if (BUZZER) {
+    pinMode(BUZZER_PIN, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
+    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(2000);
+    digitalWrite(BUZZER_PIN, HIGH);
+  }
+  ////////////////////////////////
 
   if (!SERVO_TEST) {
     if (digitalRead(PIN_SECURITE_OUVERTURE)) {
