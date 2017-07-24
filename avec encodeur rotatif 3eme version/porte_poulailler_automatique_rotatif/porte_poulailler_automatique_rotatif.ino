@@ -51,10 +51,7 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 
-
-//////////////////////
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
-/////////////////////
 
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
@@ -80,13 +77,9 @@ unsigned int memoireLibre = 0; // variable pour calcul de la memoire libre
 volatile int f_wdt = 1; // flag watchdog
 byte tempsWatchdog = WATCHDOG_BOUCLES ; // boucle temps du chien de garde
 boolean reglage = false; // menu=false ou reglage=true
-
-////////////////
 #define BUZZER true //positionner BUZZER en fonction de la presence ou pas d'un buzzer sur la carte (true = presence)
 #define BUZZER_PIN 7 // broche du buzzer
-//////////////////
-
-PowerTools tools (DEBUG ); // objet tools et power
+PowerTools tools (BUZZER_PIN, BUZZER, DEBUG ); // objet tools et power
 
 /** radio 433MHz */
 #include "Radio.h"
@@ -118,6 +111,8 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #define PIN_ACCUS_N2  A7  //analog pin A7 : tension batterie N2
 #define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
 #define ACCUS_CONVERSION_RAPPORT  7.3 // rapport de convertion CAD float
+#define ACCU_N1 false  // batterie N1 presente si true
+#define ACCU_N2 true // batterie N2 presente  si true
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
 Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
 Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
@@ -748,13 +743,11 @@ void ouverturePorte() {
     // utilisation du temps de monte pour la sécurité SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
     if ( !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
-      /////////////////////
       /*
         if (rotary.get_m_compteRoueCodeuse() < ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION) {
         rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
         }
       */
-      ////////////////////
     }
   }
 }
@@ -997,8 +990,7 @@ void routineGestionWatchdog() {
         digitalWrite(LED_PIN, HIGH);
         delay(10);
         digitalWrite(LED_PIN, LOW);
-
-        //////////////////////////////
+        
         if (batterieFaible) { // affichage si la batterie est faible
           char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
           for (byte i = 0; i < 27 ; i++) {
@@ -1007,17 +999,7 @@ void routineGestionWatchdog() {
           strcat(chaine, numeroSerieBoitier);
           radio.messageRadio(chaine);// on envoie le message
         }
-        /*
-          if (batterieFaible) { // affichage si la batterie est faible
-            char chaine[27] = "";
-            for (byte i = 0; i < 27 ; i++) {
-              chaine[i] = pgm_read_byte(affichageBatterieFaible + i);
-            }
-            radio.messageRadio(chaine);// on envoie le message
-          }
-        */
-        /////////////////////////////
-
+        
         // informations à afficher
         if (radio.get_m_radio()) {
           /**
@@ -1031,11 +1013,7 @@ void routineGestionWatchdog() {
              temps fonctionnement servo; // format _____ms
              compteur roue codeuse; //format ___P pour  pas
           */
-          
-          ////////////////////////////
           radio.envoiTexte(boitierOuvert, numeroSerieBoitier);// envoi en debut de message le numero de serie du boitier
-          ////////////////////////
-          
           displayDate();
           displayTime();
           read_temp(typeTemperature); // read temperature celsius=true
@@ -1050,16 +1028,7 @@ void routineGestionWatchdog() {
         }
         tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
 
-        //////////////////////////////
-        if (BUZZER) {
-          //si le compteurWatchdogLumiere est > 0 , le buzzer fonctionne
-          if (lum.get_m_compteurWatchdogLumiere() > 0) {
-            digitalWrite(BUZZER_PIN, LOW);
-            delay(2000);
-            digitalWrite(BUZZER_PIN, HIGH);
-          }
-        }
-        ////////////////////////////////
+        tools.fonctionnementBuzzer (lum.get_m_compteurWatchdogLumiere(), 2000) ; // fonctionnement du buzzer en fonction du parametre (compteurWatchdogLumiere)
 
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
       }
@@ -1147,15 +1116,7 @@ void setup() {
 
   rotary.init();// initialisation de la position de la roue codeuse
 
-  //////////////////////////////
-  if (BUZZER) {
-    pinMode(BUZZER_PIN, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
-    digitalWrite(BUZZER_PIN, HIGH);
-    digitalWrite(BUZZER_PIN, LOW);
-    delay(2000);
-    digitalWrite(BUZZER_PIN, HIGH);
-  }
-  ////////////////////////////////
+  tools.setupBuzzer(1000); // initialisation du buzzer et test
 
   if (!SERVO_TEST) {
     if (digitalRead(PIN_SECURITE_OUVERTURE)) {
@@ -1195,10 +1156,14 @@ void loop() {
 
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
-  ////////////////////////
-  // batterieFaible = accusN1.accusFaible() or accusN2.accusFaible(); // test de la tension des batteries
-  batterieFaible = accusN2.accusFaible() ;// test de la tension de la batterie
-  ////////////////////////
+  // test suivant le nombre de batteries presentes
+  if (ACCU_N1 and ACCU_N2) {
+    batterieFaible = accusN1.accusFaible() or accusN2.accusFaible(); // test de la tension des batteries
+  } else if (ACCU_N1) {
+    batterieFaible = accusN1.accusFaible() ;// test de la tension de la batterie N1
+  } else if (ACCU_N2) {
+    batterieFaible = accusN2.accusFaible() ;// test de la tension de la batterie N2
+  }
 
   ouverturePorte();
   fermeturePorte();

@@ -9,18 +9,18 @@
 
 #include "PowerTools.h"
 
-PowerTools::PowerTools() :  m_debug(false)
+PowerTools::PowerTools(const byte buzzer_pin, const boolean buzzer) :  m_buzzer_pin(buzzer_pin), m_buzzer(buzzer), m_debug(false)
 {
 
 }
 
 /* sucharge du constructeur */
-PowerTools::PowerTools( const boolean debug) :  m_debug(debug)
+PowerTools::PowerTools( const byte buzzer_pin, const boolean buzzer, const boolean debug) :   m_buzzer_pin(buzzer_pin), m_buzzer(buzzer), m_debug(debug)
 {
 
 }
 
-PowerTools::~PowerTools() 
+PowerTools::~PowerTools()
 {
 
 }
@@ -63,4 +63,28 @@ byte PowerTools::tailleChaine (char * chaine) {
   while (chaine[i] != '\0') i++;
   return i;
 }
+
+///-----initialisation du buzzer et test----
+void PowerTools::setupBuzzer (int temps) {
+  if (m_buzzer) {
+    pinMode(m_buzzer_pin, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
+    digitalWrite(m_buzzer_pin, HIGH);
+    digitalWrite(m_buzzer_pin, LOW);
+    delay(1000);
+    digitalWrite(m_buzzer_pin, HIGH);
+  }
+}
+
+///-----fonctionnement du buzzer en fonction du parametre compteurWatchdogLumiere----
+void PowerTools::fonctionnementBuzzer (byte compteur, int temps) {
+  if (m_buzzer) {
+    //si le compteur est > 0 , le buzzer fonctionne
+    if (compteur > 0) {
+      digitalWrite(m_buzzer_pin, LOW);
+      delay(temps);
+      digitalWrite(m_buzzer_pin, HIGH);
+    }
+  }
+}
+
 
