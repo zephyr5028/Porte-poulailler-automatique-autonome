@@ -1,6 +1,6 @@
 %!PS-Adobe-3.0
 %%Creator: gEDA gschem 1.8.1-20121123-13-g875406c
-%%CreationDate: Mon May 22 18:24:02 2017
+%%CreationDate: Tue Jul 25 11:58:36 2017
 %%Title: /home/jlm-atelier/Bureau/GIT/dossier composants porte poulailler/porte poulailler arduino schemas/porte poulailler arduino rotary ver 2-0.sch
 %%Author: (null)
 %%BoundingBox: 0 0 595 841
@@ -474,8 +474,8 @@
 /gEDAFont UTFencoding /Helvetica RE
 2 setlinecap
 0.072000 0.072000 scale
-7573 531 translate 90 rotate
-0.625134 0.625134 scale
+7012 531 translate 90 rotate
+0.523160 0.523160 scale
 -40000 -40000 translate
 gsave
 40000 40000 57000 40000 10 line
@@ -1326,7 +1326,7 @@ gsave
 false false false false 202.222224 [(   impulsion) () (Av 2,1ms) (Ar 0,9ms) (Stop 1,5ms ou 0v ) ] 0 51000 42000 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(consommation) (avec retro Åclairage :  52mA) (marche : 30mA) (sleep : 13mA) ] 0 54400 41800 180.555557 text
+false false false false 202.222224 [(consommation) (avec retro Åclairage :  52mA) (marche : 30mA) (sleep : 13mA) ] 0 54400 41500 180.555557 text
 grestore
 gsave
 40100 45200 40100 44700 10 line
@@ -1410,13 +1410,13 @@ gsave
 false false false false 202.222224 [(5w 12v) ] 0 40300 45500 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(Porte du poulailler - arduino - rotary encoder) (rÅsistances intÅgrÅes dans la carte de l'encodeur rotattif) ] 0 51700 40900 180.555557 text
+false false false false 202.222224 [(Porte du poulailler - arduino - rotary encoder) (           buzzer sur la broche D7) ] 0 51700 40900 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(avril 2017) ] 0 50800 40300 180.555557 text
+false false false false 202.222224 [(juillet 2017) ] 0 50800 40300 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(rev 2.0.7 arduino) ] 0 54300 40200 180.555557 text
+false false false false 202.222224 [(rev 2.0.8 arduino) ] 0 54300 40200 180.555557 text
 grestore
 45500 43500 45500 43600 10 line
 gsave
@@ -3344,23 +3344,23 @@ false false false false 202.222224 [(100nf) ] 0 47400 40100 180.555557 text
 grestore
 47999 40300 47999 40299 10 line
 gsave
-53500 43100 53500 43300 10 line
-53500 44000 53500 43800 10 line
-53300 43500 53700 43500 10 line
-53300 43600 53700 43600 10 line
-53500 43800 53500 43600 10 line
-53500 43500 53500 43300 10 line
-60 60 53470 43070 fbox
-60 60 53470 43970 fbox
+53200 43400 53200 43600 10 line
+53200 44300 53200 44100 10 line
+53000 43800 53400 43800 10 line
+53000 43900 53400 43900 10 line
+53200 44100 53200 43900 10 line
+53200 43800 53200 43600 10 line
+60 60 53170 43370 fbox
+60 60 53170 44270 fbox
 grestore
 gsave
-false false false false 202.222224 [(C9) ] 0 53000 43700 180.555557 text
+false false false false 202.222224 [(C9) ] 0 52700 44000 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(100nf) ] 0 52900 43200 180.555557 text
+false false false false 202.222224 [(100nf) ] 0 52600 43500 180.555557 text
 grestore
 gsave
-false false false false 202.222224 [(sur Bp ext.) ] 0 53600 43200 180.555557 text
+false false false false 202.222224 [(sur Bp ext.) ] 0 53300 43400 180.555557 text
 grestore
 gsave
 false false false false 121.333336 [(rouge) ] 0 54400 46000 108.333336 text
@@ -3426,6 +3426,87 @@ false false false false 121.333336 [(RÅs. intÅgrÅe) (carte encodeur) ] 0 53100 4
 grestore
 gsave
 false false false false 121.333336 [(RÅs. intÅgrÅe) (carte encodeur) ] 0 56200 44000 108.333336 text
+grestore
+gsave
+59700 46200 59700 45900 10 line
+59700 45000 59700 45300 10 line
+59700 45600 300 0 360 10 darc
+gsave
+true false false true 202.222224 [(+) ] 0 59700 45900 180.555557 text
+grestore
+gsave
+true false false false 202.222224 [(-) ] 0 59700 45300 180.555557 text
+grestore
+60 60 59670 46170 fbox
+60 60 59670 44970 fbox
+grestore
+gsave
+false false false false 202.222224 [(V?) ] 0 60100 45650 180.555557 text
+grestore
+gsave
+55000 43200 55200 43200 10 line
+56000 43200 55800 43200 10 line
+55500 43200 300 0 360 10 darc
+gsave
+false true false false 161.777776 [(1) ] 0 55150 43250 144.444443 text
+grestore
+gsave
+false false false false 161.777776 [(2) ] 0 55850 43250 144.444443 text
+grestore
+gsave
+false false false false 161.777776 [(Beeper) ] 0 55277 43155 144.444443 text
+grestore
+newpath
+56000 43200
+25
+0 360 arc
+fill
+grestore
+gsave
+false false false false 202.222224 [(U?) ] 0 55700 43500 180.555557 text
+grestore
+gsave
+54700 43100 54700 43300 10 line
+54550 43300 54850 43300 10 line
+gsave
+false false false false 161.777776 [(+5V) ] 0 54575 43350 144.444443 text
+grestore
+grestore
+gsave
+56100 43200 56300 43200 10 line
+56800 43300 56900 43200 10 line
+56900 43200 56800 43100 10 line
+56300 43200 56400 43100 10 line
+56400 43300 56300 43200 10 line
+56400 43300 56800 43300 10 line
+56400 43100 56800 43100 10 line
+grestore
+gsave
+false false true false 202.222224 [(D 7) ] 0 56500 43200 180.555557 text
+grestore
+gsave
+55700 42850 55700 42550 10 line
+55700 42850 55450 42700 10 line
+55450 42700 55700 42550 10 line
+55450 42850 55450 42550 10 line
+56000 42700 55800 42700 10 line
+55100 42700 55300 42700 10 line
+55300 42700 55450 42700 10 line
+55700 42700 55800 42700 10 line
+grestore
+gsave
+false true false false 202.222224 [(1N4148) ] 0 55400 42500 180.555557 text
+grestore
+gsave
+false true false false 202.222224 [(D) ] 0 56000 42500 180.555557 text
+grestore
+56000 43200 56100 43200 10 line
+54700 43100 55000 43100 10 line
+55000 42700 55000 43200 10 line
+55000 42700 55100 42700 10 line
+56000 42700 56000 43200 10 line
+gsave
+false false false false 121.333336 [(buzzer 3,5 Ç 5,5v) (<25ma 2300hz +/-500hz) ] 0 53700 42800 108.333336 text
 grestore
 60 60 50370 46170 fbox
 newpath
@@ -4471,8 +4552,8 @@ newpath
 25
 0 360 arc
 fill
-60 60 53470 43070 fbox
-60 60 53470 43970 fbox
+60 60 53170 43370 fbox
+60 60 53170 44270 fbox
 newpath
 56100 45700
 25
@@ -4500,6 +4581,38 @@ newpath
 fill
 newpath
 54600 45200
+25
+0 360 arc
+fill
+60 60 59670 46170 fbox
+60 60 59670 44970 fbox
+newpath
+56000 43200
+25
+0 360 arc
+fill
+newpath
+56000 43200
+25
+0 360 arc
+fill
+newpath
+55000 43100
+25
+0 360 arc
+fill
+newpath
+55000 43100
+25
+0 360 arc
+fill
+newpath
+55000 43100
+25
+0 360 arc
+fill
+newpath
+56000 43200
 25
 0 360 arc
 fill

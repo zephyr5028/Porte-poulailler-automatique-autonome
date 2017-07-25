@@ -4,6 +4,7 @@
     - Watchdog
     - Memory free
     - outils
+    - buzzer
 */
 
 
@@ -70,13 +71,13 @@ void PowerTools::setupBuzzer (int temps) {
     pinMode(m_buzzer_pin, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
     digitalWrite(m_buzzer_pin, HIGH);
     digitalWrite(m_buzzer_pin, LOW);
-    delay(1000);
+    delay(temps);
     digitalWrite(m_buzzer_pin, HIGH);
   }
 }
 
 ///-----fonctionnement du buzzer en fonction du parametre compteurWatchdogLumiere----
-void PowerTools::fonctionnementBuzzer (byte compteur, int temps) {
+void PowerTools::fonctionnementBuzzer (unsigned int compteur, int temps) {
   if (m_buzzer) {
     //si le compteur est > 0 , le buzzer fonctionne
     if (compteur > 0) {

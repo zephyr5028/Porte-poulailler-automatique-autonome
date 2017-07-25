@@ -30,7 +30,7 @@ class PowerTools
     void setup_watchdog(int parametreTemps);
     byte PowerTools::tailleChaine (char * chaine);//taille d'une chaine de caractères
     void setupBuzzer(int temps); //initialisation du buzzer
-    void fonctionnementBuzzer(byte compteur, int temps); //fonctionnement du buzzer en fonction du parametre compteurWatchdogLumiere
+    void fonctionnementBuzzer(unsigned int compteur, int temps); //fonctionnement du buzzer en fonction du parametre compteurWatchdogLumiere
 
 
   protected:

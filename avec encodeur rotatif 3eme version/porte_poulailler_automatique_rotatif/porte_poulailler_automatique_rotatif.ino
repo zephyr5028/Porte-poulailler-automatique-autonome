@@ -71,7 +71,7 @@ const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
 #include "PowerTools.h"
 #define DEBUG false // positionner debug pour l'utiliser ou pas
 /*-----------------------------*/
-#define WATCHDOG_BOUCLES 16 // nombre de boucles du watchdog : environ 64s pour 8 boucles
+#define WATCHDOG_BOUCLES 16 // nombre de boucles (16) du watchdog : environ 64s pour 8 boucles
 /*-----------------------------*/
 unsigned int memoireLibre = 0; // variable pour calcul de la memoire libre
 volatile int f_wdt = 1; // flag watchdog
@@ -831,10 +831,13 @@ void  routineInterruptionAlarme1() {
 ///-----test ouverture boitier-----
 void routineTestOuvertureBoitier()  {
   if ( clav.testBoitierOuvert( interruptOuvBoi, boitierOuvert)) {
-    char chaine[22] = "";
+    char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
+    char chaine1[22] = "";
     for (byte i = 0; i < 22 ; i++) {
-      chaine[i] = pgm_read_byte(ouvertureDuBoitier + i);
+      chaine1[i] = pgm_read_byte(ouvertureDuBoitier + i);
     }
+    strcat(chaine, numeroSerieBoitier);
+    strcat(chaine, chaine1);
     if (radio.get_m_radio()) {
       radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
       radio.chaineVide();
@@ -852,10 +855,13 @@ void  routineTestFermetureBoitier() {
     boitierOuvert = false; // boitier ferme
     interruptOuvBoi = false; // autorisation de la prise en compte de l'IT
     mydisp.choixRetroEclairage (0);// extinction retro eclairage
-    char chaine[22] = "";
+    char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
+    char chaine1[22] = "";
     for (byte i = 0; i < 22 ; i++) {
-      chaine[i] = pgm_read_byte(fermetureDuBoitier + i);
+      chaine1[i] = pgm_read_byte(fermetureDuBoitier + i);
     }
+    strcat(chaine, numeroSerieBoitier);
+    strcat(chaine, chaine1);
     if (radio.get_m_radio()) {
       radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
       displayTime();// avec affichage de l'heure de fermeture
@@ -990,19 +996,22 @@ void routineGestionWatchdog() {
         digitalWrite(LED_PIN, HIGH);
         delay(10);
         digitalWrite(LED_PIN, LOW);
-        
+
         if (batterieFaible) { // affichage si la batterie est faible
           char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
+          char chaine1[27]; // longueur du texte batterie faible
           for (byte i = 0; i < 27 ; i++) {
-            chaine[i] = pgm_read_byte(affichageBatterieFaible + i);
+            chaine1[i] = pgm_read_byte(affichageBatterieFaible + i);
           }
           strcat(chaine, numeroSerieBoitier);
+          strcat(chaine, chaine1);
           radio.messageRadio(chaine);// on envoie le message
         }
-        
+
         // informations à afficher
         if (radio.get_m_radio()) {
           /**
+             numero du boitier; //format Nxxx
              date; // format __/__/___
              heure; //format __:__:__
              temperature; // format __.__C pour celcius
@@ -1026,11 +1035,19 @@ void routineGestionWatchdog() {
           //radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";\0"); // envoi message radio : memoire sram restante
           radio.chaineVide();
         }
-        tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
-
-        tools.fonctionnementBuzzer (lum.get_m_compteurWatchdogLumiere(), 2000) ; // fonctionnement du buzzer en fonction du parametre (compteurWatchdogLumiere)
-
+        //fonctionnement du buzzer en fonction du parametre (compteurWatchdogLumiere)
+        //la routine tools.fonctionnementBuzzer ne fonctionne qu'en cas de switch radio sur off ????
+        //tools.fonctionnementBuzzer(lum.get_m_compteurWatchdogLumiere(), 2000) ;
+        if (BUZZER) {
+          //si le compteur est > 0 , le buzzer fonctionne
+          if (lum.get_m_compteurWatchdogLumiere() > 0) {
+            digitalWrite(BUZZER_PIN, LOW);
+            delay(2000);
+            digitalWrite(BUZZER_PIN, HIGH);
+          }
+        }
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
+        tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
       }
       f_wdt = 0;
       enterSleep(); //Revenir en mode veille
