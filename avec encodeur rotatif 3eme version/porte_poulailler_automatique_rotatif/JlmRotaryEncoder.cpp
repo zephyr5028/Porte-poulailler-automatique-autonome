@@ -16,7 +16,7 @@ JlmRotaryEncoder::~JlmRotaryEncoder()
 void JlmRotaryEncoder::init()
 {
   // pinMode(m_encoderPinA, INPUT); // interruption D2
-//  attachInterrupt(0, m_encoderPinA, RISING); // validation de l'interruption sur int0 (d2)
+  //  attachInterrupt(0, m_encoderPinA, RISING); // validation de l'interruption sur int0 (d2)
   pinMode(m_encoderPinB, INPUT); //
 }
 
@@ -32,9 +32,10 @@ void JlmRotaryEncoder::compteurRoueCodeuse() {
       m_compteRoueCodeuse++;
     }
   }
-  // Serial.print(pinA);
-  // Serial.print(pinB);
-  // Serial.println(" ");
+  // pour le verification de la variable tempoEncodeur
+  //Serial.print(pinA);
+  //Serial.print(pinB);
+  //Serial.println(" ");
 }
 
 ///-----reglage de la fin de course-----
