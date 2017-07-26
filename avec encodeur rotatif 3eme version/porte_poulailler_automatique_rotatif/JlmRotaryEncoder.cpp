@@ -32,6 +32,7 @@ void JlmRotaryEncoder::compteurRoueCodeuse() {
       m_compteRoueCodeuse++;
     }
   }
+  // pour la verification de la variable tempoEncodeur
   // Serial.print(pinA);
   // Serial.print(pinB);
   // Serial.println(" ");

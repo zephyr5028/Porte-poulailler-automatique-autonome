@@ -1,6 +1,6 @@
 /**@file*/
 /**
-    \porte du poulailler avec encodeur rotatif v2.0.1
+    \porte du poulailler avec encodeur rotatif v2.0.2
     \file porte_poulailler_affichage_clavier_rtc
     \brief Automatisation de la porte du poulailler en utilisant l'heure ou la lumière.
     \details Simplification d'utilisation. Electronique avec microcontroleur, alimentée par batterie, couplée à un capteur solaire.
@@ -12,6 +12,7 @@
 */
 
 /**
+  28 07 2017 : prise en compte du buzzer. Signal avant la fermeture de la porte
   13 07 2017 : securité à la fermeture en cas de rembobinage inverse de la cordelette
   12 07 2017 : intégration du numéro du boitier dans le message radio
   06 2017 : texte envoyé par radio, convertir la lumière en lux, convertir la course de la porte en cm, menu affichage fin de course ouverture
@@ -191,7 +192,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 LcdPCF8574  mydisp(0x27, 16, 2);
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte Poulailler.Manque carte RTC";
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
 #endif
 
 /** RTC_DS3231 */
