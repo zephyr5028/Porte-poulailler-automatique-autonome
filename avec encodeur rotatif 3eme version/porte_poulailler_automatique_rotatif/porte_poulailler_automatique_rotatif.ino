@@ -1041,8 +1041,8 @@ void routineGestionWatchdog() {
         //la routine tools.fonctionnementBuzzer ne fonctionne qu'en cas de switch radio sur off ????
         //tools.fonctionnementBuzzer(lum.get_m_compteurWatchdogLumiere(), 2000) ;
         if (BUZZER) {
-          //si le compteur est > 0 , le buzzer fonctionne
-          if (lum.get_m_compteurWatchdogLumiere() > 0) {
+          //si le compteur est > 1 , le buzzer fonctionne
+          if (lum.get_m_compteurWatchdogLumiere() > 1) {
             digitalWrite(BUZZER_PIN, LOW);
             delay(2000);
             digitalWrite(BUZZER_PIN, HIGH);
