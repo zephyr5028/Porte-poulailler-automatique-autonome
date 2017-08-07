@@ -114,7 +114,7 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
 #define ACCUS_CONVERSION_RAPPORT  7.3 // rapport de convertion CAD float
 #define ACCU_N1 true  // batterie N1 presente si true
-#define ACCU_N2 false // batterie N2 presente  si true
+#define ACCU_N2 true // batterie N2 presente  si true
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
 Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
 Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
@@ -270,9 +270,9 @@ void displayDate() {
     int timeDate = rtc.lectureRegistreEtConversion (RTC_DATE); // date
     int timeMonth = rtc.lectureRegistreEtConversion( RTC_MONTH ) ; // mois
     int timeYear = rtc.lectureRegistreEtConversion(RTC_YEAR) ; // year
-    radio.envoiUnsignedInt(timeDate,  boitierOuvert, "/");// envoi message radio
-    radio.envoiUnsignedInt(timeMonth,  boitierOuvert, "/");// envoi message radio
-    radio.envoiUnsignedInt(timeYear,  boitierOuvert, ";");// envoi message radio
+    radio.envoiUnsignedInt(timeDate,  boitierOuvert, ((char *)"/"));// envoi message radio
+    radio.envoiUnsignedInt(timeMonth,  boitierOuvert, ((char *)"/"));// envoi message radio
+    radio.envoiUnsignedInt(timeYear,  boitierOuvert, ((char *)";"));// envoi message radio
   }
 }
 
@@ -285,9 +285,9 @@ void displayTime () {
     int timeHour = rtc.lectureRegistreEtConversion (RTC_HOURS, 0x3f); // heure
     int timeMinute = rtc.lectureRegistreEtConversion( RTC_MINUTES ) ; // minutes
     int timeSeconde = rtc.lectureRegistreEtConversion(RTC_SECONDS) ; // secondes
-    radio.envoiUnsignedInt(timeHour,  boitierOuvert, ":");// envoi message radio
-    radio.envoiUnsignedInt(timeMinute,  boitierOuvert, ":");// envoi message radio
-    radio.envoiUnsignedInt(timeSeconde,  boitierOuvert, ";");// envoi message radio
+    radio.envoiUnsignedInt(timeHour,  boitierOuvert, ((char *)":"));// envoi message radio
+    radio.envoiUnsignedInt(timeMinute,  boitierOuvert, ((char *)":"));// envoi message radio
+    radio.envoiUnsignedInt(timeSeconde,  boitierOuvert, ((char *)";"));// envoi message radio
   }
 }
 
@@ -353,7 +353,7 @@ void affiTensionBatCdes() {
     byte ligne = 1;
     mydisp.affichageVoltage(  voltage, "V",  ligne);
   } else   if (radio.get_m_radio()) {
-    radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
+    radio.envoiFloat(voltage, boitierOuvert, ((char *)"V;")); // envoi message radio tension accus}*/
   }
 }
 
@@ -366,7 +366,7 @@ void affiTensionBatServo() {
     byte ligne = 1;
     mydisp.affichageVoltage(  voltage, "V",  ligne);
   } else   if (radio.get_m_radio()) {
-    radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
+    radio.envoiFloat(voltage, boitierOuvert, ((char *)"V;")); // envoi message radio tension accus
   }
 }
 
@@ -885,7 +885,7 @@ void lumiere() {
   } else   if (radio.get_m_radio())  {
     // radio.envoiUnsignedInt(lum.get_m_lumMatin(), boitierOuvert, ";"); // envoi message radio lumiere du matin
     //  radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
-    radio.envoiUnsignedInt(lumValue, boitierOuvert, "L;"); // envoi message radio lumiere
+    radio.envoiUnsignedInt(lumValue, boitierOuvert, ((char *)"L;")); // envoi message radio lumiere
   }
 }
 
@@ -919,7 +919,7 @@ void ouvFermLum() {
 void deroulementMenu (byte increment) {
   if (boitierOuvert) {
     byte j = ((increment - 1) * (colonnes + 1)); // tous les 16 caractères
-    mydisp.cursorPosition(0, 0, ""); // decalage, ligne, texte
+    mydisp.cursorPosition(0, 0, ((char *)"")); // decalage, ligne, texte
     for (byte i = j; i < j + colonnes; i++) { // boucle pour afficher 16 caractères sur le lcd
       char temp = pgm_read_byte(affichageMenu + i); // utilisation du texte présent en mèmoire flash
       mydisp.print(temp);// valable pour digoleSerial et liquidCrystal
@@ -1024,7 +1024,7 @@ void routineGestionWatchdog() {
              temps fonctionnement servo; // format _____ms
              compteur roue codeuse; //format ___P pour  pas
           */
-          radio.envoiTexte(boitierOuvert, numeroSerieBoitier);// envoi en debut de message le numero de serie du boitier
+          radio.envoiTexte(boitierOuvert, ((char *)numeroSerieBoitier));// envoi en debut de message le numero de serie du boitier
           displayDate();
           displayTime();
           read_temp(typeTemperature); // read temperature celsius=true
@@ -1032,8 +1032,8 @@ void routineGestionWatchdog() {
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
           lumiere();
           affiPulsePlusCptRoue();
-          radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert, "ms;\0");
-          radio.envoiInt(rotary.get_m_compteRoueCodeuse() - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, boitierOuvert, "P;\0");
+          radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert,((char *)"ms;\0"));
+          radio.envoiInt(rotary.get_m_compteRoueCodeuse() - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, boitierOuvert,((char *)"P;\0"));
           //radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";\0"); // envoi message radio : memoire sram restante
           radio.chaineVide();
         }

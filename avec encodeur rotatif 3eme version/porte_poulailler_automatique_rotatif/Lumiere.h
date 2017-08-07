@@ -21,7 +21,7 @@ class Lumiere
     unsigned int  reglageLumiere (bool matinSoir, byte touche);// reglage de la lumiere du matin ou du soir
     int luminositeCAD(); //tension de la luminosite CAD
     float tensionLuminosite(int valLumiere); // convertion CAD  vers tension lumiminosite
-    float Lumiere::tensionLuminositeCADversFloat();//lecture et convertion vers tension luminosite en float
+    float tensionLuminositeCADversFloat();//lecture et convertion vers tension luminosite en float
     void testLuminosite();//test luminosite et mise à jour du compteur watchdog lumiere
     void fenetreNonDeclenchement(byte horaire, byte mois);//fenetre de non declenchement et mise à jour du compteur watchdog lumiere
     //non Declenchement Position Servo et mise à jour du compteur watchdog lumiere

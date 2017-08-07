@@ -19,9 +19,9 @@ class Clavier : public  Bouton
     int get_key( int &input); // Convert ADC value to key number
     int read_key(const int &sensor); // read_key
     void positionMenu(byte &positionMenu, const byte &toucheClavier); // position du menu pour l'affichage - touches 2 et 3
-    bool deplacementDansMenu(const &touche, bool &relache, const bool &reglage);    //deplacement dans le menu
+    bool deplacementDansMenu(const int &touche, bool &relache, const bool &reglage);    //deplacement dans le menu
     void relacheTouche(const int &touche, bool &relache);  //relache touche
-    bool testTouche5(const &touche, bool &relache) ;//test touche 5
+    bool testTouche5(const int &touche, bool &relache) ;//test touche 5
 
 
   protected:

@@ -28,7 +28,7 @@ class PowerTools
     void  setupPower();//initialisation power
     //initialisation du watchdog - paramètre : 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms, 6=1 sec,7=2 sec, 8=4 sec, 9=8 secondes-----
     void setup_watchdog(int parametreTemps);
-    byte PowerTools::tailleChaine (char * chaine);//taille d'une chaine de caractères
+    byte tailleChaine (char *chaine);//taille d'une chaine de caractères
     void setupBuzzer(int temps); //initialisation du buzzer
     void fonctionnementBuzzer(unsigned int compteur, int temps); //fonctionnement du buzzer en fonction du parametre compteurWatchdogLumiere
 

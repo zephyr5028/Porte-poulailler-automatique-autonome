@@ -9,7 +9,7 @@
 Radio::Radio(byte pinEmRadio, byte pinSwitchEmissionRadio, int vitesseTransmission, byte taille, bool radio, const boolean debug) :  m_pinEmRadio(pinEmRadio), m_pinSwitchEmissionRadio(pinSwitchEmissionRadio),
   m_vitesseTransmission(vitesseTransmission), m_taille(taille), m_radio(radio), m_debug(debug)
 {
-  m_chaine[m_taille] = "";// initialisation du tableau
+  m_chaine[m_taille] = {0};// initialisation du tableau
 }
 
 Radio::~Radio()
