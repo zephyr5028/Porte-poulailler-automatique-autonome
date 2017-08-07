@@ -15,7 +15,7 @@ Clavier::Clavier() : Bouton(  ), m_oldKey (-1), m_MenuManuel(14), m_NumKeys(6),
 Clavier::Clavier(byte nbMenu, const byte pinBp, const byte pinBoitier, const int debounce, const boolean debug) :
   Bouton(  pinBp, pinBoitier,  debounce,  debug ),
   m_oldKey (-1), m_MenuManuel(nbMenu), m_debug(debug), m_NumKeys(6), m_AdcKeyVal( {
-  50, 200, 400, 600, 800
+  50, 220, 420, 620, 820
 })
 {
 

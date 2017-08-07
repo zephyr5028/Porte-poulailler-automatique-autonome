@@ -12,6 +12,7 @@
 */
 
 /**
+
   28 07 2017 : prise en compte du buzzer. Signal avant la fermeture de la porte
   13 07 2017 : securité à la fermeture en cas de rembobinage inverse de la cordelette
   12 07 2017 : intégration du numéro du boitier dans le message radio
@@ -52,7 +53,7 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 
-const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
+const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
 
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
@@ -99,9 +100,9 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-#define SERVO_PULSE_STOP 1350 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-#define SERVO_PULSE_OUVERTURE_FERMETURE   110  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   60  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_OUVERTURE_FERMETURE   220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
 ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
@@ -112,8 +113,8 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #define PIN_ACCUS_N2  A7  //analog pin A7 : tension batterie N2
 #define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
 #define ACCUS_CONVERSION_RAPPORT  7.3 // rapport de convertion CAD float
-#define ACCU_N1 false  // batterie N1 presente si true
-#define ACCU_N2 true // batterie N2 presente  si true
+#define ACCU_N1 true  // batterie N1 presente si true
+#define ACCU_N2 false // batterie N2 presente  si true
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
 Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
 Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
