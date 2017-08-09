@@ -25,12 +25,12 @@ class Radio
     void messageSansParametre();//message Radio sans parametre
     void chaineVide();//chaine radio fin de ligne avant transmission
     //envoi message float avec test de l'ouverture du boitier plus texte
-    void envoiFloat(float valeur, boolean boitierOuvert = true, char *texte = "");
+    void envoiFloat(float valeur, boolean boitierOuvert = true, char *texte = (char *)"");
     // envoi du message unsigned int avec test de l'ouverture du boitier
-    void envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert = true, char *texte = "");
-     // envoi du message int avec test de l'ouverture du boitier
-    void envoiInt(int valeur, boolean boitierOuvert = true, char *texte = "");
-    void envoiTexte(boolean boitierOuvert, char *texte = ""); // envoi d'un message texte avec test de l'ouverture du boitier
+    void envoiUnsignedInt(unsigned int valeur, boolean boitierOuvert = true, char *texte = (char *)"");
+    // envoi du message int avec test de l'ouverture du boitier
+    void envoiInt(int valeur, boolean boitierOuvert = true, char *texte = (char *)"");
+    void envoiTexte(boolean boitierOuvert, char *texte = (char *)""); // envoi d'un message texte avec test de l'ouverture du boitier
     void testSwitchEmissionRadio();//test du switch emission radio on/off
     bool get_m_radio(); //accesseur - getter
     void set_m_radio(bool radio);//mutateur - setter
@@ -42,7 +42,7 @@ class Radio
     byte m_pinSwitchEmissionRadio; // pin A2 pour le choix avec ou sans emission radio
     int m_vitesseTransmission;// vitese de la transmission radio
     bool m_radio; // pour envoi radio si necessaire
-    int const m_taille; // taille du tableau
+    int m_taille; // taille du tableau
     char m_chaine[]; // tableau de la chaine avant envoi
 
 };

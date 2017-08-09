@@ -104,7 +104,6 @@ byte Lumiere::declenchementServoLuminosite() {
     }
     if ((sensorValue <= m_lumSoir) and !m_fermeture ) {
       m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
-      /////   m_buzzer = 2; // réarmement du compteur buzzer
       return 2; // ok + fermeture
     }
   }

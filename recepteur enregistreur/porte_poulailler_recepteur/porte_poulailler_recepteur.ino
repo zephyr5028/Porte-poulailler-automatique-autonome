@@ -46,19 +46,15 @@ const char numeroSerieBoitier[] = "N005;\0"; // numero de serie du boitier recep
 #include "PowerTools.h"
 #define DEBUG false // positionner debug pour l'utiliser ou pas
 /*-----------------------------*/
-#define WATCHDOG_BOUCLES 16 // nombre de boucles du watchdog : environ 64s pour 8 boucles
+#define WATCHDOG_BOUCLES 16 // nombre de boucles (16) du watchdog : environ 64s pour 8 boucles
 /*-----------------------------*/
 unsigned int memoireLibre = 0; // variable pour calcul de la memoire libre
 volatile int f_wdt = 1; // flag watchdog
 byte tempsWatchdog = WATCHDOG_BOUCLES ; // boucle temps du chien de garde
 boolean reglage = false; // menu=false ou reglage=true
-
-////////////////
 #define BUZZER true //positionner BUZZER en fonction de la presence ou pas d'un buzzer sur la carte (true = presence)
 #define BUZZER_PIN 7 // broche du buzzer
-//////////////////
-
-PowerTools tools (DEBUG ); // objet tools et power
+PowerTools tools (BUZZER_PIN, BUZZER, DEBUG ); // objet tools et power
 
 /** radio 433MHz */
 #include "Radio.h"
@@ -77,9 +73,9 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-#define SERVO_PULSE_STOP 1350 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-#define SERVO_PULSE_OUVERTURE_FERMETURE   110  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   60  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_OUVERTURE_FERMETURE   220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
 ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
@@ -90,6 +86,8 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #define PIN_ACCUS_N2  A7  //analog pin A7 : tension batterie N2
 #define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
 #define ACCUS_CONVERSION_RAPPORT  7.3 // rapport de convertion CAD float
+#define ACCU_N1 true  // batterie N1 presente si true
+#define ACCU_N2 true // batterie N2 presente  si true
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
 Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
 Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT, DEBUG );
@@ -168,7 +166,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 LcdPCF8574  mydisp(0x3f, 16, 2);
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte Poulailler.Manque carte RTC";
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
 #endif
 
 /** RTC_DS3231 */
@@ -245,9 +243,9 @@ void displayDate() {
     int timeDate = rtc.lectureRegistreEtConversion (RTC_DATE); // date
     int timeMonth = rtc.lectureRegistreEtConversion( RTC_MONTH ) ; // mois
     int timeYear = rtc.lectureRegistreEtConversion(RTC_YEAR) ; // year
-    radio.envoiUnsignedInt(timeDate,  boitierOuvert, "/");// envoi message radio
-    radio.envoiUnsignedInt(timeMonth,  boitierOuvert, "/");// envoi message radio
-    radio.envoiUnsignedInt(timeYear,  boitierOuvert, ";");// envoi message radio
+    radio.envoiUnsignedInt(timeDate,  boitierOuvert, ((char *)"/"));// envoi message radio
+    radio.envoiUnsignedInt(timeMonth,  boitierOuvert, ((char *)"/"));// envoi message radio
+    radio.envoiUnsignedInt(timeYear,  boitierOuvert, ((char *)";"));// envoi message radio
   }
 }
 
@@ -260,9 +258,9 @@ void displayTime () {
     int timeHour = rtc.lectureRegistreEtConversion (RTC_HOURS, 0x3f); // heure
     int timeMinute = rtc.lectureRegistreEtConversion( RTC_MINUTES ) ; // minutes
     int timeSeconde = rtc.lectureRegistreEtConversion(RTC_SECONDS) ; // secondes
-    radio.envoiUnsignedInt(timeHour,  boitierOuvert, ":");// envoi message radio
-    radio.envoiUnsignedInt(timeMinute,  boitierOuvert, ":");// envoi message radio
-    radio.envoiUnsignedInt(timeSeconde,  boitierOuvert, ";");// envoi message radio
+    radio.envoiUnsignedInt(timeHour,  boitierOuvert, ((char *)":"));// envoi message radio
+    radio.envoiUnsignedInt(timeMinute,  boitierOuvert, ((char *)":"));// envoi message radio
+    radio.envoiUnsignedInt(timeSeconde,  boitierOuvert, ((char *)";"));// envoi message radio
   }
 }
 
@@ -328,7 +326,7 @@ void affiTensionBatCdes() {
     byte ligne = 1;
     mydisp.affichageVoltage(  voltage, "V",  ligne);
   } else   if (radio.get_m_radio()) {
-    radio.envoiFloat(voltage, boitierOuvert,  "V;" ); // envoi message radio tension accus}*/
+    radio.envoiFloat(voltage, boitierOuvert, ((char *)"V;")); // envoi message radio tension accus}*/
   }
 }
 
@@ -341,7 +339,7 @@ void affiTensionBatServo() {
     byte ligne = 1;
     mydisp.affichageVoltage(  voltage, "V",  ligne);
   } else   if (radio.get_m_radio()) {
-    radio.envoiFloat(voltage, boitierOuvert, "V;"); // envoi message radio tension accus
+    radio.envoiFloat(voltage, boitierOuvert, ((char *)"V;")); // envoi message radio tension accus
   }
 }
 
@@ -720,13 +718,11 @@ void ouverturePorte() {
     // utilisation du temps de monte pour la sécurité SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
     if ( !digitalRead(PIN_SECURITE_OUVERTURE) or (touche == 4 and boitierOuvert) or ( ( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_OUVERTURE * rotary.get_m_finDeCourseFermeture()))) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
-      /////////////////////
       /*
         if (rotary.get_m_compteRoueCodeuse() < ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION) {
         rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
         }
       */
-      ////////////////////
     }
   }
 }
@@ -810,10 +806,13 @@ void  routineInterruptionAlarme1() {
 ///-----test ouverture boitier-----
 void routineTestOuvertureBoitier()  {
   if ( clav.testBoitierOuvert( interruptOuvBoi, boitierOuvert)) {
-    char chaine[22] = "";
+    char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
+    char chaine1[22] = "";
     for (byte i = 0; i < 22 ; i++) {
-      chaine[i] = pgm_read_byte(ouvertureDuBoitier + i);
+      chaine1[i] = pgm_read_byte(ouvertureDuBoitier + i);
     }
+    strcat(chaine, numeroSerieBoitier);
+    strcat(chaine, chaine1);
     if (radio.get_m_radio()) {
       radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
       radio.chaineVide();
@@ -831,10 +830,13 @@ void  routineTestFermetureBoitier() {
     boitierOuvert = false; // boitier ferme
     interruptOuvBoi = false; // autorisation de la prise en compte de l'IT
     mydisp.choixRetroEclairage (0);// extinction retro eclairage
-    char chaine[22] = "";
+    char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
+    char chaine1[22] = "";
     for (byte i = 0; i < 22 ; i++) {
-      chaine[i] = pgm_read_byte(fermetureDuBoitier + i);
+      chaine1[i] = pgm_read_byte(fermetureDuBoitier + i);
     }
+    strcat(chaine, numeroSerieBoitier);
+    strcat(chaine, chaine1);
     if (radio.get_m_radio()) {
       radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
       displayTime();// avec affichage de l'heure de fermeture
@@ -856,7 +858,7 @@ void lumiere() {
   } else   if (radio.get_m_radio())  {
     // radio.envoiUnsignedInt(lum.get_m_lumMatin(), boitierOuvert, ";"); // envoi message radio lumiere du matin
     //  radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
-    radio.envoiUnsignedInt(lumValue, boitierOuvert, "L;"); // envoi message radio lumiere
+    radio.envoiUnsignedInt(lumValue, boitierOuvert, ((char *)"L;")); // envoi message radio lumiere
   }
 }
 
@@ -890,7 +892,7 @@ void ouvFermLum() {
 void deroulementMenu (byte increment) {
   if (boitierOuvert) {
     byte j = ((increment - 1) * (colonnes + 1)); // tous les 16 caractères
-    mydisp.cursorPosition(0, 0, ""); // decalage, ligne, texte
+    mydisp.cursorPosition(0, 0, ((char *)"")); // decalage, ligne, texte
     for (byte i = j; i < j + colonnes; i++) { // boucle pour afficher 16 caractères sur le lcd
       char temp = pgm_read_byte(affichageMenu + i); // utilisation du texte présent en mèmoire flash
       mydisp.print(temp);// valable pour digoleSerial et liquidCrystal
@@ -970,29 +972,21 @@ void routineGestionWatchdog() {
         delay(10);
         digitalWrite(LED_PIN, LOW);
 
-        //////////////////////////////
         if (batterieFaible) { // affichage si la batterie est faible
           char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
+          char chaine1[27]; // longueur du texte batterie faible
           for (byte i = 0; i < 27 ; i++) {
-            chaine[i] = pgm_read_byte(affichageBatterieFaible + i);
+            chaine1[i] = pgm_read_byte(affichageBatterieFaible + i);
           }
           strcat(chaine, numeroSerieBoitier);
+          strcat(chaine, chaine1);
           radio.messageRadio(chaine);// on envoie le message
         }
-        /*
-          if (batterieFaible) { // affichage si la batterie est faible
-            char chaine[27] = "";
-            for (byte i = 0; i < 27 ; i++) {
-              chaine[i] = pgm_read_byte(affichageBatterieFaible + i);
-            }
-            radio.messageRadio(chaine);// on envoie le message
-          }
-        */
-        /////////////////////////////
 
         // informations à afficher
         if (radio.get_m_radio()) {
           /**
+             numero du boitier; //format Nxxx
              date; // format __/__/___
              heure; //format __:__:__
              temperature; // format __.__C pour celcius
@@ -1003,11 +997,7 @@ void routineGestionWatchdog() {
              temps fonctionnement servo; // format _____ms
              compteur roue codeuse; //format ___P pour  pas
           */
-          
-          ////////////////////////////
-          radio.envoiTexte(boitierOuvert, numeroSerieBoitier);// envoi en debut de message le numero de serie du boitier
-          ////////////////////////
-          
+          radio.envoiTexte(boitierOuvert, ((char *)numeroSerieBoitier));// envoi en debut de message le numero de serie du boitier
           displayDate();
           displayTime();
           read_temp(typeTemperature); // read temperature celsius=true
@@ -1015,25 +1005,24 @@ void routineGestionWatchdog() {
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
           lumiere();
           affiPulsePlusCptRoue();
-          radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert, "ms;\0");
-          radio.envoiInt(rotary.get_m_compteRoueCodeuse() - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, boitierOuvert, "P;\0");
+          radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert,((char *)"ms;\0"));
+          radio.envoiInt(rotary.get_m_compteRoueCodeuse() - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, boitierOuvert,((char *)"P;\0"));
           //radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";\0"); // envoi message radio : memoire sram restante
           radio.chaineVide();
         }
-        tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
-
-        //////////////////////////////
+        //fonctionnement du buzzer en fonction du parametre (compteurWatchdogLumiere)
+        //la routine tools.fonctionnementBuzzer ne fonctionne qu'en cas de switch radio sur off ????
+        //tools.fonctionnementBuzzer(lum.get_m_compteurWatchdogLumiere(), 2000) ;
         if (BUZZER) {
-          //si le compteurWatchdogLumiere est > 0 , le buzzer fonctionne
-          if (lum.get_m_compteurWatchdogLumiere() > 0) {
+          //si le compteur est > 1 , le buzzer fonctionne
+          if (lum.get_m_compteurWatchdogLumiere() > 1) {
             digitalWrite(BUZZER_PIN, LOW);
             delay(2000);
             digitalWrite(BUZZER_PIN, HIGH);
           }
         }
-        ////////////////////////////////
-
         lum.set_m_compteurWatchdogLumiere(lum.get_m_compteurWatchdogLumiere() + 1);// incrementation compteur watchdog lumiere
+        tempsWatchdog = WATCHDOG_BOUCLES ; // initialisation du nombre de boucles
       }
       f_wdt = 0;
       enterSleep(); //Revenir en mode veille
@@ -1119,15 +1108,7 @@ void setup() {
 
   rotary.init();// initialisation de la position de la roue codeuse
 
-  //////////////////////////////
-  if (BUZZER) {
-    pinMode(BUZZER_PIN, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
-    digitalWrite(BUZZER_PIN, HIGH);
-    digitalWrite(BUZZER_PIN, LOW);
-    delay(2000);
-    digitalWrite(BUZZER_PIN, HIGH);
-  }
-  ////////////////////////////////
+  tools.setupBuzzer(1000); // initialisation du buzzer et test
 
   if (!SERVO_TEST) {
     if (digitalRead(PIN_SECURITE_OUVERTURE)) {
@@ -1167,10 +1148,14 @@ void loop() {
 
   ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
-  ////////////////////////
-  // batterieFaible = accusN1.accusFaible() or accusN2.accusFaible(); // test de la tension des batteries
-  batterieFaible = accusN2.accusFaible() ;// test de la tension de la batterie
-  ////////////////////////
+  // test suivant le nombre de batteries presentes
+  if (ACCU_N1 and ACCU_N2) {
+    batterieFaible = accusN1.accusFaible() or accusN2.accusFaible(); // test de la tension des batteries
+  } else if (ACCU_N1) {
+    batterieFaible = accusN1.accusFaible() ;// test de la tension de la batterie N1
+  } else if (ACCU_N2) {
+    batterieFaible = accusN2.accusFaible() ;// test de la tension de la batterie N2
+  }
 
   ouverturePorte();
   fermeturePorte();

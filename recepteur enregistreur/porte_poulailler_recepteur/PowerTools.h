@@ -21,19 +21,23 @@ class PowerTools
   public:
 
     // constructeur
-    PowerTools();
-    PowerTools( const boolean debug = false ); // constructeur avec debug
+    PowerTools(const byte buzzer_pin, const boolean buzzer);
+    PowerTools( const byte buzzer_pin, const boolean buzzer, const boolean debug = false ); // constructeur avec la broche du buzzzer et si present sur la carte , debug
     ~PowerTools(); // destructeur
 
     void  setupPower();//initialisation power
     //initialisation du watchdog - paramètre : 0=16ms, 1=32ms, 2=64ms, 3=128ms, 4=250ms, 5=500ms, 6=1 sec,7=2 sec, 8=4 sec, 9=8 secondes-----
     void setup_watchdog(int parametreTemps);
-    byte PowerTools::tailleChaine (char * chaine);//taille d'une chaine de caractères
+    byte tailleChaine (char *chaine);//taille d'une chaine de caractères
+    void setupBuzzer(int temps); //initialisation du buzzer
+    void fonctionnementBuzzer(unsigned int compteur, int temps); //fonctionnement du buzzer en fonction du parametre compteurWatchdogLumiere
 
 
   protected:
 
     const boolean m_debug ; // pour affichage console si nécessaire
+    const byte m_buzzer_pin ; // broche du buzzer
+    const boolean m_buzzer ; // presence du buzzer sur la carte : true
 
 
 };
