@@ -167,7 +167,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte
 #ifdef LCD_LIQIDCRYSTAL
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
-LcdPCF8574  mydisp(0x27, 16, 2);
+LcdPCF8574  mydisp(0x3f, 16, 2);
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte Poulailler.Manque carte RTC";
 #endif
 
