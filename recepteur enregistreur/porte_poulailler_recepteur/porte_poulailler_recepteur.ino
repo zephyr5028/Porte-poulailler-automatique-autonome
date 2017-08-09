@@ -166,7 +166,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 LcdPCF8574  mydisp(0x3f, 16, 2);
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
+const char affichageBonjour[] PROGMEM = "Recepteur porte . Version 1.0.0  .Recepteur porte .Manque carte RTC";
 #endif
 
 /** RTC_DS3231 */
@@ -806,6 +806,7 @@ void  routineInterruptionAlarme1() {
 ///-----test ouverture boitier-----
 void routineTestOuvertureBoitier()  {
   if ( clav.testBoitierOuvert( interruptOuvBoi, boitierOuvert)) {
+  /*  
     char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
     char chaine1[22] = "";
     for (byte i = 0; i < 22 ; i++) {
@@ -817,6 +818,7 @@ void routineTestOuvertureBoitier()  {
       radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
       radio.chaineVide();
     }
+    */
     boitierOuvert = true; // boitier ouvert
     mydisp.gestionCurseur(1); // activation du curseur
     deroulementMenu (incrementation); /// affichage du menu
@@ -830,6 +832,7 @@ void  routineTestFermetureBoitier() {
     boitierOuvert = false; // boitier ferme
     interruptOuvBoi = false; // autorisation de la prise en compte de l'IT
     mydisp.choixRetroEclairage (0);// extinction retro eclairage
+   /* 
     char chaine[VW_MAX_MESSAGE_LEN - 1] = "";
     char chaine1[22] = "";
     for (byte i = 0; i < 22 ; i++) {
@@ -842,6 +845,7 @@ void  routineTestFermetureBoitier() {
       displayTime();// avec affichage de l'heure de fermeture
       radio.chaineVide();
     }
+    */
   }
 }
 
@@ -1100,16 +1104,16 @@ void setup() {
 
   tools.setupPower(); // initialisation power de l'arduino
 
-  tools.setup_watchdog(9); // initialisation : maxi de 8 secondes pour l'it du watchdog
+ // tools.setup_watchdog(9); // initialisation : maxi de 8 secondes pour l'it du watchdog
 
-  radio.init();//initialisation radio
+ // radio.init();//initialisation radio
 
-  monServo.init(); // initialisation du servo moteur et du relais
+ // monServo.init(); // initialisation du servo moteur et du relais
 
-  rotary.init();// initialisation de la position de la roue codeuse
+ // rotary.init();// initialisation de la position de la roue codeuse
 
-  tools.setupBuzzer(1000); // initialisation du buzzer et test
-
+ // tools.setupBuzzer(1000); // initialisation du buzzer et test
+/*
   if (!SERVO_TEST) {
     if (digitalRead(PIN_SECURITE_OUVERTURE)) {
       reduit = 1;// vitesse normale
@@ -1117,7 +1121,7 @@ void setup() {
     } else {
       rotary.set_m_compteRoueCodeuse(ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION);
     }
-  }
+  }*/
 }
 
 /* loop */
@@ -1137,16 +1141,16 @@ void loop() {
   regFinDeCourseFermeture(); // reglage fin de course fermeture
   regFinDeCourseOuverture(); // reglage fin de course ouverture
   eclairageAfficheur(); // retro eclairage de l'afficheur
-
+/*
   if (SERVO_TEST) {
     testServo(); // reglage du servo plus test de la roue codeuse et du servo, à l'aide de la console
-  }
+  }*/
 
-  radio.testSwitchEmissionRadio(); // test du switch emission radio on/off
+//  radio.testSwitchEmissionRadio(); // test du switch emission radio on/off
 
   memoireLibre = freeMemory(); // calcul de la  memoire sram libre
 
-  ouvFermLum() ;  // ouverture/fermeture par test de la lumière
+ // ouvFermLum() ;  // ouverture/fermeture par test de la lumière
 
   // test suivant le nombre de batteries presentes
   if (ACCU_N1 and ACCU_N2) {
@@ -1157,26 +1161,26 @@ void loop() {
     batterieFaible = accusN2.accusFaible() ;// test de la tension de la batterie N2
   }
 
-  ouverturePorte();
-  fermeturePorte();
+ // ouverturePorte();
+ // fermeturePorte();
 
   /* pas de l'encodeur RISING */
-  if (interruptEncodeur) {
+ /* if (interruptEncodeur) {
     if ((millis() - debutTempsEncodeur) > tempoEncodeur ) {
       rotary.compteurRoueCodeuse(); // mis à jour du compteur de l'encodeur rotatif
       interruptEncodeur = false; // autorisation nouvelle it
     }
-  }
+  }*/
 
   routineTestFermetureBoitier(); // test fermeture boitier
   routineTestOuvertureBoitier();// test ouvertuer boitier
 
   routineInterruptionBp(); // routine interruption Bp
 
-  routineInterrruptionAlarme2() ; // routine alarme 2
-  routineInterruptionAlarme1(); // routine alarme 1
+ // routineInterrruptionAlarme2() ; // routine alarme 2
+ // routineInterruptionAlarme1(); // routine alarme 1
 
-  routineGestionWatchdog(); // routine de gestion du watchdog
+ // routineGestionWatchdog(); // routine de gestion du watchdog
 }
 
 
