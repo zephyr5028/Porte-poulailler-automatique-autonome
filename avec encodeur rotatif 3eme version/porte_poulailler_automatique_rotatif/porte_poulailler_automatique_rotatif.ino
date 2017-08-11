@@ -1033,8 +1033,8 @@ void routineGestionWatchdog() {
           affiTensionBatServo(); // affichage tension batterie servomoteur sur terminal
           lumiere();
           affiPulsePlusCptRoue();
-          radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert,((char *)"ms;\0"));
-          radio.envoiInt(rotary.get_m_compteRoueCodeuse() - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, boitierOuvert,((char *)"P;\0"));
+          radio.envoiUnsignedInt(monServo.get_m_tempsTotal(), boitierOuvert, ((char *)"ms;\0"));
+          radio.envoiInt(rotary.get_m_compteRoueCodeuse() - ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, boitierOuvert, ((char *)"P;\0"));
           //radio.envoiUnsignedInt( &memoireLibre, boitierOuvert, ";\0"); // envoi message radio : memoire sram restante
           radio.chaineVide();
         }
@@ -1042,8 +1042,8 @@ void routineGestionWatchdog() {
         //la routine tools.fonctionnementBuzzer ne fonctionne qu'en cas de switch radio sur off ????
         //tools.fonctionnementBuzzer(lum.get_m_compteurWatchdogLumiere(), 2000) ;
         if (BUZZER) {
-          //si le compteur est > 1 , le buzzer fonctionne
-          if (lum.get_m_compteurWatchdogLumiere() > 1) {
+          //si le compteur est > 2 , le buzzer fonctionne
+          if (lum.get_m_compteurWatchdogLumiere() > 2) {
             digitalWrite(BUZZER_PIN, LOW);
             delay(2000);
             digitalWrite(BUZZER_PIN, HIGH);
@@ -1077,6 +1077,8 @@ void setup() {
 
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT); // led broche 13
+
+  tools.setupBuzzer(1000); // initialisation du buzzer et test
 
   rtc.init();// initialisation de l'horloge et verification de la presence de la carte RTC / memoire 24C32
 
@@ -1135,8 +1137,6 @@ void setup() {
   monServo.init(); // initialisation du servo moteur et du relais
 
   rotary.init();// initialisation de la position de la roue codeuse
-
-  tools.setupBuzzer(1000); // initialisation du buzzer et test
 
   if (!SERVO_TEST) {
     if (digitalRead(PIN_SECURITE_OUVERTURE)) {
