@@ -9,7 +9,7 @@ Bouton::Bouton() :  m_pinBp(9), m_pinBoitier(6), m_debounce(350), m_relacheBp(tr
 
 }
 /* sucharge du constructeur avec le nombre de lignes du menu */
-Bouton::Bouton( const byte pinBp, const byte pinBoitier, const int debounce, const boolean debug) : m_debug(debug), m_pinBp(pinBp),
+Bouton::Bouton( const byte pinBp, const byte pinBoitier, const int debounce, boolean debug) : m_debug(debug), m_pinBp(pinBp),
   m_pinBoitier(pinBoitier), m_relacheBp(true), m_debounce(debounce), m_tempoDebounce(0), m_debouncePret(false)
 {
 

@@ -5,18 +5,14 @@
 #include "Clavier.h"
 
 Clavier::Clavier() : Bouton(  ), m_oldKey (-1), m_MenuManuel(14), m_NumKeys(6),
-  m_AdcKeyVal( {
-  50, 200, 400, 600, 800
-})
+  m_AdcKeyVal { 50, 200, 400, 600, 800 }
 {
 
 }
 /* sucharge du constructeur avec le nombre de lignes du menu */
-Clavier::Clavier(byte nbMenu, const byte pinBp, const byte pinBoitier, const int debounce, const boolean debug) :
+Clavier::Clavier(byte nbMenu, const byte pinBp, const byte pinBoitier, const int debounce, boolean debug) :
   Bouton(  pinBp, pinBoitier,  debounce,  debug ),
-  m_oldKey (-1), m_MenuManuel(nbMenu), m_debug(debug), m_NumKeys(6), m_AdcKeyVal( {
-  50, 220, 420, 620, 820
-})
+  m_oldKey (-1), m_MenuManuel(nbMenu), m_debug(debug), m_NumKeys(6), m_AdcKeyVal { 50, 220, 420, 620, 820 }
 {
 
 }
@@ -80,7 +76,7 @@ void Clavier::relacheTouche(const int &touche, bool &relache) {
 }
 
 ///-----deplacement dans le menu-----
-bool Clavier::deplacementDansMenu(const &touche, bool &relache, const bool &reglage) {
+bool Clavier::deplacementDansMenu(const int &touche, bool &relache, const bool &reglage) {
   if ((touche == 2 or touche == 3) and relache and !reglage) { // si appui sur les touches 2 ou 3 , la touche relache et le mode reglage
     relache = false;
     return true;
@@ -90,7 +86,7 @@ bool Clavier::deplacementDansMenu(const &touche, bool &relache, const bool &regl
 }
 
 ///-----test touche 5-----
-bool Clavier::testTouche5(const &touche, bool &relache) {
+bool Clavier::testTouche5(const int &touche, bool &relache) {
   if (touche == 5 and relache == true ) { // retro eclairage si appuis sur la touche 5
     relache = false;
     return true;

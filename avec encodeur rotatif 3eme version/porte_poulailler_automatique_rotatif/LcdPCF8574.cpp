@@ -139,7 +139,7 @@ void LcdPCF8574::affichageLumFinCourse( int LumFinCourse, byte ligne, String tex
   chaineLigne += LumFinCourse;
   chaineLigne += texte;
   affichageUneLigne(chaineLigne);// affichage sur lcd
-  if (siNonReglable)  cursorPosition(0, 0, "");
+  if (siNonReglable)  cursorPosition(0, 0, (char *)"");
 }
 
 ///-----affichage tensions-----
@@ -151,7 +151,7 @@ void LcdPCF8574::affichageVoltage( float voltage, String texte, byte ligne)
   chaineLigne += voltage;
   chaineLigne += texte;
   affichageUneLigne(chaineLigne);// affichage sur lcd
-  cursorPosition(0, 0, "");// decalage, ligne, texte
+  cursorPosition(0, 0, (char *)"");// decalage, ligne, texte
 }
 
 ///-----affichage choix ouverture fermeture-----
@@ -176,7 +176,7 @@ void LcdPCF8574::affichageServo(int pulse, int roueCodeuse, byte ligne)
   chaineLigne += roueCodeuse;
     chaineLigne += "pas";
   affichageUneLigne(chaineLigne);// affichage sur lcd
-  cursorPosition(0, 0, ""); // decalage, ligne, texte
+  cursorPosition(0, 0, (char *)""); // decalage, ligne, texte
 }
 
 ///-----Bonjour-----
@@ -193,7 +193,7 @@ void LcdPCF8574::bonjour(String chaine1, String chaine2) {
     delay (700);
   }
   gestionCurseur (true);
-  cursorPosition(0, 0, ""); // decalage, ligne, texte
+  cursorPosition(0, 0, (char *)""); // decalage, ligne, texte
   choixRetroEclairage(false);
 }
 

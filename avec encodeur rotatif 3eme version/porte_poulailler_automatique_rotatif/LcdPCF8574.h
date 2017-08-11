@@ -46,7 +46,7 @@ class LcdPCF8574  : public LiquidCrystal_I2C
   protected:
 
     const boolean m_debug ; // pour affichage console si nécessaire
-    int const m_taille; // taille du tableau - 16 caractères
+    byte m_taille; // taille du tableau - 16 caractères
     byte m_decalage; // position du curseur
     byte m_ligne; // numero ligne
     byte m_deplacement; // deplacement du curseur

@@ -13,7 +13,7 @@ class Clavier : public  Bouton
   public:
 
     Clavier(); // constructeur
-    Clavier( byte nbMenu, const byte pinBp, const byte pinBoitier, const int debounce = 350, const boolean debug = false ); // surcharge du constructeur
+    Clavier( byte nbMenu, const byte pinBp, const byte pinBoitier, const int debounce = 350, boolean debug = false ); // surcharge du constructeur
     ~Clavier(); // destructeur
 
     int get_key( int &input); // Convert ADC value to key number
@@ -26,7 +26,7 @@ class Clavier : public  Bouton
 
   protected:
 
-    const boolean m_debug ; // pour affichage console si nécessaire
+    boolean m_debug ; // pour affichage console si nécessaire
     const byte m_oldKey;  // -1
     const byte m_NumKeys;  // nombre de touches +1
     byte m_MenuManuel; // nombre de lignes du menu

@@ -72,7 +72,7 @@ void LcdDigoleI2C::affichageUneLigne(String chaine) {
   for (byte i = 0; i < chaine.length(); i++)  {  //move string to right
     print(chaine[i]);
   }
-  cursorPosition(m_decalage, m_ligne, "");// decalage, ligne, texte
+  cursorPosition(m_decalage, m_ligne, (char *)"");// decalage, ligne, texte
 }
 
 ///-----reset display position and clean the line-----
@@ -136,7 +136,7 @@ void LcdDigoleI2C::affichageLumFinCourse( int LumFinCourse, byte ligne, String t
   chaineLigne += LumFinCourse;
   chaineLigne += texte;
   affichageUneLigne(chaineLigne);// affichage sur lcd
-  if (siNonReglable)  cursorPosition(0, 0, "");
+  if (siNonReglable)  cursorPosition(0, 0, (char *)"");
 }
 
 ///-----affichage tensions-----
@@ -148,7 +148,7 @@ void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte ligne)
   chaineLigne += voltage;
   chaineLigne += texte;
   affichageUneLigne(chaineLigne);// affichage sur lcd
-  cursorPosition(0, 0, "");// decalage, ligne, texte
+  cursorPosition(0, 0, (char *)"");// decalage, ligne, texte
 }
 
 ///-----affichage choix ouverture fermeture-----
@@ -173,7 +173,7 @@ void LcdDigoleI2C::affichageServo(int pulse, int roueCodeuse,  byte ligne)
   chaineLigne += roueCodeuse;
     chaineLigne += "pas";
   affichageUneLigne(chaineLigne);// affichage sur lcd
-  cursorPosition(0, 0, ""); // decalage, ligne, texte
+  cursorPosition(0, 0, (char *)""); // decalage, ligne, texte
 }
 
 ///-----affichage au demarrage sur les deux lignes-----
@@ -190,7 +190,7 @@ void LcdDigoleI2C::bonjour(String chaine1, String chaine2) {
     delay (700);
   }
   gestionCurseur (true);
-  cursorPosition(0, 0, ""); // decalage, ligne, texte
+  cursorPosition(0, 0, (char *)""); // decalage, ligne, texte
   choixRetroEclairage(false);
 }
 
