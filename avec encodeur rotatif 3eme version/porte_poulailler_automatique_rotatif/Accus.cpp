@@ -35,6 +35,12 @@ bool Accus::accusFaible() {
 ///------- lecture tension batterie CAD-----
 int Accus::tensionAccusCAD() {
   int valAccus = analogRead(m_accusPin); //read the input on analog pin tension batterie
+  /* pour le calcul de la variable ACCUS_CONVERSION_RAPPORT_ACCUS_Nx
+   * tension batterie multimètre * 100 * 1023 / valAccus 
+   */
+  //Serial.print (m_accusPin);
+  //Serial.print ("  ");
+  //Serial.println (valAccus);
   return valAccus;
 }
 
