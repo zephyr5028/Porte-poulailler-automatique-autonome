@@ -14,14 +14,13 @@ class Lumiere
   public:
 
     // constructeur avec debug
-    Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir,  const byte heureFenetreSoir = 17 , const float rapportConvertion = 5,
-             const byte tempsLum = 2,  boolean debug = false );
+    Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir,  const byte heureFenetreSoir = 17 ,
+             const int R2 = 10000, const float  Vref = 5.0, const int maxCAD = 1023, const byte tempsLum = 2,  boolean debug = false );
     ~Lumiere(); // destructeur
 
     unsigned int  reglageLumiere (bool matinSoir, byte touche);// reglage de la lumiere du matin ou du soir
-    int luminositeCAD(); //tension de la luminosite CAD
-    float tensionLuminosite(int valLumiere); // convertion CAD  vers tension lumiminosite
-    float tensionLuminositeCADversFloat();//lecture et convertion vers tension luminosite en float
+    int luminositeCAD(); //lecture de la luminosite CAD
+    unsigned int tensionLuminosite(); // convertion CAD  vers LDR
     void testLuminosite();//test luminosite et mise à jour du compteur watchdog lumiere
     void fenetreNonDeclenchement(byte horaire, byte mois);//fenetre de non declenchement et mise à jour du compteur watchdog lumiere
     //non Declenchement Position Servo et mise à jour du compteur watchdog lumiere
@@ -49,8 +48,8 @@ class Lumiere
     const unsigned int m_lumiereMax; // valeur maxi de la lumiere 1020
     const byte m_incrementation; // pas de 10
     const byte m_lumierePin; //analog pin - tension luminosite
-    // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V)
-    const float m_rapportConvertion; // 5 pour convertion
+    const int m_R2 ; // resistance R2 du pont
+    const float  m_Vref; // tension de reference
     const int m_maxCAD; // maximum du convertisseur analogique numérique 1023
     const byte m_heureFenetreSoir; // horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
     const byte m_tempsLum; // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)

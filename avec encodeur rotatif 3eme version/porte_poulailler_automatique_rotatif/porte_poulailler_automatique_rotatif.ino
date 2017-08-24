@@ -107,18 +107,22 @@ bool reduit = false; // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
 ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
 
+/** definitions */
+#define V_REFERENCE 5.18 // tension de reference
+#define MAX_CAD 1023  // maximum du convertisseur analogique digital
+
 /** Accus */
 #include "Accus.h"
 #define PIN_ACCUS_N1  A6  //analog pin A6 : tension batterie N1
 #define PIN_ACCUS_N2  A7  //analog pin A7 : tension batterie N2
 #define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
-#define ACCUS_CONVERSION_RAPPORT_ACCUS_N1  762 // rapport de convertion : tension batterie multimètre * 100 * 1023 / CAD valAccus 
-#define ACCUS_CONVERSION_RAPPORT_ACCUS_N2  762 // rapport de convertion : tension batterie multimètre * 100 * 1023 / CAD valAccus 
+#define ACCUS_R1 4700 // resistance  R1 du pont
+#define ACCUS_R2 10000 // resistance  R2 du pont
 #define ACCU_N1 true  // batterie N1 presente si true
 #define ACCU_N2 true // batterie N2 presente  si true
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
-Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT_ACCUS_N1, DEBUG );
-Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT_ACCUS_N2, DEBUG );
+Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, V_REFERENCE, MAX_CAD, DEBUG );
+Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, V_REFERENCE, MAX_CAD, DEBUG );
 
 /** encodeur rotatif */
 #include "JlmRotaryEncoder.h"
@@ -139,12 +143,12 @@ int tempoEncodeur = 5; // tempo pour éviter les rebonds de l'encodeur ms
 /** lumiere */
 #include "Lumiere.h"
 #define PIN_LUMIERE A0  //analog pin A0 : luminosite
-#define LUMIERE_CONVERSION_RAPPORT  5 // rapport de convertion CAD float
+#define LDR_R2 10000 // resistance  R2 du pont avec la LDR
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
 #define LUMIERE_BOUCLES   5  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define LUMIERE_MATIN  330  // valeur de la lumière du matin
 #define LUMIERE_SOIR  150  // valeur de la lumiere du soir
-Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LUMIERE_CONVERSION_RAPPORT, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
+Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LDR_R2, V_REFERENCE, MAX_CAD, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 
 /** interruptions */
 volatile boolean interruptBp = false; // etat interruption entree 9
@@ -347,8 +351,7 @@ void eclairageAfficheur() {
 /* batteries */
 ///-------affichage tension batterie commandes
 void affiTensionBatCdes() {
-  int valBat = accusN1.tensionAccusCAD(); // tension batterie CAD
-  float voltage = accusN1.tensionAccus(valBat);// read the input on analog pin A6 : tension batterie N1
+  float voltage = accusN1.tensionAccus();// read the input on analog pin A6 : tension batterie N1
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
@@ -360,8 +363,7 @@ void affiTensionBatCdes() {
 
 ///-------affichage tension batterie servo-moteur
 void affiTensionBatServo() {
-  int valBat = accusN2.tensionAccusCAD(); // tension batterie CAD
-  float voltage = accusN2.tensionAccus(valBat);// read the input on analog pin A7 : tension batterie N2
+  float voltage = accusN2.tensionAccus();// read the input on analog pin A7 : tension batterie N2
   // print out the value you read:
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;

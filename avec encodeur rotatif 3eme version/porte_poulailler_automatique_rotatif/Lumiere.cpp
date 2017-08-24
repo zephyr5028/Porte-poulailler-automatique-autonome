@@ -6,10 +6,10 @@
 #include "Lumiere.h"
 
 //constructeur avec debug
-Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const float rapportConvertion, const byte tempsLum, const boolean debug) :
+Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const int R2, const float  Vref, const int maxCAD, const byte tempsLum, const boolean debug) :
   m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir),
-  m_rapportConvertion(rapportConvertion), m_debug(debug), m_ouverture(1), m_fermeture(0),
-  m_lumiereMax(1020), m_incrementation(10), m_maxCAD(1023), m_compteurWatchdogLumiere(0),
+  m_R2(R2), m_Vref(Vref), m_maxCAD(maxCAD), m_debug(debug), m_ouverture(1), m_fermeture(0),
+   m_lumiereMax(1020), m_incrementation(10), m_compteurWatchdogLumiere(0),
   m_heureFenetreSoir(heureFenetreSoir), m_tempsLum(tempsLum)
 {
 }
@@ -48,18 +48,19 @@ int Lumiere::luminositeCAD() {
   return valLumiere;
 }
 
-///------- convertion CAD  vers tension luminosite -----
-float Lumiere::tensionLuminosite(int valLumiere) {
-  // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 5V)
-  float voltage = valLumiere * (m_rapportConvertion / m_maxCAD);
+///------- convertion CAD  vers LDR ( resitance ou lux )-----
+unsigned int Lumiere::tensionLuminosite() {
+  float resistorVoltage = (luminositeCAD() * m_Vref) / m_maxCAD;
+  // utilisation d'un pont de resistances : vout = vin * R2 / R1 + R2
+  float ldrVoltage = m_Vref - resistorVoltage;
+   unsigned int ldrResistance = (ldrVoltage * m_R2) / resistorVoltage;  
+  // courbe lux / resistance de la LDR
+  float LUX_CALC_SCALAR = 12518931;
+  float LUX_CALC_EXPONENT = -1.28;
+  int voltage = LUX_CALC_SCALAR * pow(ldrResistance, LUX_CALC_EXPONENT);
   return voltage;
 }
 
-///-----lecture et convertion vers tension luminosite en float-----
-float Lumiere::tensionLuminositeCADversFloat() {
-  float tension = tensionLuminosite(luminositeCAD());
-  return tension;
-}
 
 ///-----test luminosite et mise à jour du compteur watchdog lumiere-----
 void Lumiere::testLuminosite() {
