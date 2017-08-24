@@ -53,7 +53,7 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 
-const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
+const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
 
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
@@ -100,7 +100,7 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-#define SERVO_PULSE_STOP 1350 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE   220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
@@ -112,8 +112,8 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #define PIN_ACCUS_N1  A6  //analog pin A6 : tension batterie N1
 #define PIN_ACCUS_N2  A7  //analog pin A7 : tension batterie N2
 #define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
-#define ACCUS_CONVERSION_RAPPORT_ACCUS_N1  732 // rapport de convertion : tension batterie multimètre * 100 * 1023 / CAD valAccus 
-#define ACCUS_CONVERSION_RAPPORT_ACCUS_N2  733 // rapport de convertion : tension batterie multimètre * 100 * 1023 / CAD valAccus 
+#define ACCUS_CONVERSION_RAPPORT_ACCUS_N1  762 // rapport de convertion : tension batterie multimètre * 100 * 1023 / CAD valAccus 
+#define ACCUS_CONVERSION_RAPPORT_ACCUS_N2  762 // rapport de convertion : tension batterie multimètre * 100 * 1023 / CAD valAccus 
 #define ACCU_N1 true  // batterie N1 presente si true
 #define ACCU_N2 true // batterie N2 presente  si true
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
@@ -125,8 +125,8 @@ Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT_ACC
 #define SECURITE_TEMPS_FERMETURE  300 // utilisation du temps de descente pour la sécurité =  SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
 #define SECURITE_TEMPS_OUVERTURE  300 // utilisation du temps de monté pour la sécurité =  SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
 #define ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION 100 // initialisation de la position de l'encodeur rotatif avec le contact reed
-#define ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION   190  // initialisation par defaut au demarrage de la possition de la roue codeuse 
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  70 // initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION   150  // initialisation par defaut au demarrage de la possition de la roue codeuse 
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  40 // initialisation par defaut au demarrage de la valeur de fin de course fermeture
 // définition des pin pour le KY040
 #define ENCODER_PIN_A   2   // A
 #define ENCODER_PIN_B   11   // B
@@ -134,16 +134,16 @@ Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_CONVERSION_RAPPORT_ACC
 JlmRotaryEncoder rotary(ENCODER_PIN_A, ENCODER_PIN_B, ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE, ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION); // clearButton si besoin
 volatile bool interruptEncodeur = false; // valider la prise en compte de l'interruption
 volatile unsigned long debutTempsEncodeur = 0; // utilisation de millis()
-int tempoEncodeur = 15; // tempo pour éviter les rebonds de l'encodeur ms
+int tempoEncodeur = 5; // tempo pour éviter les rebonds de l'encodeur ms
 
 /** lumiere */
 #include "Lumiere.h"
 #define PIN_LUMIERE A0  //analog pin A0 : luminosite
 #define LUMIERE_CONVERSION_RAPPORT  5 // rapport de convertion CAD float
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
-#define LUMIERE_BOUCLES   4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
+#define LUMIERE_BOUCLES   5  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define LUMIERE_MATIN  330  // valeur de la lumière du matin
-#define LUMIERE_SOIR  80  // valeur de la lumiere du soir
+#define LUMIERE_SOIR  150  // valeur de la lumiere du soir
 Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LUMIERE_CONVERSION_RAPPORT, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 
 /** interruptions */
@@ -188,7 +188,7 @@ bool LcdCursor = true; //curseur du lcd if true = enable
 /// I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
 LcdDigoleI2C mydisp( &Wire, '\x27', colonnes, debug); // classe lcd digole i2c (lcd 2*16 caracteres)
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 1.4.1  .Porte Poulailler.Manque carte RTC";
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
 #endif
 #ifdef LCD_LIQIDCRYSTAL
 #include "LcdPCF8574.h"
