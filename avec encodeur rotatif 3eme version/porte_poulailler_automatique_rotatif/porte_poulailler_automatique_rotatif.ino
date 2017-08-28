@@ -145,7 +145,7 @@ int tempoEncodeur = 5; // tempo pour éviter les rebonds de l'encodeur ms
 #define PIN_LUMIERE A0  //analog pin A0 : luminosite
 #define LDR_R2 10000 // resistance  R2 du pont avec la LDR
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
-#define LUMIERE_BOUCLES   5  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
+#define LUMIERE_BOUCLES   4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define LUMIERE_MATIN  330  // valeur de la lumière du matin
 #define LUMIERE_SOIR  150  // valeur de la lumiere du soir
 Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LDR_R2, V_REFERENCE, MAX_CAD, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
@@ -1044,8 +1044,8 @@ void routineGestionWatchdog() {
         //la routine tools.fonctionnementBuzzer ne fonctionne qu'en cas de switch radio sur off ????
         //tools.fonctionnementBuzzer(lum.get_m_compteurWatchdogLumiere(), 2000) ;
         if (BUZZER) {
-          //si le compteur est > 2 , le buzzer fonctionne
-          if (lum.get_m_compteurWatchdogLumiere() > 2) {
+          //si le compteur est > 1 , le buzzer fonctionne
+          if (lum.get_m_compteurWatchdogLumiere() > 1) {
             digitalWrite(BUZZER_PIN, LOW);
             delay(2000);
             digitalWrite(BUZZER_PIN, HIGH);
