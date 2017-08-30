@@ -53,7 +53,7 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 
-const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
+const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
 
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
@@ -100,7 +100,7 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-#define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_STOP 1350 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE   220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
@@ -108,7 +108,7 @@ bool reduit = false; // vitesse du servo, normal ou reduit(false)
 ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
 
 /** definitions */
-#define V_REFERENCE 5.18 // tension de reference
+#define V_REFERENCE 4.99 // tension de reference
 #define MAX_CAD 1023  // maximum du convertisseur analogique digital
 
 /** Accus */
@@ -138,7 +138,7 @@ Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, V_REFERE
 JlmRotaryEncoder rotary(ENCODER_PIN_A, ENCODER_PIN_B, ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE, ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION); // clearButton si besoin
 volatile bool interruptEncodeur = false; // valider la prise en compte de l'interruption
 volatile unsigned long debutTempsEncodeur = 0; // utilisation de millis()
-int tempoEncodeur = 5; // tempo pour éviter les rebonds de l'encodeur ms
+int tempoEncodeur = 15; // tempo pour éviter les rebonds de l'encodeur ms
 
 /** lumiere */
 #include "Lumiere.h"
