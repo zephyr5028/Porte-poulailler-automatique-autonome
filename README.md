@@ -1,6 +1,8 @@
 # Porte de poulailler automatique et autonome
 
-Ensemble complètement, autonome et reproductible par l'utilisation de l'impression 3D.
+Ensemble complet, autonome et reproductible par l'utilisation de l'impression 3D.
+
+
 
 
 
