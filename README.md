@@ -44,4 +44,4 @@ Versions :
 
 2eme version avec un codeur optique, fonctionnant pour l'ouverture/fermeture avec l'heure et la lumière.
 
-3eme version avec un codeur optique et l'intégration dans un boitier étanche IP55 à l'aide d'une imprimante 3D.
+3eme version avec un codeur rotatif et l'intégration dans un boitier étanche IP55 à l'aide d'une imprimante 3D.
