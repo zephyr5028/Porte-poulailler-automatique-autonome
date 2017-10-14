@@ -79,7 +79,7 @@ unsigned int memoireLibre = 0; // variable pour calcul de la memoire libre
 volatile int f_wdt = 1; // flag watchdog
 byte tempsWatchdog = WATCHDOG_BOUCLES ; // boucle temps du chien de garde
 boolean reglage = false; // menu=false ou reglage=true
-#define BUZZER false //positionner BUZZER en fonction de la presence ou pas d'un buzzer sur la carte (true = presence)
+#define BUZZER true //positionner BUZZER en fonction de la presence ou pas d'un buzzer sur la carte (true = presence)
 #define BUZZER_PIN 7 // broche du buzzer
 PowerTools tools (BUZZER_PIN, BUZZER, DEBUG ); // objet tools et power
 
