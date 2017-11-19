@@ -102,7 +102,7 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
 #define SERVO_PULSE_STOP 1498 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE   220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
 // pulse stop, ouverture/fermeture , reduit et debug si nécessaire
 ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
@@ -740,7 +740,7 @@ void read_temp(const boolean typeTemperature) {
 void ouverturePorte() {
   if (monServo.get_m_servoAction() and !monServo.get_m_ouvFerm()) {
     //Serial.println (rotary.get_m_compteRoueCodeuse());
-    if (rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() + 5) {
+    if (rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() + 12) {  // passage de +5 a +12
       reduit = 0;// vitesse reduite
 
       monServo.servoVitesse( reduit);
@@ -761,7 +761,7 @@ void ouverturePorte() {
 void  fermeturePorte() {
   if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
     //Serial.println (rotary.get_m_compteRoueCodeuse());
-    if (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + ( rotary.get_m_finDeCourseFermeture() - 10)) {
+    if (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + ( rotary.get_m_finDeCourseFermeture() - 16)) {  // passage de -10 a -16
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
