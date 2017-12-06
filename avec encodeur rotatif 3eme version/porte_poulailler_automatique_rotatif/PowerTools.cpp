@@ -10,6 +10,10 @@
 
 #include "PowerTools.h"
 
+PowerTools::PowerTools() :  m_buzzer_pin(7), m_buzzer(false), m_debug(false)
+{
+
+}
 PowerTools::PowerTools(const byte buzzer_pin, const boolean buzzer) :  m_buzzer_pin(buzzer_pin), m_buzzer(buzzer), m_debug(false)
 {
 
@@ -86,6 +90,24 @@ void PowerTools::fonctionnementBuzzer (unsigned int compteur, int temps) {
       digitalWrite(m_buzzer_pin, HIGH);
     }
   }
+}
+
+///----- Mesure la référence interne à 1.1 volts pour connaitre la tension d'alimentation------
+unsigned int PowerTools::analogReadReference(void) {
+  /* Elimine toutes charges résiduelles */
+  ADMUX = 0x4F;
+  delayMicroseconds(5);
+  /* Sélectionne la référence interne à 1.1 volts comme point de mesure, avec comme limite haute VCC */
+  ADMUX = 0x4E;
+  delayMicroseconds(200);
+  /* Active le convertisseur analogique -> numérique */
+  ADCSRA |= (1 << ADEN);
+  /* Lance une conversion analogique -> numérique */
+  ADCSRA |= (1 << ADSC);
+  /* Attend la fin de la conversion */
+  while(ADCSRA & (1 << ADSC));
+  /* Récupère le résultat de la conversion */
+  return ADCL | (ADCH << 8);
 }
 
 

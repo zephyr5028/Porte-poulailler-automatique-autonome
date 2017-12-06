@@ -21,6 +21,7 @@ class PowerTools
   public:
 
     // constructeur
+    PowerTools();
     PowerTools(const byte buzzer_pin, const boolean buzzer);
     PowerTools( const byte buzzer_pin, const boolean buzzer, const boolean debug = false ); // constructeur avec la broche du buzzzer et si present sur la carte , debug
     ~PowerTools(); // destructeur
@@ -31,6 +32,7 @@ class PowerTools
     byte tailleChaine (char *chaine);//taille d'une chaine de caractères
     void setupBuzzer(int temps); //initialisation du buzzer
     void fonctionnementBuzzer(unsigned int compteur, int temps); //fonctionnement du buzzer en fonction du parametre compteurWatchdogLumiere
+    unsigned int analogReadReference(void) ; // Mesure la référence interne à 1.1 volts pour connaitre la tension d'alimentation
 
 
   protected:

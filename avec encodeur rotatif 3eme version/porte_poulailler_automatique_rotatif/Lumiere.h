@@ -6,16 +6,18 @@
 #ifndef Lumiere_h
 #define Lumiere_h
 
+#include "PowerTools.h"
 #include "Arduino.h"
 
-class Lumiere
+class Lumiere  :  public PowerTools
 {
 
   public:
 
     // constructeur avec debug
     Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir,  const byte heureFenetreSoir = 17 ,
-             const int R2 = 10000, const float  Vref = 5.0, const int maxCAD = 1023, const byte tempsLum = 2,  boolean debug = false );
+             const int R2 = 10000, const int maxCAD = 1023, const byte tempsLum = 2,  boolean debug = false );
+    //const int R2 = 10000, const float  Vref = 5.0, const int maxCAD = 1023, const byte tempsLum = 2,  boolean debug = false );
     ~Lumiere(); // destructeur
 
     unsigned int  reglageLumiere (bool matinSoir, byte touche);// reglage de la lumiere du matin ou du soir
@@ -49,7 +51,7 @@ class Lumiere
     const byte m_incrementation; // pas de 10
     const byte m_lumierePin; //analog pin - tension luminosite
     const int m_R2 ; // resistance R2 du pont
-    const float  m_Vref; // tension de reference
+    // const float  m_Vref; // tension de reference
     const int m_maxCAD; // maximum du convertisseur analogique numérique 1023
     const byte m_heureFenetreSoir; // horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
     const byte m_tempsLum; // 2 boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)

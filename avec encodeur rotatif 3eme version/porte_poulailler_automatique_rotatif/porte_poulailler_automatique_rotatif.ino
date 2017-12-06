@@ -113,7 +113,7 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 //#define V_REFERENCE 5.06 // tension de reference
 #define MAX_CAD 1023  // maximum du convertisseur analogique digital
 //https://www.carnetdumaker.net/articles/mesurer-la-tension-dalimentation-dune-carte-arduino-genuino-ou-dun-microcontroleur-avr/
-float tensionAlimentation = (MAX_CAD * 1.1) / analogReadReference();
+//float tensionAlimentation = (MAX_CAD * 1.1) / tools.analogReadReference();
 
 /** Accus */
 #include "Accus.h"
@@ -125,8 +125,10 @@ float tensionAlimentation = (MAX_CAD * 1.1) / analogReadReference();
 #define ACCU_N1 true  // batterie N1 presente si true
 #define ACCU_N2 true // batterie N2 presente  si true
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
-Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, tensionAlimentation, MAX_CAD, DEBUG );
-Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, tensionAlimentation, MAX_CAD, DEBUG );
+//Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, tensionAlimentation, MAX_CAD, DEBUG );
+//Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, tensionAlimentation, MAX_CAD, DEBUG );
+Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, MAX_CAD, DEBUG );
+Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, MAX_CAD, DEBUG );
 
 /** encodeur rotatif */
 #include "JlmRotaryEncoder.h"
@@ -152,7 +154,8 @@ int tempoEncodeur = 5; // tempo pour éviter les rebonds de l'encodeur ms
 #define LUMIERE_BOUCLES   4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define LUMIERE_MATIN  330  // valeur de la lumière du matin
 #define LUMIERE_SOIR  150  // valeur de la lumiere du soir
-Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LDR_R2, tensionAlimentation, MAX_CAD, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
+//Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LDR_R2, tensionAlimentation, MAX_CAD, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
+Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LDR_R2, MAX_CAD, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 
 /** interruptions */
 volatile boolean interruptBp = false; // etat interruption entree 9
@@ -353,24 +356,6 @@ void eclairageAfficheur() {
 }
 
 /* batteries */
-///----- Mesure la référence interne à 1.1 volts pour connaitre la tension d'alimentation------
-unsigned int analogReadReference(void) {
-  /* Elimine toutes charges résiduelles */
-  ADMUX = 0x4F;
-  delayMicroseconds(5);
-  /* Sélectionne la référence interne à 1.1 volts comme point de mesure, avec comme limite haute VCC */
-  ADMUX = 0x4E;
-  delayMicroseconds(200);
-  /* Active le convertisseur analogique -> numérique */
-  ADCSRA |= (1 << ADEN);
-  /* Lance une conversion analogique -> numérique */
-  ADCSRA |= (1 << ADSC);
-  /* Attend la fin de la conversion */
-  while(ADCSRA & (1 << ADSC));
-  /* Récupère le résultat de la conversion */
-  return ADCL | (ADCH << 8);
-}
-
 ///-------affichage tension batterie commandes
 void affiTensionBatCdes() {
   float voltage = accusN1.tensionAccus();// read the input on analog pin A6 : tension batterie N1

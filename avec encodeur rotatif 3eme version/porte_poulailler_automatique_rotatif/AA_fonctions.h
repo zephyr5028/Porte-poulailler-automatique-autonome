@@ -38,8 +38,6 @@ void affiPulsePlusCptRoue();
 void eclairageAfficheur();
 
 /* batteries */
-//----- Mesure la référence interne à 1.1 volts pour connaitre la tension d'alimentation------
-unsigned int analogReadReference(void);
 //-------affichage tension batterie commandes
 void affiTensionBatCdes();
 

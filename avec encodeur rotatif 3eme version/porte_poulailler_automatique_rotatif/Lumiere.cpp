@@ -6,11 +6,11 @@
 #include "Lumiere.h"
 
 //constructeur avec debug
-Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const int R2, const float  Vref, const int maxCAD, const byte tempsLum, const boolean debug) :
-  m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir), m_heureFenetreSoir(heureFenetreSoir),
-  m_R2(R2), m_Vref(Vref), m_maxCAD(maxCAD), m_tempsLum(tempsLum), m_debug(debug),
-  m_ouverture(1), m_fermeture(0), m_lumiereMax(1020), m_incrementation(10), m_compteurWatchdogLumiere(0)
-
+//Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const int R2, const float  Vref, const int maxCAD, const byte tempsLum, const boolean debug) :
+Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const int R2, const int maxCAD, const byte tempsLum, const boolean debug) :
+  PowerTools(), m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir), m_heureFenetreSoir(heureFenetreSoir),
+  m_R2(R2), m_maxCAD(maxCAD), m_tempsLum(tempsLum), m_debug(debug), m_ouverture(1), m_fermeture(0), m_lumiereMax(1020), m_incrementation(10), m_compteurWatchdogLumiere(0)
+  //m_R2(R2), m_Vref(Vref), m_maxCAD(maxCAD), m_tempsLum(tempsLum), m_debug(debug),
 {
 }
 
@@ -50,9 +50,11 @@ int Lumiere::luminositeCAD() {
 
 ///------- convertion CAD  vers LDR ( resitance ou lux )-----
 unsigned int Lumiere::tensionLuminosite() {
-  float resistorVoltage = (luminositeCAD() * m_Vref) / m_maxCAD;
+  float resistorVoltage = (luminositeCAD() * analogReadReference()) / m_maxCAD;
+  // float resistorVoltage = (luminositeCAD() * analogReadReference()) / m_maxCAD;
   // utilisation d'un pont de resistances : vout = vin * R2 / R1 + R2
-  float ldrVoltage = m_Vref - resistorVoltage;
+  float ldrVoltage = analogReadReference() - resistorVoltage;
+  //float ldrVoltage = analogReadReference() - resistorVoltage;
   unsigned int ldrResistance = (ldrVoltage * m_R2) / resistorVoltage;
   // courbe lux / resistance de la LDR
   float LUX_CALC_SCALAR = 12518931;
