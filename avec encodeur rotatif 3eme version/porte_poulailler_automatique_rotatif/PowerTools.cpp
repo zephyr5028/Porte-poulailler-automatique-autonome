@@ -110,4 +110,9 @@ unsigned int PowerTools::analogReadReference(void) {
   return ADCL | (ADCH << 8);
 }
 
+///-----mesure de la tension d'alimentation de reference-----
+float PowerTools::vccReference() {
+  return (1023 * 1.1) /analogReadReference();
+}
+
 

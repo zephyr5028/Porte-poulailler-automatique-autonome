@@ -120,6 +120,7 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #define PIN_ACCUS_N1  A6  //analog pin A6 : tension batterie N1
 #define PIN_ACCUS_N2  A7  //analog pin A7 : tension batterie N2
 #define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
+#define OFFSET_AREF 0.08 // offset de la tension de reference aref (1.1v), = 0.08v
 #define ACCUS_R1 4700 // resistance  R1 du pont
 #define ACCUS_R2 10000 // resistance  R2 du pont
 #define ACCU_N1 true  // batterie N1 presente si true
@@ -127,8 +128,8 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
 //Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, tensionAlimentation, MAX_CAD, DEBUG );
 //Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, tensionAlimentation, MAX_CAD, DEBUG );
-Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, MAX_CAD, DEBUG );
-Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, MAX_CAD, DEBUG );
+Accus accusN1 (PIN_ACCUS_N1, OFFSET_AREF, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, MAX_CAD, DEBUG );
+Accus accusN2 (PIN_ACCUS_N2, OFFSET_AREF, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, MAX_CAD, DEBUG );
 
 /** encodeur rotatif */
 #include "JlmRotaryEncoder.h"
@@ -1143,6 +1144,9 @@ void setup() {
   tools.setupPower(); // initialisation power de l'arduino
 
   tools.setup_watchdog(9); // initialisation : maxi de 8 secondes pour l'it du watchdog
+
+  accusN1.init(); // initialisation des de l'objet accus n1
+  accusN2.init(); // initialisation des de l'objet accus n2
 
   radio.init();//initialisation radio
 

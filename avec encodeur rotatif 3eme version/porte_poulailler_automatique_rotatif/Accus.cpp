@@ -6,8 +6,8 @@
 #include "Accus.h"
 
 //constructeur avec debug
-Accus::Accus(  const byte accusPin, const float tensionMiniAccus, const int R1, const int R2, const int maxCAD, const boolean debug) :
-  PowerTools(), m_accusPin(accusPin), m_tensionMiniAccus(tensionMiniAccus), m_R1(R1), m_R2(R2), m_maxCAD(maxCAD), m_debug(debug), m_valMinCAD(668)
+Accus::Accus(  const byte accusPin,  float const offsetAREF, const float tensionMiniAccus, const int R1, const int R2, const int maxCAD, const boolean debug) :
+  PowerTools(), m_accusPin(accusPin),  m_offsetAREF(offsetAREF), m_tensionMiniAccus(tensionMiniAccus), m_R1(R1), m_R2(R2), m_maxCAD(maxCAD), m_debug(debug), m_valMinCAD(668)
 {
 }
 
@@ -19,8 +19,8 @@ Accus::~Accus()
 void Accus::init () {
   //utilisation d'un pont de resistances : vout = vin * R2 / R1 + R2
   float vout = (m_tensionMiniAccus * m_R2) / (m_R1 + m_R2) ;
-  m_valMinCAD = (vout * m_maxCAD) /  analogReadReference() ;
-  //m_valMinCAD = (vout * m_maxCAD) / m_Vref ;
+  m_valMinCAD = (vout * m_maxCAD) /  vccReference() ; // valeur cad pour la comparaison avec la tension minimale des batteries
+  m_offsetAREF_CAD = (m_offsetAREF * m_maxCAD) /  vccReference() ; // offset aref traduit en valeur CAD
 }
 
 ///------- lecture tension batterie CAD-----
@@ -47,9 +47,9 @@ bool Accus::accusFaible() {
 
 ///------- convertion CAD  vers tension batterie -----
 float Accus::tensionAccus() {
-  //utilisation d'un pont de resistances : vout = vin * R2 / R1 + R2
-  float vout = (lectureAccusCAD() * analogReadReference()) / m_maxCAD;
-  //float vout = (lectureAccusCAD() * m_Vref) / m_maxCAD;
+  // calcul de la tension en sortie du pont de resistance
+  float vout = (lectureAccusCAD() * 1.1) / (analogReadReference() + m_offsetAREF_CAD);
+  //utilisation d'un pont de resistances : vout = vin * R2 / R1 + R2. vin correspond à la tension de la batterie
   float vin = (vout * (m_R1 + m_R2)) / m_R2;
   // vin : tension de l'accu
   return vin;

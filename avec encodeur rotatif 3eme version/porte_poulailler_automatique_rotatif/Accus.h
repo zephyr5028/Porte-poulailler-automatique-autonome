@@ -20,7 +20,7 @@ class Accus  :  public PowerTools
   public:
     // constructeur avec debug
     //Accus( const byte accusPin, const float tensionMiniAccus = 4.8,  const int R1 = 4700,  const int R2 = 10000, const float  Vref = 5.0, const int maxCAD = 1023, boolean debug = false);
-    Accus( const byte accusPin, const float tensionMiniAccus = 4.8,  const int R1 = 4700,  const int R2 = 10000, const int maxCAD = 1023, boolean debug = false);
+    Accus( const byte accusPin,  float const offsetAREF = 0.08, const float tensionMiniAccus = 4.8,  const int R1 = 4700,  const int R2 = 10000, const int maxCAD = 1023, boolean debug = false);
     ~Accus(); // destructeur
 
     void init();// initialisation
@@ -38,6 +38,8 @@ class Accus  :  public PowerTools
     const int m_R2 ; // resistance R2 du pont
     //   const float  m_Vref; // tension de reference
     int m_valMinCAD; // valeur minimale du CAD en fonction de la tension mini de l'accu
+    const float m_offsetAREF ; // offset de la reference de tension aref(1.1v) = 0.08v théorique
+    int m_offsetAREF_CAD ; // offset aref traduit en valeur CAD
 
 };
 
