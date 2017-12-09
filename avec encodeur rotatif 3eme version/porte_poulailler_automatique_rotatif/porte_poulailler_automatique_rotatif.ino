@@ -110,24 +110,21 @@ bool reduit = false; // vitesse du servo, normal ou reduit(false)
 ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
 
 /** definitions */
-//#define V_REFERENCE 5.06 // tension de reference
 #define MAX_CAD 1023  // maximum du convertisseur analogique digital
 //https://www.carnetdumaker.net/articles/mesurer-la-tension-dalimentation-dune-carte-arduino-genuino-ou-dun-microcontroleur-avr/
 //float tensionAlimentation = (MAX_CAD * 1.1) / tools.analogReadReference();
+#define OFFSET_AREF -0.07 // offset de la tension de reference aref (1.1v), = +/-0.08v therorique
 
 /** Accus */
 #include "Accus.h"
 #define PIN_ACCUS_N1  A6  //analog pin A6 : tension batterie N1
 #define PIN_ACCUS_N2  A7  //analog pin A7 : tension batterie N2
 #define ACCUS_TESION_MINIMALE  4.8 //valeur minimum de l'accu 4.8v
-#define OFFSET_AREF 0.08 // offset de la tension de reference aref (1.1v), = 0.08v
 #define ACCUS_R1 4700 // resistance  R1 du pont
 #define ACCUS_R2 10000 // resistance  R2 du pont
 #define ACCU_N1 true  // batterie N1 presente si true
 #define ACCU_N2 true // batterie N2 presente  si true
 boolean batterieFaible = false; //  batterie < ACCUS_TESION_MINIMALE = true
-//Accus accusN1 (PIN_ACCUS_N1, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, tensionAlimentation, MAX_CAD, DEBUG );
-//Accus accusN2 (PIN_ACCUS_N2, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, tensionAlimentation, MAX_CAD, DEBUG );
 Accus accusN1 (PIN_ACCUS_N1, OFFSET_AREF, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, MAX_CAD, DEBUG );
 Accus accusN2 (PIN_ACCUS_N2, OFFSET_AREF, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS_R2, MAX_CAD, DEBUG );
 
@@ -1200,6 +1197,8 @@ void loop() {
   } else if (ACCU_N2) {
     batterieFaible = accusN2.accusFaible() ;// test de la tension de la batterie N2
   }
+
+//Serial.println(tools.vccReference()-0.07);
 
   ouverturePorte();
   fermeturePorte();

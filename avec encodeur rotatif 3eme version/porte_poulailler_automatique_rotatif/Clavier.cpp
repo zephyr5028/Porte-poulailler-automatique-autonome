@@ -4,7 +4,7 @@
 
 #include "Clavier.h"
 
-Clavier::Clavier() : Bouton(  ), m_oldKey (-1), m_MenuManuel(14), m_NumKeys(6),
+Clavier::Clavier() : Bouton(), m_oldKey (-1), m_MenuManuel(14), m_NumKeys(6),
   m_AdcKeyVal { 50, 200, 400, 600, 800 }
 {
 

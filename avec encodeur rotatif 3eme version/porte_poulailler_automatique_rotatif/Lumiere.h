@@ -17,7 +17,6 @@ class Lumiere  :  public PowerTools
     // constructeur avec debug
     Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir,  const byte heureFenetreSoir = 17 ,
              const int R2 = 10000, const int maxCAD = 1023, const byte tempsLum = 2,  boolean debug = false );
-    //const int R2 = 10000, const float  Vref = 5.0, const int maxCAD = 1023, const byte tempsLum = 2,  boolean debug = false );
     ~Lumiere(); // destructeur
 
     unsigned int  reglageLumiere (bool matinSoir, byte touche);// reglage de la lumiere du matin ou du soir

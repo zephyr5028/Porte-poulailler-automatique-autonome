@@ -6,11 +6,9 @@
 #include "Lumiere.h"
 
 //constructeur avec debug
-//Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const int R2, const float  Vref, const int maxCAD, const byte tempsLum, const boolean debug) :
 Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const int R2, const int maxCAD, const byte tempsLum, const boolean debug) :
   PowerTools(), m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir), m_heureFenetreSoir(heureFenetreSoir),
   m_R2(R2), m_maxCAD(maxCAD), m_tempsLum(tempsLum), m_debug(debug), m_ouverture(1), m_fermeture(0), m_lumiereMax(1020), m_incrementation(10), m_compteurWatchdogLumiere(0)
-  //m_R2(R2), m_Vref(Vref), m_maxCAD(maxCAD), m_tempsLum(tempsLum), m_debug(debug),
 {
 }
 
