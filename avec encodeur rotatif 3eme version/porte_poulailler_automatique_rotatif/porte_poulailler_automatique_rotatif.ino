@@ -1,6 +1,6 @@
 /**@file*/
 /**
-    \porte du poulailler avec encodeur rotatif v2.0.2
+    \porte du poulailler avec encodeur rotatif v2.0.3
     \file porte_poulailler_affichage_clavier_rtc
     \brief Automatisation de la porte du poulailler en utilisant l'heure ou la lumière.
     \details Simplification d'utilisation. Electronique avec microcontroleur, alimentée par batterie, couplée à un capteur solaire.
@@ -13,6 +13,7 @@
 
 /**
 
+  10 12 2017 : amélioration de la lecture de la tension des batteries avec l'utilisation de AREF interne (1.1v)
   28 07 2017 : prise en compte du buzzer. Signal avant la fermeture de la porte
   13 07 2017 : securité à la fermeture en cas de rembobinage inverse de la cordelette
   12 07 2017 : intégration du numéro du boitier dans le message radio
@@ -98,11 +99,11 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 
 /** servo - montée et descente de la porte */
 #include "ServoMoteur.h"
-#define SERVO_TEST false // pour utiliser ou non le test du servomoteur
+#define SERVO_TEST false// pour utiliser ou non le test du servomoteur
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-#define SERVO_PULSE_STOP 1498 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_STOP 1474 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE   220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
@@ -203,7 +204,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 LcdPCF8574  mydisp(0x3f, 16, 2);
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
 #endif
 
 /** RTC_DS3231 */
@@ -1142,8 +1143,8 @@ void setup() {
 
   tools.setup_watchdog(9); // initialisation : maxi de 8 secondes pour l'it du watchdog
 
-  accusN1.init(); // initialisation des de l'objet accus n1
-  accusN2.init(); // initialisation des de l'objet accus n2
+  accusN1.init(); // initialisation de l'objet accus n1
+  accusN2.init(); // initialisation de l'objet accus n2
 
   radio.init();//initialisation radio
 
@@ -1197,8 +1198,6 @@ void loop() {
   } else if (ACCU_N2) {
     batterieFaible = accusN2.accusFaible() ;// test de la tension de la batterie N2
   }
-
-//Serial.println(tools.vccReference()-0.07);
 
   ouverturePorte();
   fermeturePorte();

@@ -48,9 +48,10 @@ int Lumiere::luminositeCAD() {
 
 ///------- convertion CAD  vers LDR ( resitance ou lux )-----
 unsigned int Lumiere::tensionLuminosite() {
+  // utilisation de la tension de reference aref pour les calculs
   float resistorVoltage = (luminositeCAD() * 1.1) / analogReadReference();
   // utilisation d'un pont de resistances : vout = vin * R2 / R1 + R2
-  float ldrVoltage = vccReference() - resistorVoltage;
+  float ldrVoltage = ((m_maxCAD * 1.1) /analogReadReference()) - resistorVoltage;
   unsigned int ldrResistance = (ldrVoltage * m_R2) / resistorVoltage;
   // courbe lux / resistance de la LDR
   float LUX_CALC_SCALAR = 12518931;

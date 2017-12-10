@@ -17,10 +17,9 @@ Accus::~Accus()
 
 ///-----initialisation-----
 void Accus::init () {
-  //utilisation d'un pont de resistances : vout = vin * R2 / R1 + R2
+  //utilisation d'un pont de resistances : vout = vin * R2 / R1 + R2. vin = m_tensionMiniAccus. vout = entrée du convertisseur
   float vout = (m_tensionMiniAccus * m_R2) / (m_R1 + m_R2) ;
-  m_valMinCAD = (vout * m_maxCAD) /  vccReference() ; // valeur cad pour la comparaison avec la tension minimale des batteries
-  m_offsetAREF_CAD = (m_offsetAREF * m_maxCAD) /  vccReference() ; // offset aref traduit en valeur CAD
+  m_valMinCAD = (vout * analogReadReference()) / 1.1; // valeur cad pour la comparaison avec la tension minimale des batteries
 }
 
 ///------- lecture tension batterie CAD-----
@@ -48,7 +47,7 @@ bool Accus::accusFaible() {
 ///------- convertion CAD  vers tension batterie -----
 float Accus::tensionAccus() {
   // calcul de la tension en sortie du pont de resistance
-  float vout = (lectureAccusCAD() * 1.1) / (analogReadReference() + m_offsetAREF_CAD);
+  float vout = ((lectureAccusCAD() * 1.1) / analogReadReference()) + m_offsetAREF ;
   //utilisation d'un pont de resistances : vout = vin * R2 / R1 + R2. vin correspond à la tension de la batterie
   float vin = (vout * (m_R1 + m_R2)) / m_R2;
   // vin : tension de l'accu

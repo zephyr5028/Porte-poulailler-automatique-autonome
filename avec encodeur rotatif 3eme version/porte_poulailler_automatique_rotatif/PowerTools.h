@@ -33,7 +33,6 @@ class PowerTools
     void setupBuzzer(int temps); //initialisation du buzzer
     void fonctionnementBuzzer(unsigned int compteur, int temps); //fonctionnement du buzzer en fonction du parametre compteurWatchdogLumiere
     unsigned int analogReadReference(void) ; // Mesure la référence interne à 1.1 volts pour connaitre la tension d'alimentation
-    float vccReference(); //mesure de la tension d'alimentation de reference
 
 
   protected:
