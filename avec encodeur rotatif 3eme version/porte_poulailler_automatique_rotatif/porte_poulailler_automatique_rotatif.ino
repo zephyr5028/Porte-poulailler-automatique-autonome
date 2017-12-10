@@ -114,7 +114,7 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #define MAX_CAD 1023  // maximum du convertisseur analogique digital
 //https://www.carnetdumaker.net/articles/mesurer-la-tension-dalimentation-dune-carte-arduino-genuino-ou-dun-microcontroleur-avr/
 //float tensionAlimentation = (MAX_CAD * 1.1) / tools.analogReadReference();
-#define OFFSET_AREF -0.07 // offset de la tension de reference aref (1.1v), = +/-0.08v therorique
+#define OFFSET_AREF -0.07 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 
 /** Accus */
 #include "Accus.h"
@@ -135,7 +135,7 @@ Accus accusN2 (PIN_ACCUS_N2, OFFSET_AREF, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS
 #define SECURITE_TEMPS_OUVERTURE  300 // utilisation du temps de monté pour la sécurité =  SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
 #define ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION 100 // initialisation de la position de l'encodeur rotatif avec le contact reed
 #define ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION   150  // initialisation par defaut au demarrage de la possition de la roue codeuse 
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  40 // initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  65 // initialisation par defaut au demarrage de la valeur de fin de course fermeture
 // définition des pin pour le KY040
 #define ENCODER_PIN_A   2   // A
 #define ENCODER_PIN_B   11   // B
@@ -766,14 +766,15 @@ void ouverturePorte() {
 ///-----sequence fermeture de la porte-----
 void  fermeturePorte() {
   if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
-    //Serial.println (rotary.get_m_compteRoueCodeuse());
+    Serial.println (rotary.get_m_compteRoueCodeuse());
     if (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + ( rotary.get_m_finDeCourseFermeture() - 16)) {  // passage de -10 a -16
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
     }
     // utilisation du temps de descente pour la sécurité SECURITE_TEMPS_FERMETURE * les pas du codeur rotatif
     // 2000 pour 2s de delais pour débuter la fermeture sans le test du relais reed
-    if (((!digitalRead(PIN_SECURITE_OUVERTURE) and ( millis() - monServo.get_m_debutTemps()) > 2000)) or (touche == 4 and boitierOuvert) or (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture())
+    if (((!digitalRead(PIN_SECURITE_OUVERTURE) and ( millis() - monServo.get_m_debutTemps()) > 2000)) or (touche == 4 and boitierOuvert)
+        or (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + rotary.get_m_finDeCourseFermeture())
         or (( millis() - monServo.get_m_debutTemps()) > (SECURITE_TEMPS_FERMETURE * rotary.get_m_finDeCourseFermeture()))) {
       rotary.set_m_compteRoueCodeuse (monServo.servoHorsTension(rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseOuverture()));
     }
