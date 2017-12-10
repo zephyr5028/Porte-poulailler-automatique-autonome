@@ -26,9 +26,9 @@ void JlmRotaryEncoder::compteurRoueCodeuse() {
   bool pinB = digitalRead(m_encoderPinB);
   if (pinA) {
     if (!pinB) {
-      m_compteRoueCodeuse--;
-    } else {
       m_compteRoueCodeuse++;
+    } else {
+      m_compteRoueCodeuse--;
     }
   }
   //pour la verification de la variable tempoEncodeur

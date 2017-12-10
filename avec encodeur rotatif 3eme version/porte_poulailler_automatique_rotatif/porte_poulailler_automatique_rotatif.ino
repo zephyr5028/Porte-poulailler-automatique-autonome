@@ -766,7 +766,7 @@ void ouverturePorte() {
 ///-----sequence fermeture de la porte-----
 void  fermeturePorte() {
   if (monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
-    Serial.println (rotary.get_m_compteRoueCodeuse());
+    //Serial.println (rotary.get_m_compteRoueCodeuse());
     if (rotary.get_m_compteRoueCodeuse() >= rotary.get_m_finDeCourseOuverture() + ( rotary.get_m_finDeCourseFermeture() - 16)) {  // passage de -10 a -16
       reduit = 0;// vitesse reduite
       monServo.servoVitesse( reduit);
