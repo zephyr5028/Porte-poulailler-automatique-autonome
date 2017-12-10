@@ -53,7 +53,7 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 
-const char numeroSerieBoitier[] = "N003;\0"; // numero de serie du boitier
+const char numeroSerieBoitier[] = "N006;\0"; // numero de serie du boitier
 
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
@@ -202,7 +202,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 #ifdef LCD_LIQIDCRYSTAL
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
-LcdPCF8574  mydisp(0x27, 16, 2);
+LcdPCF8574  mydisp(0x3f, 16, 2);
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
 #endif
 
