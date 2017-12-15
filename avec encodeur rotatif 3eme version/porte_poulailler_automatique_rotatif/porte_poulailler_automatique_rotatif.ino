@@ -114,7 +114,7 @@ ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SE
 #define MAX_CAD 1023  // maximum du convertisseur analogique digital
 //https://www.carnetdumaker.net/articles/mesurer-la-tension-dalimentation-dune-carte-arduino-genuino-ou-dun-microcontroleur-avr/
 //float tensionAlimentation = (MAX_CAD * 1.1) / tools.analogReadReference();
-#define OFFSET_AREF -0.07 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
+#define OFFSET_AREF -0.08 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 
 /** Accus */
 #include "Accus.h"
