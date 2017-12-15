@@ -26,9 +26,9 @@ void JlmRotaryEncoder::compteurRoueCodeuse() {
   bool pinB = digitalRead(m_encoderPinB);
   if (pinA) {
     if (!pinB) {
-      m_compteRoueCodeuse++;
-    } else {
       m_compteRoueCodeuse--;
+    } else {
+      m_compteRoueCodeuse++;
     }
   }
   //pour la verification de la variable tempoEncodeur
@@ -46,13 +46,13 @@ int  JlmRotaryEncoder::reglageFinDeCourse (bool ouvFerm, byte touche) {
     if (ouvFerm) finDeCourse = m_finDeCourseOuverture; else finDeCourse = m_finDeCourseFermeture;
     if (touche == 2) {
       if (finDeCourse < m_finDeCourseMax) {
-        finDeCourse++ ; //incrementation
+        finDeCourse-- ; //incrementation
       } else {
         finDeCourse = 0;
       }
     } else {
       if (finDeCourse > 0) {
-        finDeCourse-- ; //decrementation
+        finDeCourse++ ; //decrementation
       } else {
         finDeCourse =  m_finDeCourseMax;
       }

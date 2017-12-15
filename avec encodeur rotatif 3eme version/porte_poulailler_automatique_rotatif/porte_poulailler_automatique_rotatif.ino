@@ -54,7 +54,7 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 
-const char numeroSerieBoitier[] = "N006;\0"; // numero de serie du boitier
+const char numeroSerieBoitier[] = "N003;\0"; // numero de serie du boitier
 
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
@@ -103,7 +103,7 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-#define SERVO_PULSE_STOP 1474 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_STOP 1498 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE   220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
@@ -203,7 +203,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 #ifdef LCD_LIQIDCRYSTAL
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
-LcdPCF8574  mydisp(0x3f, 16, 2);
+LcdPCF8574  mydisp(0x27, 16, 2);
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
 #endif
 
