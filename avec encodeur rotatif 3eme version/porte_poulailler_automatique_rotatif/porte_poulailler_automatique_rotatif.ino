@@ -13,6 +13,7 @@
 
 /**
 
+  15 12 2017 : passage à la version v2.0.3
   10 12 2017 : amélioration de la lecture de la tension des batteries avec l'utilisation de AREF interne (1.1v)
   28 07 2017 : prise en compte du buzzer. Signal avant la fermeture de la porte
   13 07 2017 : securité à la fermeture en cas de rembobinage inverse de la cordelette
