@@ -55,12 +55,12 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 /**-------boitiers......*/
-#define BOITIER_N001  // boitier n1
+//#define BOITIER_N001  // boitier n1
 //#define BOITIER_N002  // boitier n2
 //#define BOITIER_N003  // boitier n3
 //#define BOITIER_N004  // boitier n4
 //#define BOITIER_N005  // boitier n5
-//#define BOITIER_N006  // boitier n6
+#define BOITIER_N006  // boitier n6
 
 /*--------------------------------------------------------------------------------*/
 #if defined(BOITIER_N001)
@@ -74,7 +74,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
-// void JlmRotaryEncoder::compteurRoueCodeuse(). m_compteRoueCodeuse++; m_compteRoueCodeuse--; inversion ++ et --
+#define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
@@ -94,7 +94,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
-// void JlmRotaryEncoder::compteurRoueCodeuse(). m_compteRoueCodeuse++; m_compteRoueCodeuse--; inversion ++ et --
+#define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
@@ -115,7 +115,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 #define FOURCHETTE_OUVERTURE  12 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.08 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
-// void JlmRotaryEncoder::compteurRoueCodeuse(). m_compteRoueCodeuse++; m_compteRoueCodeuse--; inversion ++ et --
+#define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
@@ -136,7 +136,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.08 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
-// void JlmRotaryEncoder::compteurRoueCodeuse(). m_compteRoueCodeuse++; m_compteRoueCodeuse--; inversion ++ et --
+#define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
@@ -159,9 +159,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 #define FOURCHETTE_OUVERTURE  12 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.07 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
-
-// void JlmRotaryEncoder::compteurRoueCodeuse(). m_compteRoueCodeuse++; m_compteRoueCodeuse--; inversion ++ et --
-
+#define SENS 0 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
@@ -172,6 +170,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /*--------------------------------------------------------------------------------*/
 
 #else
+// parametres par defaut
 const char numeroSerieBoitier[] = "N00x;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.x  .Porte Poulailler.Manque carte RTC";
 #define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
@@ -182,7 +181,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.x  .Porte
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
-// void JlmRotaryEncoder::compteurRoueCodeuse(). m_compteRoueCodeuse++; m_compteRoueCodeuse--; inversion ++ et --
+#define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
 /*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
@@ -454,7 +453,7 @@ void closeTime() {
 void affiPulsePlusCptRoue() {
   int pulse = monServo.get_m_pulse();
   byte test = 0;
-  test = rotary.testCompteurRoueCodeuse (5); // tolerance de 5
+  test = rotary.testCompteurRoueCodeuse(5); // tolerance de 5
   unsigned int compteRoueCodeuse = rotary.get_m_compteRoueCodeuse();
   if ( boitierOuvert) { // si le boitier est ouvert
     byte ligne = 1;
@@ -1339,7 +1338,7 @@ void loop() {
   if (interruptEncodeur) {
     // if ((millis() - debutTempsEncodeur) > tempoEncodeur ) {
     if ((millis() - debutTempsEncodeur) > TEMPO_ENCODEUR ) {
-      rotary.compteurRoueCodeuse(); // mis à jour du compteur de l'encodeur rotatif
+      rotary.compteurRoueCodeuse(SENS); // mis à jour du compteur de l'encodeur rotatif
       interruptEncodeur = false; // autorisation nouvelle it
     }
   }

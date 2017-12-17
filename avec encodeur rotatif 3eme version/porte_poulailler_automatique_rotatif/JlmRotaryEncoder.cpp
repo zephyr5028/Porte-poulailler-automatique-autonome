@@ -21,14 +21,15 @@ void JlmRotaryEncoder::init()
 
 ///-----compteur roue codeuse-----
 // code gray avec l'it sur la broche d2 INT0
-void JlmRotaryEncoder::compteurRoueCodeuse() {
+void JlmRotaryEncoder::compteurRoueCodeuse(bool sens) {
   bool pinA = digitalRead(m_encoderPinA);
   bool pinB = digitalRead(m_encoderPinB);
   if (pinA) {
     if (!pinB) {
-      m_compteRoueCodeuse--;
+      // parametre sens en fonction des boitiers
+      if (sens) m_compteRoueCodeuse--; else  m_compteRoueCodeuse++;
     } else {
-      m_compteRoueCodeuse++;
+      if (sens) m_compteRoueCodeuse++; else  m_compteRoueCodeuse--;
     }
   }
   //pour la verification de la variable tempoEncodeur

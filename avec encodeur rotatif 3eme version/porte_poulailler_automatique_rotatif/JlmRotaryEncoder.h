@@ -23,7 +23,7 @@ class JlmRotaryEncoder
 
     void init(); // initialisation des branchements
 
-    void compteurRoueCodeuse();//compteur roue codeuse
+    void compteurRoueCodeuse(bool sens);//compteur roue codeuse
     byte testCompteurRoueCodeuse (byte tolerance);//test du compteur roue codeuse pour affichage ouvert ou ferme
     int reglageFinDeCourse (bool ouvFerm, byte touche); //reglage de la fin de course
     
