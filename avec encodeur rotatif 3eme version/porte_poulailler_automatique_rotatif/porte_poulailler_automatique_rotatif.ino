@@ -63,7 +63,7 @@
 //#define BOITIER_N006  // boitier n6
 
 /*--------------------------------------------------------------------------------*/
-#ifdef BOITIER_N001
+#if defined(BOITIER_N001)
 const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
 #define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
@@ -82,9 +82,8 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
-#endif
 
-#ifdef BOITIER_N002
+#elif defined(BOITIER_N002)
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte Poulailler.Manque carte RTC";
 #define SERVO_PULSE_STOP 1350 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
@@ -104,9 +103,8 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
-#endif
 
-#ifdef BOITIER_N003
+#elif defined(BOITIER_N003)
 const char numeroSerieBoitier[] = "N003;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
 #define SERVO_PULSE_STOP 1498 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
@@ -126,9 +124,8 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
-#endif
 
-#ifdef BOITIER_N004
+#elif defined(BOITIER_N004)
 const char numeroSerieBoitier[] = "N004;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
 #define SERVO_PULSE_STOP 1474 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
@@ -148,32 +145,10 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 #define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 //#define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
-#endif
 
-#ifdef BOITIER_N005
-const char numeroSerieBoitier[] = "N005;\0"; // numero de serie du boitier
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
-//#define SERVO_PULSE_STOP 1474 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-//define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-//#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
-//#define TEMPO_ENCODEUR  5  // tempo pour éviter les rebonds de l'encodeur ms
-//#define FOURCHETTE_FERMETURE  16 // - pas de l'encodeur rotatif
-//#define FOURCHETTE_OUVERTURE  12 // + pas de l'encodeur rotatif
-//#define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
-#define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
-//#define BH1750 @023 // capteur de lumiere en lux
-// void JlmRotaryEncoder::compteurRoueCodeuse(). m_compteRoueCodeuse++; m_compteRoueCodeuse--; inversion ++ et --
-/*--------------------------------------------------------------------------------*/
-/// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
-//#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
-#define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
-/// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
-#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
-//#define PCF8574T // liquid crystal i2c avec pcf8574t @027
-/*--------------------------------------------------------------------------------*/
-#endif
+// BOITIER_N005 : le boitier n005 est un recepteur avec un montage electronique different.
 
-#ifdef BOITIER_N006
+#elif defined(BOITIER_N006)
 const char numeroSerieBoitier[] = "N006;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
 #define SERVO_PULSE_STOP 1474 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
@@ -194,6 +169,26 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 #define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 //#define PCF8574T // liquid crystal i2c avec pcf8574t @027
+/*--------------------------------------------------------------------------------*/
+
+#else
+const char numeroSerieBoitier[] = "N00x;\0"; // numero de serie du boitier
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.x  .Porte Poulailler.Manque carte RTC";
+#define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define TEMPO_ENCODEUR  5  // tempo pour éviter les rebonds de l'encodeur ms
+#define FOURCHETTE_FERMETURE  10 // - pas de l'encodeur rotatif
+#define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
+#define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
+#define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
+// void JlmRotaryEncoder::compteurRoueCodeuse(). m_compteRoueCodeuse++; m_compteRoueCodeuse--; inversion ++ et --
+/*--------------------------------------------------------------------------------*/
+/// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
+#define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
+/// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
+//#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
+#define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
 #endif
 
