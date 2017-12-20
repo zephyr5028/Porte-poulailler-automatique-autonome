@@ -57,10 +57,10 @@
 /**-------boitiers......*/
 //#define BOITIER_N001  // boitier n1
 //#define BOITIER_N002  // boitier n2
-//#define BOITIER_N003  // boitier n3
+#define BOITIER_N003  // boitier n3
 //#define BOITIER_N004  // boitier n4
 //#define BOITIER_N005  // boitier n5
-#define BOITIER_N006  // boitier n6
+//#define BOITIER_N006  // boitier n6
 
 /*--------------------------------------------------------------------------------*/
 #if defined(BOITIER_N001)
@@ -979,7 +979,7 @@ void  routineTestFermetureBoitier() {
     strcat(chaine, numeroSerieBoitier);
     strcat(chaine, chaine1);
     if (radio.get_m_radio()) {
-      radio.envoiMessage(chaine);// message radio à l'ouverture du boitier
+      radio.envoiMessage(chaine);// message radio à la fermeture du boitier
       displayTime();// avec affichage de l'heure de fermeture
       radio.chaineVide();
     }
@@ -1153,8 +1153,9 @@ void routineGestionWatchdog() {
         //la routine tools.fonctionnementBuzzer ne fonctionne qu'en cas de switch radio sur off ????
         //tools.fonctionnementBuzzer(lum.get_m_compteurWatchdogLumiere(), 2000) ;
         if (BUZZER) {
-          //si le compteur est > 1 , le buzzer fonctionne
-          if (lum.get_m_compteurWatchdogLumiere() > 1) {
+          //si le compteur est > 1, la porte ouverte et le servo non en action, le buzzer fonctionne
+         // if ((lum.get_m_compteurWatchdogLumiere() > 1) and monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
+            if (lum.get_m_compteurWatchdogLumiere() > 1) {
             digitalWrite(BUZZER_PIN, LOW);
             delay(2000);
             digitalWrite(BUZZER_PIN, HIGH);
