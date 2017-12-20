@@ -12,15 +12,15 @@
 */
 
 /**
-
+  17 12 2017 : parametres des boitiers dans le programme
   15 12 2017 : passage à la version v2.0.3
   10 12 2017 : amélioration de la lecture de la tension des batteries avec l'utilisation de AREF interne (1.1v)
   28 07 2017 : prise en compte du buzzer. Signal avant la fermeture de la porte
   13 07 2017 : securité à la fermeture en cas de rembobinage inverse de la cordelette
   12 07 2017 : intégration du numéro du boitier dans le message radio
-  06 2017 : texte envoyé par radio, convertir la lumière en lux, convertir la course de la porte en cm, menu affichage fin de course ouverture
-  03 2017 : encodeur rotatif.
-  01 2017 : classes radio, lcd (digole et liquidcrystal), horloge, bouton.
+     06 2017 : texte envoyé par radio, convertir la lumière en lux, convertir la course de la porte en cm, menu affichage fin de course ouverture
+     03 2017 : encodeur rotatif.
+     01 2017 : classes radio, lcd (digole et liquidcrystal), horloge, bouton.
   29 12 2016 : classe Codeur (optique).
   28 12 2016 : classe Lumiere.
   26 12 2016 : classe Accus.
@@ -29,19 +29,19 @@
   20 09 2016 : classe clavier.
   19 09 2016 : suppression du blocage au demarrage (si = 200).
   18 09 2016 : en cas de probleme avec le sens de rotation du servo :
-    - variable globale : sens.
-    - arret fin de course ( contact) quelque soit le sens.
-    - diminution de la vitesse reduite dans la descente de la trappe (inertie).
+                  - variable globale : sens.
+                  - arret fin de course ( contact) quelque soit le sens.
+                  - diminution de la vitesse reduite dans la descente de la trappe (inertie).
   17 09 2016 : problème avec servotimer2  :
-       Le pulse en ms ne fonctionne pas donc le servo est tjs dans le même sens (hs).
-       Les valeurs du pulse étaient mauvaise.
-       Il faut :
-               90° : 1500ms.
-                0° : 1000ms.
-              180° : 2000ms.
+                  - Le pulse en ms ne fonctionne pas donc le servo est tjs dans le même sens (hs).
+                  - Les valeurs du pulse étaient mauvaise.
+                  - Il faut :
+                        90° : 1500ms.
+                         0° : 1000ms.
+                       180° : 2000ms.
   10 09 2016 :
-    - affichage compteur roue codeuse envoi radio.
-    - delay d'attente de la remontée du servo augmentée : 300.
+                 - affichage compteur roue codeuse envoi radio.
+                 - delay d'attente de la remontée du servo augmentée : 300.
   Important :
     -with ServoTimer2 et VirtualWire.
     -il faut commenter typedef dans la bibliothèque servotimer2.
@@ -75,14 +75,12 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
-/*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
-
 #elif defined(BOITIER_N002)
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte Poulailler.Manque carte RTC";
@@ -95,7 +93,6 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
-/*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
@@ -103,7 +100,6 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.1  .Porte
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
-
 #elif defined(BOITIER_N003)
 const char numeroSerieBoitier[] = "N003;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
@@ -116,7 +112,6 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.08 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
-/*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
@@ -124,7 +119,6 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
-
 #elif defined(BOITIER_N004)
 const char numeroSerieBoitier[] = "N004;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
@@ -137,7 +131,6 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.08 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
-/*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
@@ -145,9 +138,8 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 #define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 //#define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
-
 // BOITIER_N005 : le boitier n005 est un recepteur avec un montage electronique different.
-
+/*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N006)
 const char numeroSerieBoitier[] = "N006;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
@@ -160,7 +152,6 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.07 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 0 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
-/*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
@@ -168,7 +159,6 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 #define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 //#define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
-
 #else
 // parametres par defaut
 const char numeroSerieBoitier[] = "N00x;\0"; // numero de serie du boitier
@@ -182,7 +172,6 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.x  .Porte
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
-/*--------------------------------------------------------------------------------*/
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
@@ -190,7 +179,6 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.x  .Porte
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
 #endif
-
 
 /**------Bibliothèque Flash pour mise en mémoire flash de l'arduino F()--------*/
 #include <Flash.h>
@@ -230,18 +218,13 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
-//#define SERVO_PULSE_STOP 1498 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-//#define SERVO_PULSE_OUVERTURE_FERMETURE   220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-//#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT   100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 bool reduit = false; // vitesse du servo, normal ou reduit(false)
-// pulse stop, ouverture/fermeture , reduit et debug si nécessaire
 ServoMoteur monServo(PIN_SERVO_CDE, PIN_SERVO_RELAIS, PIN_SECURITE_OUVERTURE, SERVO_PULSE_STOP, SERVO_PULSE_OUVERTURE_FERMETURE, SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT, DEBUG);
 
 /** definitions */
 #define MAX_CAD 1023  // maximum du convertisseur analogique digital
 //https://www.carnetdumaker.net/articles/mesurer-la-tension-dalimentation-dune-carte-arduino-genuino-ou-dun-microcontroleur-avr/
 //float tensionAlimentation = (MAX_CAD * 1.1) / tools.analogReadReference();
-//#define OFFSET_AREF -0.08 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 
 /** Accus */
 #include "Accus.h"
@@ -270,17 +253,14 @@ Accus accusN2 (PIN_ACCUS_N2, OFFSET_AREF, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS
 JlmRotaryEncoder rotary(ENCODER_PIN_A, ENCODER_PIN_B, ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE, ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION, ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION); // clearButton si besoin
 volatile bool interruptEncodeur = false; // valider la prise en compte de l'interruption
 volatile unsigned long debutTempsEncodeur = 0; // utilisation de millis()
-// int tempoEncodeur = 5; // tempo pour éviter les rebonds de l'encodeur ms
 
 /** lumiere */
 #include "Lumiere.h"
 #define PIN_LUMIERE A0  //analog pin A0 : luminosite
 #define LDR_R2 10000 // resistance  R2 du pont avec la LDR
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
-//#define LUMIERE_BOUCLES   4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define LUMIERE_MATIN  330  // valeur de la lumière du matin
 #define LUMIERE_SOIR  150  // valeur de la lumiere du soir
-//Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LDR_R2, tensionAlimentation, MAX_CAD, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LDR_R2, MAX_CAD, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 
 /** interruptions */
@@ -335,7 +315,6 @@ LcdPCF8574  mydisp(0x27, 16, 2);
 #else // #ifdef PC8574AT
 LcdPCF8574  mydisp(0x3f, 16, 2);
 #endif
-//const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
 #endif
 
 /** RTC_DS3231 */
@@ -355,10 +334,6 @@ const char affichageMenu[] PROGMEM = "      Date      .      Heure     . Heure O
 const char affichageBatterieFaible[] PROGMEM = "*** Batterie faible ! ***";
 const char ouvertureDuBoitier[] PROGMEM = "Ouverture du boitier.";
 const char fermetureDuBoitier[] PROGMEM = "Fermeture du boitier.";
-//const char aimantEnHaut[] PROGMEM = " aimant en haut .";
-
-
-//#include "AA_fonctions.h" // prototypes des fonctions du programme
 
 /* clavier */
 ///-----lecture clavier------
@@ -879,7 +854,6 @@ void ouverturePorte() {
     //Serial.println (rotary.get_m_compteRoueCodeuse());
     if (rotary.get_m_compteRoueCodeuse() <= rotary.get_m_finDeCourseOuverture() + FOURCHETTE_OUVERTURE) {  // passage de +5 a +12
       reduit = 0;// vitesse reduite
-
       monServo.servoVitesse( reduit);
     }
     // utilisation du temps de monte pour la sécurité SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
@@ -923,7 +897,6 @@ void  fermeturePorte() {
 */
 ///-----routine interruption D2 INT0------
 void myInterruptINT0() {
-  //rotary.compteurRoueCodeuse(); // mis à jour du compteur de l'encodeur rotatif
   if (!interruptEncodeur) {
     interruptEncodeur  = true; // pour prise en compte de l'it
     debutTempsEncodeur  = millis(); // pour éviter les rebonds sur le front descendant du signal
@@ -1024,8 +997,6 @@ void lumiere() {
     bool nonReglable = 1; // pour afficher le curseur sur la premiere ligne car non reglable
     mydisp.affichageLumFinCourse(lumValue, ligne, " lux", nonReglable);
   } else   if (radio.get_m_radio())  {
-    // radio.envoiUnsignedInt(lum.get_m_lumMatin(), boitierOuvert, ";"); // envoi message radio lumiere du matin
-    //  radio.envoiUnsignedInt(lum.get_m_lumSoir(), boitierOuvert, ";"); // envoi message radio lumiere du soir
     radio.envoiUnsignedInt(lumValue, boitierOuvert, ((char *)"L;")); // envoi message radio lumiere
   }
 }
@@ -1038,7 +1009,7 @@ void ouvFermLum() {
   //fenetre de non declenchement pour ne pas declencher la fermeture avant 17h00 et l'ouverture après 17h00 et mise à jour du compteur watchdog lumiere
   // horaire évoluant en fonction du mois
   lum.fenetreNonDeclenchement(valHeure, valMois) ;
-  //non eclenchement en fonction de la position du servo et mise à jour du compteur watchdog lumiere
+  //non enclenchement en fonction de la position du servo et mise à jour du compteur watchdog lumiere
   lum.nonDeclenchementPositionServo (rotary.get_m_compteRoueCodeuse(), rotary.get_m_finDeCourseFermeture(), rotary.get_m_finDeCourseOuverture());
   byte declenchementLuminosite = lum.declenchementServoLuminosite(); // test de la luninosite et declenchement du servo
   switch (declenchementLuminosite) {
@@ -1217,9 +1188,6 @@ void setup() {
 
   Serial.begin(9600);
   pinMode(LED_PIN, OUTPUT); // led broche 13
-
-  // En mesurant la référence à 1.1 volts, on peut déduire la tension d'alimentation réelle du microcontrôleur
-  //float tension_alim = (1023 * 1.1) / analogReadReference();
 
   tools.setupBuzzer(1000); // initialisation du buzzer et test
 
