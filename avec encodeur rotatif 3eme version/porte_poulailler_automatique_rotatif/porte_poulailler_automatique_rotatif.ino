@@ -1154,8 +1154,8 @@ void routineGestionWatchdog() {
         //tools.fonctionnementBuzzer(lum.get_m_compteurWatchdogLumiere(), 2000) ;
         if (BUZZER) {
           //si le compteur est > 1, la porte ouverte et le servo non en action, le buzzer fonctionne
-         // if ((lum.get_m_compteurWatchdogLumiere() > 1) and monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
-            if (lum.get_m_compteurWatchdogLumiere() > 1) {
+          if ((lum.get_m_compteurWatchdogLumiere() > 1) and monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
+            // if (lum.get_m_compteurWatchdogLumiere() > 1) {
             digitalWrite(BUZZER_PIN, LOW);
             delay(2000);
             digitalWrite(BUZZER_PIN, HIGH);
@@ -1305,7 +1305,6 @@ void loop() {
 
   /* pas de l'encodeur RISING */
   if (interruptEncodeur) {
-    // if ((millis() - debutTempsEncodeur) > tempoEncodeur ) {
     if ((millis() - debutTempsEncodeur) > TEMPO_ENCODEUR ) {
       rotary.compteurRoueCodeuse(SENS); // mis à jour du compteur de l'encodeur rotatif
       interruptEncodeur = false; // autorisation nouvelle it
