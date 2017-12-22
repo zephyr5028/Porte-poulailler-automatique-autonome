@@ -1153,9 +1153,8 @@ void routineGestionWatchdog() {
         //la routine tools.fonctionnementBuzzer ne fonctionne qu'en cas de switch radio sur off ????
         //tools.fonctionnementBuzzer(lum.get_m_compteurWatchdogLumiere(), 2000) ;
         if (BUZZER) {
-          //si le compteur est > 1, la porte ouverte et le servo non en action, le buzzer fonctionne
-         //if ((lum.get_m_compteurWatchdogLumiere() > 1) and monServo.get_m_servoAction() and monServo.get_m_ouvFerm()) {
-             if ((lum.get_m_compteurWatchdogLumiere() > 1)  and monServo.get_m_ouvFerm()){
+          //si le compteur est > 1, la porte ouverte, le buzzer fonctionne
+          if ((lum.get_m_compteurWatchdogLumiere() > 1)  and !monServo.get_m_ouvFerm()) {
             digitalWrite(BUZZER_PIN, LOW);
             delay(2000);
             digitalWrite(BUZZER_PIN, HIGH);
