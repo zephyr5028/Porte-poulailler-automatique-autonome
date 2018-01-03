@@ -55,9 +55,9 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 /**-------boitiers......*/
-//#define BOITIER_N001  // boitier n1
+#define BOITIER_N001  // boitier n1
 //#define BOITIER_N002  // boitier n2
-#define BOITIER_N003  // boitier n3
+//#define BOITIER_N003  // boitier n3
 //#define BOITIER_N004  // boitier n4
 //#define BOITIER_N005  // boitier n5
 //#define BOITIER_N006  // boitier n6
@@ -65,7 +65,7 @@
 /*--------------------------------------------------------------------------------*/
 #if defined(BOITIER_N001)
 const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte Poulailler.Manque carte RTC";
+const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
 #define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
