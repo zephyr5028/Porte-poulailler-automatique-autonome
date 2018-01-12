@@ -91,7 +91,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 #define FOURCHETTE_FERMETURE  10 // - pas de l'encodeur rotatif
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
-#define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
+#define OFFSET_AREF -0.07 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
