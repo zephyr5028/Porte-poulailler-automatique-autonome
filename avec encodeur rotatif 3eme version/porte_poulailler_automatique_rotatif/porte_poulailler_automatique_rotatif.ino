@@ -56,11 +56,11 @@
 */
 /**-------boitiers......*/
 //#define BOITIER_N001  // boitier n1
-#define BOITIER_N002  // boitier n2
+//#define BOITIER_N002  // boitier n2
 //#define BOITIER_N003  // boitier n3
 //#define BOITIER_N004  // boitier n4
 //#define BOITIER_N005  // boitier n5
-//#define BOITIER_N006  // boitier n6
+#define BOITIER_N006  // boitier n6
 
 /*--------------------------------------------------------------------------------*/
 #if defined(BOITIER_N001)
@@ -156,8 +156,9 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 //#define LCD_DIGOLE  // utilisation de lcd avec circuit I2C Digole - PIC16F182
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
-#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
-//#define PCF8574T // liquid crystal i2c avec pcf8574t @027
+/// pcb lcm1602 with pcf8574t
+//#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
+#define PCF8574T // liquid crystal i2c avec pcf8574t @027
 /*--------------------------------------------------------------------------------*/
 #else
 // parametres par defaut
