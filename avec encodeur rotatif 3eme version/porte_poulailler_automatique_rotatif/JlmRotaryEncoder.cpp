@@ -2,7 +2,7 @@
 
 // surcharge constructeur avec timer - broches dt et clk ainsi que sw si besoin
 JlmRotaryEncoder::JlmRotaryEncoder(byte pinA, byte pinB,  int finDeCourseFermeture, int finDeCourseOuverture, int compteRoueCodeuse) : m_encoderPinA(pinA), m_encoderPinB(pinB),
-  m_finDeCourseFermeture(finDeCourseFermeture), m_finDeCourseOuverture(finDeCourseOuverture), m_compteRoueCodeuse(compteRoueCodeuse),  m_finDeCourseMax(500),  m_interruptRoueCodeuse(false)
+  m_finDeCourseFermeture(finDeCourseFermeture), m_finDeCourseOuverture(finDeCourseOuverture), m_compteRoueCodeuse(compteRoueCodeuse),  m_finDeCourseMax(200),  m_interruptRoueCodeuse(false)
 {
   JlmRotaryEncoder::init();// initialisation des branchements
 }
@@ -40,7 +40,7 @@ void JlmRotaryEncoder::compteurRoueCodeuse(bool sens) {
 
 }
 
-///-----reglage de la fin de course-----
+///-----reglage de la fin de course----- probleme de fonctionnement avec les chiffres negatifs...a traiter !!!
 int  JlmRotaryEncoder::reglageFinDeCourse (bool ouvFerm, byte touche) {
   if (touche == 2 or touche == 3) {
     int finDeCourse;

@@ -43,7 +43,7 @@ class JlmRotaryEncoder
     byte m_encoderPinB; //  pin B
 
     volatile boolean m_interruptRoueCodeuse;    // gestion de l'anti-rebonds
-    const int m_finDeCourseMax; // valeur maxi de la fin de course 500
+    const int m_finDeCourseMax; // valeur maxi de la fin de course 200
     int m_compteRoueCodeuse;  // un compteur de position au départ
     int m_finDeCourseFermeture; // initialisation de la valeur de la fin de course fermeture au depart
     int m_finDeCourseOuverture; // initialisation de la valeur de la fin de course ouverture au depart

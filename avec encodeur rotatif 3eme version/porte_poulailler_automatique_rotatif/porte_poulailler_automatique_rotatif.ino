@@ -57,10 +57,10 @@
 /**-------boitiers......*/
 //#define BOITIER_N001  // boitier n1
 //#define BOITIER_N002  // boitier n2
-//#define BOITIER_N003  // boitier n3
+#define BOITIER_N003  // boitier n3
 //#define BOITIER_N004  // boitier n4
 //#define BOITIER_N005  // boitier n5
-#define BOITIER_N006  // boitier n6
+//#define BOITIER_N006  // boitier n6
 
 /*--------------------------------------------------------------------------------*/
 #if defined(BOITIER_N001)
@@ -1204,6 +1204,22 @@ void setup() {
     colonne = 34;// position dans la mèmoire flash
     affichageDemarrage(colonne);
   }
+  // initialisation des valeurs pour l'ouverture ou la fermeture...a simplifier !!!
+  unsigned valeurChoix = 65; //initialisation fermeture
+  byte vall1 = valeurChoix & 0xFF; // pf
+  byte vall2 = (valeurChoix >> 8) & 0xFF; //  PF
+  rtc.i2c_eeprom_write_byte( 0x20, vall1); // écriture de la valeur du reglage de la lumiere ( low )  dans l'eeprom de la carte rtc (i2c @ 0x57)
+  delay(10);
+  rtc.i2c_eeprom_write_byte( 0x21, vall2); // écriture de la valeur du reglage de la lumiere ( high )dans l'eeprom de la carte rtc (i2c @ 0x57)
+  delay(10);
+
+  valeurChoix = 100;//initialisation ouverture
+  vall1 = valeurChoix & 0xFF; // pf
+  vall2 = (valeurChoix >> 8) & 0xFF; //  PF
+  rtc.i2c_eeprom_write_byte( 0x22, vall1); // écriture de la valeur du reglage de la lumiere ( low )  dans l'eeprom de la carte rtc (i2c @ 0x57)
+  delay(10);
+  rtc.i2c_eeprom_write_byte( 0x23, vall2); // écriture de la valeur du reglage de la lumiere ( high )dans l'eeprom de la carte rtc (i2c @ 0x57)
+  delay(10);
 
   incrementation = menuDate; // position du  menu au demarrage
   deroulementMenu (incrementation); // affichage du menu
