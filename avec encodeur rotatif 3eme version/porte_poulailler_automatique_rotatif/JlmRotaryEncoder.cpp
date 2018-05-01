@@ -45,7 +45,7 @@ int  JlmRotaryEncoder::reglageFinDeCourse (bool ouvFerm, byte touche) {
   if (touche == 2 or touche == 3) {
     int finDeCourse;
     if (ouvFerm) finDeCourse = m_finDeCourseOuverture; else finDeCourse = m_finDeCourseFermeture;
-    if (touche == 2) {
+    if (touche == 3) {
       if (finDeCourse < m_finDeCourseMax) {
         finDeCourse-- ; //incrementation
       } else {

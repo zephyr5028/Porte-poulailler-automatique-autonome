@@ -80,6 +80,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  60// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N002)
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
@@ -99,6 +100,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  50// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N003)
 const char numeroSerieBoitier[] = "N003;\0"; // numero de serie du boitier
@@ -118,6 +120,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  55// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N004)
 const char numeroSerieBoitier[] = "N004;\0"; // numero de serie du boitier
@@ -137,6 +140,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 #define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 //#define PCF8574T // liquid crystal i2c avec pcf8574t @027
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  60// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 // BOITIER_N005 : le boitier n005 est un recepteur avec un montage electronique different.
 /*--------------------------------------------------------------------------------*/
@@ -159,6 +163,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// pcb lcm1602 with pcf8574t
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  55// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #else
 // parametres par defaut
@@ -178,6 +183,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.x  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  60// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #endif
 
@@ -246,7 +252,7 @@ Accus accusN2 (PIN_ACCUS_N2, OFFSET_AREF, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS
 #define SECURITE_TEMPS_OUVERTURE  300 // utilisation du temps de monté pour la sécurité =  SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
 #define ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION 100 // initialisation de la position de l'encodeur rotatif avec le contact reed
 #define ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION   150  // initialisation par defaut au demarrage de la possition de la roue codeuse 
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  65 // initialisation par defaut au demarrage de la valeur de fin de course fermeture
+//#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  60// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 // définition des pin pour le KY040
 #define ENCODER_PIN_A   2   // A
 #define ENCODER_PIN_B   11   // B
@@ -1205,7 +1211,7 @@ void setup() {
     affichageDemarrage(colonne);
   }
   // initialisation des valeurs pour l'ouverture ou la fermeture...a simplifier !!!
-  unsigned valeurChoix = 65; //initialisation fermeture
+  unsigned valeurChoix = ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE; //initialisation fermeture
   byte vall1 = valeurChoix & 0xFF; // pf
   byte vall2 = (valeurChoix >> 8) & 0xFF; //  PF
   rtc.i2c_eeprom_write_byte( 0x20, vall1); // écriture de la valeur du reglage de la lumiere ( low )  dans l'eeprom de la carte rtc (i2c @ 0x57)
@@ -1213,7 +1219,7 @@ void setup() {
   rtc.i2c_eeprom_write_byte( 0x21, vall2); // écriture de la valeur du reglage de la lumiere ( high )dans l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
 
-  valeurChoix = 100;//initialisation ouverture
+  valeurChoix = ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION;//initialisation ouverture
   vall1 = valeurChoix & 0xFF; // pf
   vall2 = (valeurChoix >> 8) & 0xFF; //  PF
   rtc.i2c_eeprom_write_byte( 0x22, vall1); // écriture de la valeur du reglage de la lumiere ( low )  dans l'eeprom de la carte rtc (i2c @ 0x57)
