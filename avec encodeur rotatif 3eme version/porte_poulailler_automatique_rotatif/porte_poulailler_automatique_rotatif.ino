@@ -120,7 +120,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  55// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  52// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N004)
 const char numeroSerieBoitier[] = "N004;\0"; // numero de serie du boitier
