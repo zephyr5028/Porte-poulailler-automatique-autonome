@@ -105,9 +105,9 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 #elif defined(BOITIER_N003)
 const char numeroSerieBoitier[] = "N003;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
-#define SERVO_PULSE_STOP 1498 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_STOP 1388 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  150  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 #define TEMPO_ENCODEUR  5  // tempo pour éviter les rebonds de l'encodeur ms
 #define FOURCHETTE_FERMETURE  16 // - pas de l'encodeur rotatif
 #define FOURCHETTE_OUVERTURE  12 // + pas de l'encodeur rotatif
