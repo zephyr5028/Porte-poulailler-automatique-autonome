@@ -12,6 +12,13 @@
 */
 
 /**
+  12 01 2020 : passage version v2.0.4, pour petites modifications : 
+                    - affichage n serie du boitier au demarrage,
+                    - type manuel pour l'ouverture du boitier
+                    - servo reglé par un potentiometre interne 10k
+                    - ldr etanche
+                    - bouton etanche
+                    - parametre demarrage ouverture 40
   17 12 2017 : parametres des boitiers dans le programme
   15 12 2017 : passage à la version v2.0.3
   10 12 2017 : amélioration de la lecture de la tension des batteries avec l'utilisation de AREF interne (1.1v)
@@ -55,32 +62,32 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 /**-------boitiers......*/
-//#define BOITIER_N001  // boitier n1
+#define BOITIER_N001  // boitier n1
 //#define BOITIER_N002  // boitier n2
-#define BOITIER_N003  // boitier n3
+//#define BOITIER_N003  // boitier n3
 //#define BOITIER_N004  // boitier n4
 //#define BOITIER_N005  // boitier n5
 //#define BOITIER_N006  // boitier n6
 
 /*--------------------------------------------------------------------------------*/
 #if defined(BOITIER_N001)
+const char affichageBonjour[] PROGMEM = "   Porte N001   . Version 2.0.4  .Porte Poulailler.Manque carte RTC";
 const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
-#define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-#define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop)
+#define SERVO_PULSE_OUVERTURE_FERMETURE  140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 #define TEMPO_ENCODEUR  5  // tempo pour éviter les rebonds de l'encodeur ms
 #define FOURCHETTE_FERMETURE  10 // - pas de l'encodeur rotatif
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
-#define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
+#define OFFSET_AREF -0.08 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  60// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  40// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N002)
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
@@ -267,7 +274,7 @@ volatile unsigned long debutTempsEncodeur = 0; // utilisation de millis()
 #define LDR_R2 10000 // resistance  R2 du pont avec la LDR
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
 #define LUMIERE_MATIN  330  // valeur de la lumière du matin
-#define LUMIERE_SOIR  150  // valeur de la lumiere du soir
+#define LUMIERE_SOIR  50  // valeur de la lumiere du soir
 Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LDR_R2, MAX_CAD, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 
 /** interruptions */
@@ -310,10 +317,9 @@ int temps = 0;// pour calcul dans la fonction temporisationAffichage
 bool LcdCursor = true; //curseur du lcd if true = enable
 
 #ifdef  LCD_DIGOLE
-/// I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
+// I2C:Arduino UNO: SDA (data line) is on analog input pin 4, and SCL (clock line) is on analog input pin 5 on UNO and Duemilanove
 #include "LcdDigoleI2C.h"
 LcdDigoleI2C mydisp( &Wire, '\x27', colonnes, debug); // classe lcd digole i2c (lcd 2*16 caracteres)
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
 #else  // #ifdef LCD_LIQIDCRYSTAL
 #include "LcdPCF8574.h"
 // Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f

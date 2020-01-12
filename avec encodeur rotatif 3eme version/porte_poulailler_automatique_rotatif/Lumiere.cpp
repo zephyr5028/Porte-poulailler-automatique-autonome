@@ -55,7 +55,7 @@ unsigned int Lumiere::tensionLuminosite() {
   unsigned int ldrResistance = (ldrVoltage * m_R2) / resistorVoltage;
   // courbe lux / resistance de la LDR
   float LUX_CALC_SCALAR = 12518931;
-  float LUX_CALC_EXPONENT = -1.28;
+  float LUX_CALC_EXPONENT = -1.405; // -1.28;
   int voltage = LUX_CALC_SCALAR * pow(ldrResistance, LUX_CALC_EXPONENT);
   return voltage;
 }
