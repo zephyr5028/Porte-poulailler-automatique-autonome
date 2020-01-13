@@ -12,6 +12,8 @@
 */
 
 /**
+  12 02 2020 : branche choix ouverture fermeture
+  
   12 01 2020 : passage version v2.0.4, pour petites modifications : 
                     - affichage n serie du boitier au demarrage,
                     - type manuel pour l'ouverture du boitier
