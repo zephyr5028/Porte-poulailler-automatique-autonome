@@ -12,8 +12,8 @@
 */
 
 /**
-  12 02 2020 : branche choix ouverture fermeture
-  
+  12 02 2020 : branche choix ouverture fermeture en cours
+    
   12 01 2020 : passage version v2.0.4, pour petites modifications : 
                     - affichage n serie du boitier au demarrage,
                     - type manuel pour l'ouverture du boitier
@@ -261,7 +261,6 @@ Accus accusN2 (PIN_ACCUS_N2, OFFSET_AREF, ACCUS_TESION_MINIMALE, ACCUS_R1, ACCUS
 #define SECURITE_TEMPS_OUVERTURE  300 // utilisation du temps de monté pour la sécurité =  SECURITE_TEMPS_OUVERTURE * les pas du codeur rotatif
 #define ROUE_CODEUSE_POSITION_OUVERTURE_INITIALISATION 100 // initialisation de la position de l'encodeur rotatif avec le contact reed
 #define ROUE_CODEUSE_POSITION_DEFAUT_INITIALISATION   150  // initialisation par defaut au demarrage de la possition de la roue codeuse 
-//#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  60// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 // définition des pin pour le KY040
 #define ENCODER_PIN_A   2   // A
 #define ENCODER_PIN_B   11   // B
