@@ -35,7 +35,8 @@ class HorlogeDS3232 : public DS3232RTC
     // sauvegarde dans l'eeprom I2C le choix de la lumiere ou de la valeur de fin de course
     void sauvEepromChoix ( unsigned int valeurChoix, const bool matinSoirOuvFerm, const bool lumiereFinDeCourse);
     float calculTemperature (const bool typeTemperature);//valeur de la temperature en fonction du type
-    bool choixTypeOuvertureFermeture(bool choixOuvertureFermeture, const byte alarme); // mise à jour du choix du type d'ouverture / fermeture
+    //ajout manuel : bool choixTypeOuvertureFermeture(bool choixOuvertureFermeture, const byte alarme); // mise à jour du choix du type d'ouverture / fermeture
+    byte choixTypeOuvertureFermeture(byte choixOuvertureFermeture, const byte alarme); // mise à jour du choix du type d'ouverture / fermeture
     byte get_m_alarm1Hour();//accesseur - getter
     byte get_m_alarm1Minute();//accesseur - getter
     byte get_m_alarm1Second();//accesseur - getter

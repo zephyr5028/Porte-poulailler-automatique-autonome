@@ -8,7 +8,7 @@
 //constructeur avec debug
 Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const int R2, const int maxCAD, const byte tempsLum, const boolean debug) :
   PowerTools(), m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir), m_heureFenetreSoir(heureFenetreSoir),
-  m_R2(R2), m_maxCAD(maxCAD), m_tempsLum(tempsLum), m_debug(debug), m_ouverture(1), m_fermeture(0), m_lumiereMax(1020), m_incrementation(10), m_compteurWatchdogLumiere(0)
+  m_R2(R2), m_maxCAD(maxCAD), m_tempsLum(tempsLum), m_debug(debug), m_ouverture(1), m_fermeture(1), m_lumiereMax(1020), m_incrementation(10), m_compteurWatchdogLumiere(0)
 {
 }
 
@@ -102,11 +102,11 @@ void Lumiere::nonDeclenchementPositionServo (volatile unsigned int compteRoueCod
 byte Lumiere::declenchementServoLuminosite() {
   if (m_compteurWatchdogLumiere >= m_tempsLum) {
     int sensorValue = luminositeCAD();
-    if ((sensorValue >= m_lumMatin) and !m_ouverture ) {
+    if ((sensorValue >= m_lumMatin) and m_ouverture==0 ) {  // ajout manuel : if ((sensorValue >= m_lumMatin) and !m_ouverture ) {
       m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
       return 1; // ok + ouverture
     }
-    if ((sensorValue <= m_lumSoir) and !m_fermeture ) {
+    if ((sensorValue <= m_lumSoir) and m_fermeture==0 ) {  // ajout manuel : if ((sensorValue <= m_lumSoir) and !m_fermeture ) {
       m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
       return 2; // ok + fermeture
     }
@@ -115,20 +115,20 @@ byte Lumiere::declenchementServoLuminosite() {
 }
 
 //-----accesseur - getter-----
-bool Lumiere::get_m_ouverture() {
+byte Lumiere::get_m_ouverture() { // ajout manuel : bool Lumiere::get_m_ouverture() {
   return m_ouverture;
 }
 //-----mutateur - setter-----
-void Lumiere::set_m_ouverture(bool ouverture) {
+void Lumiere::set_m_ouverture(byte ouverture) { // ajout manuel : void Lumiere::set_m_ouverture(bool ouverture) {
   m_ouverture = ouverture;
 }
 
 ///-----accesseur - getter-----
-bool Lumiere::get_m_fermeture() {
+byte Lumiere::get_m_fermeture() { // ajout manuel :  bool Lumiere::get_m_fermeture() {
   return m_fermeture;
 }
 //-----mutateur - setter-----
-void Lumiere::set_m_fermeture(bool fermeture) {
+void Lumiere::set_m_fermeture(byte fermeture) { // ajout manuel : void Lumiere::set_m_fermeture(bool fermeture) {
   m_fermeture = fermeture;
 }
 

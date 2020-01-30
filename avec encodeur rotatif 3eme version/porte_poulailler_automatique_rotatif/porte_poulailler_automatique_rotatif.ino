@@ -64,8 +64,8 @@
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
 /**-------boitiers......*/
-#define BOITIER_N001  // boitier n1
-//#define BOITIER_N002  // boitier n2
+//#define BOITIER_N001  // boitier n1
+#define BOITIER_N002  // boitier n2
 //#define BOITIER_N003  // boitier n3
 //#define BOITIER_N004  // boitier n4
 //#define BOITIER_N005  // boitier n5
@@ -92,11 +92,11 @@ const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
 #define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  40// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N002)
+const char affichageBonjour[] PROGMEM = "   Porte N002   . Version 2.0.4  .Porte Poulailler.Manque carte RTC";
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
-#define SERVO_PULSE_STOP 1350 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-#define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_OUVERTURE_FERMETURE  140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 #define TEMPO_ENCODEUR  15  // tempo pour éviter les rebonds de l'encodeur ms
 #define FOURCHETTE_FERMETURE  10 // - pas de l'encodeur rotatif
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
@@ -109,7 +109,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  50// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  40// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N003)
 const char numeroSerieBoitier[] = "N003;\0"; // numero de serie du boitier

@@ -27,10 +27,10 @@ class Lumiere  :  public PowerTools
     //non Declenchement Position Servo et mise à jour du compteur watchdog lumiere
     void nonDeclenchementPositionServo (volatile unsigned int compteRoueCodeuse, unsigned int finDeCourseFermeture, unsigned int finDeCourseOuverture);
     byte declenchementServoLuminosite();//declenchement servo par la luminosite
-    bool get_m_ouverture();
-    void set_m_ouverture(bool ouverture);
-    bool get_m_fermeture();
-    void set_m_fermeture(bool fermeture);
+    byte get_m_ouverture();  // ajout manuel : bool get_m_ouverture();
+    void set_m_ouverture(byte ouverture); // ajout manuel : void set_m_ouverture(bool ouverture);
+    byte get_m_fermeture();// ajout manuel : bool get_m_fermeture();
+    void set_m_fermeture(byte fermeture);// ajout manuel : void set_m_fermeture(bool fermeture);
     unsigned int get_m_lumMatin();
     void set_m_lumMatin(unsigned int lumMatin);
     unsigned int get_m_lumSoir();
@@ -43,8 +43,8 @@ class Lumiere  :  public PowerTools
 
     unsigned int  m_lumMatin; /// valeur de la lumière du matin
     unsigned int m_lumSoir; // valeur de la lumiere du soir
-    bool m_ouverture ; // ouverture  (lumiere ou heure) 1 donc heure
-    bool m_fermeture ; //  fermeture (lumiere ou heure) 0 donc lumiere
+    byte m_ouverture ; // ajout manuel ouverture  (0 lumiere,1 manuel, 2 heure) (bool m_ouverture ; // ouverture  (lumiere ou heure) 1 donc heure)
+    byte m_fermeture ; //  ajout manuel fermeture (0 lumiere , 1 manuel, 2 heure) (bool m_fermeture ; //  fermeture (lumiere ou heure) 0 donc lumiere)
     unsigned int m_compteurWatchdogLumiere; // compteur pour eviter un declenchement intempestif
     const unsigned int m_lumiereMax; // valeur maxi de la lumiere 1020
     const byte m_incrementation; // pas de 10
