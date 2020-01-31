@@ -43,8 +43,8 @@ class Lumiere  :  public PowerTools
 
     unsigned int  m_lumMatin; /// valeur de la lumière du matin
     unsigned int m_lumSoir; // valeur de la lumiere du soir
-    byte m_ouverture ; // ajout manuel ouverture  (0 lumiere,1 manuel, 2 heure) (bool m_ouverture ; // ouverture  (lumiere ou heure) 1 donc heure)
-    byte m_fermeture ; //  ajout manuel fermeture (0 lumiere , 1 manuel, 2 heure) (bool m_fermeture ; //  fermeture (lumiere ou heure) 0 donc lumiere)
+    byte m_ouverture ; // ajout manuel ouverture  (0 lumiere,2 manuel, 1 heure) (bool m_ouverture ; // ouverture  (lumiere ou heure) 1 donc heure)
+    byte m_fermeture ; //  ajout manuel fermeture (0 lumiere , 2 manuel, 1 heure) (bool m_fermeture ; //  fermeture (lumiere ou heure) 0 donc lumiere)
     unsigned int m_compteurWatchdogLumiere; // compteur pour eviter un declenchement intempestif
     const unsigned int m_lumiereMax; // valeur maxi de la lumiere 1020
     const byte m_incrementation; // pas de 10

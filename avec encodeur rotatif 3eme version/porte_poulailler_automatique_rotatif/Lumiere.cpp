@@ -8,7 +8,7 @@
 //constructeur avec debug
 Lumiere::Lumiere( const byte lumierePin, unsigned int lumMatin, unsigned int lumSoir, const byte heureFenetreSoir, const int R2, const int maxCAD, const byte tempsLum, const boolean debug) :
   PowerTools(), m_lumierePin(lumierePin), m_lumMatin(lumMatin), m_lumSoir(lumSoir), m_heureFenetreSoir(heureFenetreSoir),
-  m_R2(R2), m_maxCAD(maxCAD), m_tempsLum(tempsLum), m_debug(debug), m_ouverture(1), m_fermeture(1), m_lumiereMax(1020), m_incrementation(10), m_compteurWatchdogLumiere(0)
+  m_R2(R2), m_maxCAD(maxCAD), m_tempsLum(tempsLum), m_debug(debug), m_ouverture(2), m_fermeture(2), m_lumiereMax(1020), m_incrementation(10), m_compteurWatchdogLumiere(0)
 {
 }
 
@@ -88,11 +88,11 @@ void Lumiere::fenetreNonDeclenchement(byte horaire, byte mois) {
 ///-----non Declenchement Position Servo et mise à jour du compteur watchdog lumiere-----
 void Lumiere::nonDeclenchementPositionServo (volatile unsigned int compteRoueCodeuse, unsigned int finDeCourseFermeture, unsigned int finDeCourseOuverture) {
   int sensorValue = luminositeCAD();
-  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and !m_ouverture and (sensorValue >= m_lumMatin))
+  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and m_ouverture==0 and (sensorValue >= m_lumMatin))
       or (( compteRoueCodeuse >= (finDeCourseOuverture + finDeCourseFermeture - 2)) and !m_fermeture and (sensorValue <= m_lumSoir))) {
     m_compteurWatchdogLumiere = 0; //raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }
-  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and !m_fermeture and (sensorValue > m_lumSoir))
+  if (((compteRoueCodeuse <= (finDeCourseOuverture + 2)) and m_fermeture==0 and (sensorValue > m_lumSoir))
       or (( compteRoueCodeuse >= (finDeCourseOuverture + finDeCourseFermeture - 2)) and !m_ouverture and (sensorValue < m_lumMatin))) {
     m_compteurWatchdogLumiere = 0;//raz du compteur watchdog lumiere pour ne pas prendre en compte une ombre
   }

@@ -1,6 +1,6 @@
 /**@file*/
 /**
-    \porte du poulailler avec encodeur rotatif v2.0.3
+    \porte du poulailler avec encodeur rotatif v2.0.4
     \file porte_poulailler_affichage_clavier_rtc
     \brief Automatisation de la porte du poulailler en utilisant l'heure ou la lumière.
     \details Simplification d'utilisation. Electronique avec microcontroleur, alimentée par batterie, couplée à un capteur solaire.
@@ -12,7 +12,8 @@
 */
 
 /**
-  12 02 2020 : branche choix ouverture fermeture en cours
+  31 01 2020 : modification du choix ouverture fermeture avec l'ajout de manuel (heure,lumiere,manuel)
+  12 01 2020 : branche choix ouverture fermeture en cours
     
   12 01 2020 : passage version v2.0.4, pour petites modifications : 
                     - affichage n serie du boitier au demarrage,
@@ -179,8 +180,8 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 const char numeroSerieBoitier[] = "N00x;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.x  .Porte Poulailler.Manque carte RTC";
 #define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-#define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define SERVO_PULSE_OUVERTURE_FERMETURE  140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 #define TEMPO_ENCODEUR  5  // tempo pour éviter les rebonds de l'encodeur ms
 #define FOURCHETTE_FERMETURE  10 // - pas de l'encodeur rotatif
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
@@ -275,7 +276,7 @@ volatile unsigned long debutTempsEncodeur = 0; // utilisation de millis()
 #define LDR_R2 10000 // resistance  R2 du pont avec la LDR
 #define LUMIERE_HEURE_FENETRE_SOIR  17  //horaire de la fenetre de non declenchement lumiere si utilisation horaire : 17h
 #define LUMIERE_MATIN  330  // valeur de la lumière du matin
-#define LUMIERE_SOIR  50  // valeur de la lumiere du soir
+#define LUMIERE_SOIR  40  // valeur de la lumiere du soir
 Lumiere lum(PIN_LUMIERE, LUMIERE_MATIN , LUMIERE_SOIR, LUMIERE_HEURE_FENETRE_SOIR, LDR_R2, MAX_CAD, LUMIERE_BOUCLES, DEBUG ); // objet lumiere
 
 /** interruptions */
@@ -333,6 +334,10 @@ LcdPCF8574  mydisp(0x3f, 16, 2);
 
 /** RTC_DS3231 */
 #include "HorlogeDS3232.h"
+#define MSECOND   1000
+#define MMINUTE   60*MSECOND
+#define MHOUR     60*MMINUTE
+#define MDAY      24*MHOUR
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
 const byte adresseBoitier24C32 = 0x57;// adresse du boitier memoire eeprom 24c32
 const byte jourSemaine = 1, jour = 2, mois = 3, annee = 4, heure = 5, minutes = 6, secondes = 7;
@@ -500,8 +505,9 @@ void affiTensionBatServo() {
 }
 
 /* choix pour l'ouverture et la fermeture :
-     - heure
-     - lumiere
+   - lumiere == 0
+   - manuel == 2
+   - heure == 1    
 */
 ///------affichage du choix de l'ouverture et la fermeture------
 void affiChoixOuvFerm() {
@@ -523,10 +529,12 @@ void choixOuvFerm () {
       if (mydisp.get_m_decalage() == deplacement) {
         lum.set_m_ouverture(rtc.choixTypeOuvertureFermeture(lum.get_m_ouverture(), alarm_1));//choix du type d'ouverture / fermeture
         affiChoixOuvFerm();
+ //Serial.print (lum.get_m_ouverture());
       }
       if (mydisp.get_m_decalage() == 2 * deplacement) {
         lum.set_m_fermeture(rtc.choixTypeOuvertureFermeture(lum.get_m_fermeture(), alarm_2));//choix du type d'ouverture / fermeture
         affiChoixOuvFerm();
+ //Serial.print (lum.get_m_fermeture());
       }
     }
   }
@@ -1241,7 +1249,9 @@ void setup() {
   delay(10);
   lum.set_m_fermeture( rtc.i2c_eeprom_read_byte( 0x15)); // lecture du type de fermeture @15   de l'eeprom de la carte rtc (i2c @ 0x57)
   delay(10);
-
+  //Serial.print (rtc.i2c_eeprom_read_byte( 0x14));
+  //Serial.print (rtc.i2c_eeprom_read_byte( 0x15));
+  
   byte val1 = rtc.i2c_eeprom_read_byte( 0x16); // lecture pf lumière du matin (byte)
   delay(10);
   byte val2 = rtc.i2c_eeprom_read_byte( 0x17); // lecture Pf lumiere du matin (byte)

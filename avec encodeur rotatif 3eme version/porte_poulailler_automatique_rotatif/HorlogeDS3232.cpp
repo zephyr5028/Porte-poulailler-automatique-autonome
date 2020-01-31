@@ -192,13 +192,18 @@ float HorlogeDS3232::calculTemperature (const bool typeTemperature) {
 }
 
 ///-----mise à jour du choix du type d'ouverture / fermeture-----
-// ajout manuelbool HorlogeDS3232::choixTypeOuvertureFermeture(bool choixOuvertureFermeture, const byte alarme) {
+// ajout manuel : bool HorlogeDS3232::choixTypeOuvertureFermeture(bool choixOuvertureFermeture, const byte alarme) {
 byte HorlogeDS3232::choixTypeOuvertureFermeture(byte choixOuvertureFermeture, const byte alarme) {
   byte adresse(0);
+  byte activation = true;
+  byte desactivation = false;
   if (alarme == 1)  adresse = 0x14; else adresse = 0x15; // 0x14 alarm1 / 0x15 alarm2
   // ajout manuel : if (choixOuvertureFermeture)  choixOuvertureFermeture = false; else choixOuvertureFermeture = true; // o lumiere, 1 horloge
-  if (choixOuvertureFermeture==0 or choixOuvertureFermeture==2) {
-    RTC.alarmInterrupt(alarme, choixOuvertureFermeture); // alarme : activation 1 / desactivation 0
+  if (choixOuvertureFermeture >=2)  choixOuvertureFermeture = 0; else ++choixOuvertureFermeture ; //rotation pour l'affichage (lum,man,hre)
+  if (choixOuvertureFermeture == 1) {  // 1 pour heure sinon desactivation de l'alarme(x)
+    RTC.alarmInterrupt(alarme, activation); // alarme(x)  activation 1 
+  } else {
+    RTC.alarmInterrupt(alarme, desactivation); //  alarme(x)  desactivation 0
   }
   i2c_eeprom_write_byte( adresse, choixOuvertureFermeture); // écriture du type d'ouverture/ fermeture @14 ou 15 de l'eeprom de la carte rtc (i2c @ 0x57)
   return choixOuvertureFermeture;

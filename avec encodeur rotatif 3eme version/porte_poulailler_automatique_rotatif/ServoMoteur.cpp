@@ -50,7 +50,7 @@ void ServoMoteur::servoVitesse( bool reduit)
 
 ///-----modification de la vitesse-----
 void ServoMoteur::modificationVitesse( bool reduit) {
-  // modification vitesse ouverture : 1500 - (140 ou 70)  / fermeture : 1500 + (140 ou 70)
+  // modification vitesse ouverture : 1500 - 140  / fermeture : 1500 + 140
   if (reduit) m_pulse = m_pulseOuvFerm; else m_pulse = m_pulseReduit;
   if (m_ouvFerm) ServoTimer2:: write(m_pulse = m_pulseStop - m_pulse); else ServoTimer2:: write(m_pulse = m_pulseStop + m_pulse);
 }

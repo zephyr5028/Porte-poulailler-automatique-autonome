@@ -152,14 +152,29 @@ void LcdDigoleI2C::affichageVoltage( float voltage, String texte, byte ligne)
 }
 
 ///-----affichage choix ouverture fermeture-----
-void LcdDigoleI2C::affichageChoix( bool ouverture, bool fermeture,  byte ligne)
+// ajout manuel : void LcdDigoleI2C::affichageChoix( bool ouverture, bool fermeture,  byte ligne)
+void LcdDigoleI2C::affichageChoix( byte ouverture, byte fermeture,  byte ligne)
 {
   m_ligne = ligne;
   String chaineLigne = "";
   chaineLigne += " ouv:";
-  if (ouverture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  //ajout manuel : if (ouverture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  if (ouverture == 1)  {
+    chaineLigne += "hre ";
+  } else  if (ouverture == 0) {
+    chaineLigne += "lum ";
+  }   else {
+    chaineLigne += "man ";
+  }
   chaineLigne += "fer:";
-  if (fermeture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  // ajout manuel : if (fermeture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  if (fermeture == 1) {
+    chaineLigne += "hre ";
+  }  else   if (fermeture == 0) {
+    chaineLigne += "lum ";
+  }  else {
+    chaineLigne += "man ";
+  }
   affichageUneLigne(chaineLigne);// affichage sur lcd
 }
 
@@ -169,9 +184,9 @@ void LcdDigoleI2C::affichageServo(int pulse, int roueCodeuse,  byte ligne)
   m_ligne = ligne;
   String chaineLigne = "";
   chaineLigne += pulse;
-   chaineLigne += "ms   ";
+  chaineLigne += "ms   ";
   chaineLigne += roueCodeuse;
-    chaineLigne += "pas";
+  chaineLigne += "pas";
   affichageUneLigne(chaineLigne);// affichage sur lcd
   cursorPosition(0, 0, (char *)""); // decalage, ligne, texte
 }

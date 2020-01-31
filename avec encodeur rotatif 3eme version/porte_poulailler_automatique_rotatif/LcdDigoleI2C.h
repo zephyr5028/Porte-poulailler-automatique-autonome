@@ -39,7 +39,8 @@ class LcdDigoleI2C  : public DigoleSerialDisp  {
 
     void affichageLumFinCourse( int lum,  byte ligne, String texte, bool siNonReglable = 0); //affichage lumiere et fin de course
     void affichageVoltage( float voltage, String texte,  byte ligne); //affichage tensions
-    void affichageChoix( bool ouverture, bool fermeture,  byte ligne);//affichage choix ouverture fermeture
+    //ajout manuel : void affichageChoix( bool ouverture, bool fermeture,  byte ligne);//affichage choix ouverture fermeture
+    void affichageChoix( byte ouverture, byte fermeture,  byte ligne);//affichage choix ouverture fermeture
     void affichageServo(int pulse, int compteRoueCodeuse,  byte ligne) ; //affichage pulse et roue codeuse du servo
     void razLcd(); //remise à zero du lcd
     void bonjour(String chaine1, String chaine2); //affichage au demarrage

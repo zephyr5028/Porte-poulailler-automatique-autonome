@@ -155,15 +155,45 @@ void LcdPCF8574::affichageVoltage( float voltage, String texte, byte ligne)
 }
 
 ///-----affichage choix ouverture fermeture-----
-void LcdPCF8574::affichageChoix( bool ouverture, bool fermeture, byte ligne)
+// ajout manuel : void LcdPCF8574::affichageChoix( bool ouverture, bool fermeture, byte ligne)
+void LcdPCF8574::affichageChoix( byte ouverture, byte fermeture, byte ligne)
 {
   m_ligne = ligne;
   String chaineLigne = "";
   chaineLigne += " ouv:";
-  if (ouverture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  //ajout manuel : if (ouverture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  if (ouverture == 1)  {
+    chaineLigne += "hre ";
+  } else  if (ouverture == 0) {
+    chaineLigne += "lum ";
+  }   else {
+    chaineLigne += "man ";
+  }
   chaineLigne += "fer:";
-  if (fermeture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  // ajout manuel : if (fermeture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  if (fermeture == 1) {
+    chaineLigne += "hre ";
+  }  else   if (fermeture == 0) {
+    chaineLigne += "lum ";
+  }  else {
+    chaineLigne += "man ";
+  }
   affichageUneLigne(chaineLigne);// affichage sur lcd
+/*
+  m_ligne = ligne;
+  String chaineLigne = "";
+  chaineLigne += " ouv:";
+  // ajout manuel : if (ouverture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  if (ouverture == 2)  chaineLigne += "hre ";
+  if (ouverture == 0) chaineLigne += "lum ";
+  else chaineLigne += "man "; // ouverture == 1
+  chaineLigne += "fer:";
+  // ajout manuel : if (fermeture)  chaineLigne += "hre "; else  chaineLigne += "lum ";
+  if (fermeture == 2)  chaineLigne += "hre "; 
+  if (fermeture == 0) chaineLigne += "lum ";
+  else chaineLigne += "man "; // ouverture == 1
+  affichageUneLigne(chaineLigne);// affichage sur lcd
+  */
 }
 
 ///-----affichage pulse et roue codeuse du servo-------
