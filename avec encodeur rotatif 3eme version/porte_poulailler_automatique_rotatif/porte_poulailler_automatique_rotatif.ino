@@ -96,11 +96,11 @@ const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
 const char affichageBonjour[] PROGMEM = "   Porte N002   . Version 2.0.4  .Porte Poulailler.Manque carte RTC";
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
 #define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-#define SERVO_PULSE_OUVERTURE_FERMETURE  140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE  300  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
-#define TEMPO_ENCODEUR  15  // tempo pour éviter les rebonds de l'encodeur ms
-#define FOURCHETTE_FERMETURE  10 // - pas de l'encodeur rotatif
-#define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
+#define TEMPO_ENCODEUR  5  // tempo pour éviter les rebonds de l'encodeur ms
+#define FOURCHETTE_FERMETURE  16 // - pas de l'encodeur rotatif
+#define FOURCHETTE_OUVERTURE  12 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.07 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
