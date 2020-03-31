@@ -15,7 +15,7 @@ class ServoMoteur : public ServoTimer2
 
     // constructeur avec numero de broche et debug si necessaire
     ServoMoteur( const byte pinCde, const byte pinRelais, const byte pinSecuriteHaute, const int pulseStop = 1500, const int pulseOuvFerm = 140,
-                 const int pulseReduit = 70,  boolean debug = false);
+                 const int pulseReduit = 100,  boolean debug = false);
 
     ~ServoMoteur(); // destructeur
 

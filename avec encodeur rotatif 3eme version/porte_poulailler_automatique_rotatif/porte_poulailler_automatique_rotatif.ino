@@ -64,13 +64,16 @@
            __TIME__  l'heure de la compilation                         chaîne
            __STDC__  1 si le compilateur est ISO, 0 sinon              entier
 */
+
+#define SERVO_TEST false// pour utiliser (true) ou non (false) le test du servomoteur
+
 /**-------boitiers......*/
 //#define BOITIER_N001  // boitier n1
-#define BOITIER_N002  // boitier n2
+//#define BOITIER_N002  // boitier n2
 //#define BOITIER_N003  // boitier n3
 //#define BOITIER_N004  // boitier n4
 //#define BOITIER_N005  // boitier n5
-//#define BOITIER_N006  // boitier n6
+#define BOITIER_N006  // boitier n6
 
 /*--------------------------------------------------------------------------------*/
 #if defined(BOITIER_N001)
@@ -95,12 +98,12 @@ const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
 #elif defined(BOITIER_N002)
 const char affichageBonjour[] PROGMEM = "   Porte N002   . Version 2.0.4  .Porte Poulailler.Manque carte RTC";
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
-#define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-#define SERVO_PULSE_OUVERTURE_FERMETURE  300  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
+#define SERVO_PULSE_OUVERTURE_FERMETURE  240  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 #define TEMPO_ENCODEUR  5  // tempo pour éviter les rebonds de l'encodeur ms
-#define FOURCHETTE_FERMETURE  16 // - pas de l'encodeur rotatif
-#define FOURCHETTE_OUVERTURE  12 // + pas de l'encodeur rotatif
+#define FOURCHETTE_FERMETURE  10 // - pas de l'encodeur rotatif
+#define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
 #define OFFSET_AREF -0.07 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
@@ -110,7 +113,7 @@ const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  40// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  15// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N003)
 const char numeroSerieBoitier[] = "N003;\0"; // numero de serie du boitier
@@ -173,7 +176,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// pcb lcm1602 with pcf8574t
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  55// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  25// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #else
 // parametres par defaut
@@ -231,7 +234,6 @@ Radio radio(PIN_RADIO_EMISSION, PIN_RADIO_EMISSION_SWITCH, RADIO_TRANSMISSION_VI
 
 /** servo - montée et descente de la porte */
 #include "ServoMoteur.h"
-#define SERVO_TEST false// pour utiliser ou non le test du servomoteur
 #define PIN_SERVO_CDE 8 // pin D8 cde du servo
 #define PIN_SERVO_RELAIS 4 // pin D4 relais du servo
 #define PIN_SECURITE_OUVERTURE 12 // pin D12 pour l'ouverture de porte
@@ -919,6 +921,7 @@ void  fermeturePorte() {
 */
 ///-----routine interruption D2 INT0------
 void myInterruptINT0() {
+    Serial.println("ok");
   if (!interruptEncodeur) {
     interruptEncodeur  = true; // pour prise en compte de l'it
     debutTempsEncodeur  = millis(); // pour éviter les rebonds sur le front descendant du signal
