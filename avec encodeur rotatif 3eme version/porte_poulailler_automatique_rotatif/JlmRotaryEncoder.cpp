@@ -36,7 +36,7 @@ void JlmRotaryEncoder::compteurRoueCodeuse(bool sens) {
   //Serial.print(pinA);
   //Serial.print(pinB);
   //Serial.println(" ");
-  Serial.println(m_compteRoueCodeuse);
+  //Serial.println(m_compteRoueCodeuse);
 
 }
 

@@ -79,29 +79,29 @@
 #if defined(BOITIER_N001)
 const char affichageBonjour[] PROGMEM = "   Porte N001   . Version 2.0.4  .Porte Poulailler.Manque carte RTC";
 const char numeroSerieBoitier[] = "N001;\0"; // numero de serie du boitier
-#define SERVO_PULSE_STOP 1500 // value should usually be 750 to 2200 (1500 = stop)
-#define SERVO_PULSE_OUVERTURE_FERMETURE  140  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
-#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
+#define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop)
+#define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
 #define TEMPO_ENCODEUR  5  // tempo pour éviter les rebonds de l'encodeur ms
 #define FOURCHETTE_FERMETURE  10 // - pas de l'encodeur rotatif
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
-#define OFFSET_AREF -0.08 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
+#define OFFSET_AREF -0.00 // offset de la tension de reference aref (1.1v), = +/-0.08v theorique
 #define SENS 1 // sens pour le compteur m_compteRoueCodeuse++; et m_compteRoueCodeuse--; de la classe JlmRotaryEncoder
 /// choisir entre un afficheur lcd I2C de type Digole (PICF182) ou de type LiquidCrystal (PCF8574)
 #define LCD_LIQIDCRYSTAL  // utilisation de lcd liquid crystal I2C - PCF8574
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  40// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  30// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N002)
 const char affichageBonjour[] PROGMEM = "   Porte N002   . Version 2.0.4  .Porte Poulailler.Manque carte RTC";
 const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
 #define SERVO_PULSE_STOP 1450 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
-#define SERVO_PULSE_OUVERTURE_FERMETURE  240  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
+#define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  160  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
-#define TEMPO_ENCODEUR  5  // tempo pour éviter les rebonds de l'encodeur ms
+#define TEMPO_ENCODEUR  15  // tempo pour éviter les rebonds de l'encodeur ms
 #define FOURCHETTE_FERMETURE  10 // - pas de l'encodeur rotatif
 #define FOURCHETTE_OUVERTURE  5 // + pas de l'encodeur rotatif
 #define LUMIERE_BOUCLES  4  //  boucles pour valider l'ouverture / fermeture avec la lumière (compteur watchdog)
@@ -113,7 +113,7 @@ const char numeroSerieBoitier[] = "N002;\0"; // numero de serie du boitier
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  15// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  30// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N003)
 const char numeroSerieBoitier[] = "N003;\0"; // numero de serie du boitier
@@ -133,7 +133,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  52// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  30// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N004)
 const char numeroSerieBoitier[] = "N004;\0"; // numero de serie du boitier
@@ -153,13 +153,13 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.2  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 #define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 //#define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  60// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  30// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 // BOITIER_N005 : le boitier n005 est un recepteur avec un montage electronique different.
 /*--------------------------------------------------------------------------------*/
 #elif defined(BOITIER_N006)
+const char affichageBonjour[] PROGMEM = "   Porte N006   . Version 2.0.4  .Porte Poulailler.Manque carte RTC";
 const char numeroSerieBoitier[] = "N006;\0"; // numero de serie du boitier
-const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte Poulailler.Manque carte RTC";
 #define SERVO_PULSE_STOP 1474 // value should usually be 750 to 2200 (1500 = stop), a tester pour chaque servo
 #define SERVO_PULSE_OUVERTURE_FERMETURE  220  // vitesse d'ouverture ou fermeture ( 1500 +/- 140)
 #define SERVO_PULSE_OUVERTURE_FERMETURE_REDUIT  100  // vitesse réduite d'ouverture ou fermeture ( 1500 +/- 100)
@@ -176,7 +176,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.3  .Porte
 /// pcb lcm1602 with pcf8574t
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  25// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  30// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #else
 // parametres par defaut
@@ -196,7 +196,7 @@ const char affichageBonjour[] PROGMEM = "Porte Poulailler. Version 2.0.x  .Porte
 /// Set the LCD address to 0x27 for a 16 chars and 2 line display pour pcf8574t / si pcf8574at alors l'adresse est 0x3f
 //#define PCF8574AT // liquid crystal i2c avec pcf8574at @03f
 #define PCF8574T // liquid crystal i2c avec pcf8574t @027
-#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  60// initialisation par defaut au demarrage de la valeur de fin de course fermeture
+#define ROUE_CODEUSE_POSITION_DEFAUT_FIN_DE_COURSE_FERMETURE  30// initialisation par defaut au demarrage de la valeur de fin de course fermeture
 /*--------------------------------------------------------------------------------*/
 #endif
 
@@ -921,7 +921,6 @@ void  fermeturePorte() {
 */
 ///-----routine interruption D2 INT0------
 void myInterruptINT0() {
-    Serial.println("ok");
   if (!interruptEncodeur) {
     interruptEncodeur  = true; // pour prise en compte de l'it
     debutTempsEncodeur  = millis(); // pour éviter les rebonds sur le front descendant du signal
