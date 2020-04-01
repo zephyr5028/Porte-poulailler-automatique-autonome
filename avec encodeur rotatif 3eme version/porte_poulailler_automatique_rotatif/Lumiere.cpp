@@ -115,20 +115,20 @@ byte Lumiere::declenchementServoLuminosite() {
 }
 
 //-----accesseur - getter-----
-byte Lumiere::get_m_ouverture() { // ajout manuel : bool Lumiere::get_m_ouverture() {
+byte Lumiere::get_m_ouverture() { // ajout manuel : 0:lumiere, 1:heure, 2:mamuel
   return m_ouverture;
 }
 //-----mutateur - setter-----
-void Lumiere::set_m_ouverture(byte ouverture) { // ajout manuel : void Lumiere::set_m_ouverture(bool ouverture) {
+void Lumiere::set_m_ouverture(byte ouverture) { // ajout manuel 
   m_ouverture = ouverture;
 }
 
 ///-----accesseur - getter-----
-byte Lumiere::get_m_fermeture() { // ajout manuel :  bool Lumiere::get_m_fermeture() {
+byte Lumiere::get_m_fermeture() { // ajout manuel : 0:lumiere, 1:heure, 2:mamuel
   return m_fermeture;
 }
 //-----mutateur - setter-----
-void Lumiere::set_m_fermeture(byte fermeture) { // ajout manuel : void Lumiere::set_m_fermeture(bool fermeture) {
+void Lumiere::set_m_fermeture(byte fermeture) { // ajout manuel
   m_fermeture = fermeture;
 }
 

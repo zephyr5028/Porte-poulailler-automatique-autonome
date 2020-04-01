@@ -19,8 +19,8 @@ ServoMoteur::~ServoMoteur()
 
 ///-----initialisation-----
 void ServoMoteur::init () {
-  pinMode(m_pinRelais, OUTPUT); // relais servo's pin  an OUTPUT
-  digitalWrite(m_pinRelais, LOW); // mise hors tension du relais du servo
+  digitalWrite(m_pinRelais, LOW); // mise hors tension du relais du servo (activation resistance de rappel avant l'activation de la broche de sortie)
+  pinMode(m_pinRelais, OUTPUT); // relais servo's pin  an OUTPUT (pour eviter de cliqueter le relais)
   ServoTimer2::attach(m_pinCde); // use digital pin for commande du servo
   // on démarre à une valeur censée être la moitié de l'excursion totale de l'angle réalisé par le servomoteur
   ServoTimer2::write(m_pulseStop);  // value should usually be 750 to 2200 (environ 1500 = stop)

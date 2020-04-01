@@ -336,7 +336,7 @@ LcdPCF8574  mydisp(0x3f, 16, 2);
 
 /** RTC_DS3231 */
 #include "HorlogeDS3232.h"
-#define MSECOND   1000
+#define MSECOND   1000UL    // le UL precise  que 1000 est un unsigned long
 #define MMINUTE   60*MSECOND
 #define MHOUR     60*MMINUTE
 #define MDAY      24*MHOUR
@@ -508,8 +508,8 @@ void affiTensionBatServo() {
 
 /* choix pour l'ouverture et la fermeture :
    - lumiere == 0
-   - manuel == 2
-   - heure == 1    
+   - heure == 1 
+   - manuel == 2  
 */
 ///------affichage du choix de l'ouverture et la fermeture------
 void affiChoixOuvFerm() {
@@ -1178,7 +1178,7 @@ void routineGestionWatchdog() {
         //tools.fonctionnementBuzzer(lum.get_m_compteurWatchdogLumiere(), 2000) ;
         if (BUZZER) {
           //si le compteur est > 1, la porte ouverte, le buzzer fonctionne
-          if ((lum.get_m_compteurWatchdogLumiere() > 1)  and !monServo.get_m_ouvFerm()) {
+          if ((lum.get_m_compteurWatchdogLumiere() > 1)  and !monServo.get_m_ouvFerm() and (lum.get_m_fermeture() == 0)) { // choix fermeture lumiere
             digitalWrite(BUZZER_PIN, LOW);
             delay(2000);
             digitalWrite(BUZZER_PIN, HIGH);

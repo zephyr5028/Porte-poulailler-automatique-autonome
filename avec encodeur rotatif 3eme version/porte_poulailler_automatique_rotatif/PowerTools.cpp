@@ -72,8 +72,8 @@ byte PowerTools::tailleChaine (char * chaine) {
 ///-----initialisation du buzzer et test----
 void PowerTools::setupBuzzer (int temps) {
   if (m_buzzer) {
-    pinMode(m_buzzer_pin, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
     digitalWrite(m_buzzer_pin, HIGH);
+    pinMode(m_buzzer_pin, OUTPUT); // buzzer 3,5 à 5,5v <25ma 2300hz +/-500hz
     digitalWrite(m_buzzer_pin, LOW);
     delay(temps);
     digitalWrite(m_buzzer_pin, HIGH);

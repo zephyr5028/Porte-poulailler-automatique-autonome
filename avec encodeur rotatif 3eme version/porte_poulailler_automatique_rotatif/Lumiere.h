@@ -27,9 +27,9 @@ class Lumiere  :  public PowerTools
     //non Declenchement Position Servo et mise à jour du compteur watchdog lumiere
     void nonDeclenchementPositionServo (volatile unsigned int compteRoueCodeuse, unsigned int finDeCourseFermeture, unsigned int finDeCourseOuverture);
     byte declenchementServoLuminosite();//declenchement servo par la luminosite
-    byte get_m_ouverture();  // ajout manuel : bool get_m_ouverture();
+    byte get_m_ouverture();  // ajout manuel : byte get_m_ouverture(); 0:lumiere, 1:heure, 2:mamuel
     void set_m_ouverture(byte ouverture); // ajout manuel : void set_m_ouverture(bool ouverture);
-    byte get_m_fermeture();// ajout manuel : bool get_m_fermeture();
+    byte get_m_fermeture();// ajout manuel : byte get_m_fermeture();  0:lumiere, 1:heure, 2:mamuel
     void set_m_fermeture(byte fermeture);// ajout manuel : void set_m_fermeture(bool fermeture);
     unsigned int get_m_lumMatin();
     void set_m_lumMatin(unsigned int lumMatin);
