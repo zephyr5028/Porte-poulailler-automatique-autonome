@@ -340,6 +340,28 @@ LcdPCF8574  mydisp(0x3f, 16, 2);
 #define MMINUTE   60*MSECOND
 #define MHOUR     60*MMINUTE
 #define MDAY      24*MHOUR
+// DS3232 Register Addresses
+#define RTC_SECONDS 0x00
+#define RTC_MINUTES 0x01
+#define RTC_HOURS 0x02
+#define RTC_DAY 0x03
+#define RTC_DATE 0x04
+#define RTC_MONTH 0x05
+#define RTC_YEAR 0x06
+#define ALM1_SECONDS 0x07
+#define ALM1_MINUTES 0x08
+#define ALM1_HOURS 0x09
+#define ALM1_DAYDATE 0x0A
+#define ALM2_MINUTES 0x0B
+#define ALM2_HOURS 0x0C
+#define ALM2_DAYDATE 0x0D
+#define RTC_CONTROL 0x0E
+#define RTC_STATUS 0x0F
+#define RTC_AGING 0x10
+#define RTC_TEMP_MSB 0x11
+#define RTC_TEMP_LSB 0x12
+#define SRAM_START_ADDR 0x14 // first SRAM address
+#define SRAM_SIZE 236 // number of bytes of SRAM
 const byte rtcINT = 5; // digital pin D5 as l'interruption du rtc ( alarme)
 const byte adresseBoitier24C32 = 0x57;// adresse du boitier memoire eeprom 24c32
 const byte jourSemaine = 1, jour = 2, mois = 3, annee = 4, heure = 5, minutes = 6, secondes = 7;
@@ -1362,5 +1384,3 @@ void loop() {
 
   routineGestionWatchdog(); // routine de gestion du watchdog
 }
-
-

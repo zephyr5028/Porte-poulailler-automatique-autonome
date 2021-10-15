@@ -8,7 +8,7 @@
 
 #include <Wire.h>
 #include <DS3232RTC.h>    //http://github.com/JChristensen/DS3232RTC
-#include <Time.h>         //http://www.arduino.cc/playground/Code/Time  
+//#include <TimeLib.h>         //http://www.arduino.cc/playground/Code/Time  
 #define DS3231_I2C_ADDRESS 0x68
 #include "Arduino.h"
 
@@ -63,4 +63,3 @@ class HorlogeDS3232 : public DS3232RTC
 };
 
 #endif
-
